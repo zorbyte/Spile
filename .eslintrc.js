@@ -1,3 +1,7 @@
+// Copyright (C) GAwesomeBot Authors, this is a modification of https://github.com/GAwesomeBot/bot/blob/development/.eslintrc.js
+// with the modification of some rules such as indents and the addition of other configurations, plugins for the linting
+// of TypeScript and the upholding of code style opinions elsewhere in the project, of which is licensed under the LGPL-3.0.
+
 module.exports = {
   extends: [
     "eslint:recommended",
