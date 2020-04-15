@@ -1,5 +1,5 @@
 {
-  "name": "netherite",
+  "name": "spile",
   "version": "0.0.1",
   "description": "A Minecraft Server written in TypeScript.",
   "main": "./dist/index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zorbyte/Netherite.git"
+    "url": "git+https://github.com/SpileMC/Spile.git"
   },
   "keywords": [
     "minecraft",
@@ -23,9 +23,9 @@
   "author": "zorbyte",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/zorbyte/Netherite/issues"
+    "url": "https://github.com/SpileMC/Spile/issues"
   },
-  "homepage": "https://github.com/zorbyte/Netherite#readme",
+  "homepage": "https://github.com/SpileMC/Spile#readme",
   "devDependencies": {
     "@types/chalk": "^2.2.0",
     "@types/node": "^13.11.1",
