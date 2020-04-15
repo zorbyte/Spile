@@ -1,8 +1,6 @@
-# Netherite Server
+# Spile Server
 
-> Please not that the name of this project is still under debate.
-
-Netherite is a Minecraft Java edition game server, that is written from scratch in TypeScript using Node.js.
+Spile is a Minecraft Java edition game server, that is written from scratch in TypeScript using Node.js.
 
 ## Project structure
 
