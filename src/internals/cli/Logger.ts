@@ -3,14 +3,14 @@ import SonicBoom from "sonic-boom";
 import ora from "ora";
 import { formatWithOptions } from "util";
 import { WriteStream } from "tty";
-import { REPLServer } from "repl";
-import createREPL from "./createREPL";
+import { createInterface, Interface } from "readline";
+import Environment from "../../modules/Environment";
 
-interface MethodColours {
+interface IMethodColours {
   [k: string]: chalk.Chalk;
 }
 
-interface ConsoleLogMethods {
+interface IConsoleLogMethods {
   debug(...any: any[]): void;
   info(...any: any[]): void;
   warn(...any: any[]): void;
@@ -19,60 +19,75 @@ interface ConsoleLogMethods {
 
 // Used for type checking on class building.
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface LoggerMethods extends ConsoleLogMethods { }
+interface ILoggerMethods extends IConsoleLogMethods { }
 
 // Used to superimpose methods over the Logger class.
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Logger extends LoggerMethods { }
+interface Logger extends ILoggerMethods { }
 
-export enum LoggerLevels {
+export enum ELoggerLevels {
   DEBUG,
   INFO,
   WARN,
   ERROR,
 }
 
-interface ColourOption {
+interface IColourOption {
   colors?: boolean;
 }
 
+export function calculateLevel(env: typeof Environment): number {
+  return Math.min(env.debugSig, env.devSig, 1);
+}
+
 class Logger {
-  public methodColours: MethodColours = {
+  public methodColours: IMethodColours = {
     debug: chalk.grey,
     info: chalk.cyan,
     warn: chalk.yellow,
     error: chalk.red,
   };
 
-  private stdout: SonicBoom;
+  private stdout: SonicBoom;;
   private currentOra: ora.Ora | null = null;
-  private repl?: REPLServer;
+  private rl?: Interface;
 
   // 1 should only be used in production! Use 0 in development.
   // These still work as numbers, but I recommend you use the enum.
-  public constructor(levelMin = LoggerLevels.INFO) {
+  public constructor(public name?: string | ELoggerLevels, levelMin: string | ELoggerLevels = ELoggerLevels.INFO, fd?: string) {
+    /* eslint-disable no-param-reassign */
+    const nameType = typeof this.name;
+    if (nameType === "undefined" && typeof levelMin === "undefined") levelMin = ELoggerLevels.INFO;
+    if (this.name in ELoggerLevels) levelMin = this.name;
+    // @ts-ignore
+    else if (nameType === "string") this.name = this.name.toLowerCase();
+    /* eslint-enable no-param-reassign */
+
     let i = 0;
 
-    this.stdout = new SonicBoom({ fd: (process.stdout as unknown as { fd: number }).fd } as unknown as string);
+    this.stdout = new SonicBoom({ fd: fd || (process.stdout as unknown as { fd: number; }).fd } as unknown as string);
 
     const stdoutColours = this.checkColourSupport(process.stdout);
-    const stderrColours = this.checkColourSupport(process.stderr);
+    this.stdout.on("drain", () => {
+      if (this.rl) {
+        this.rl.prompt(true);
+      }
+    });
 
     for (const [lvl, colFn] of Object.entries(this.methodColours)) {
       const levelIndex = i;
 
-      this[lvl as keyof LoggerMethods] = (...args: any[]) => {
+      this[lvl as keyof ILoggerMethods] = (...args: any[]) => {
         if (levelIndex >= levelMin) {
           let logStr = formatWithOptions(
-            lvl === "error" ? stderrColours : stdoutColours,
+            stdoutColours,
             this.formatString(lvl, colFn),
             ...args,
           );
-          logStr += "\n";
 
-          logStr = `\r${logStr}`;
+          logStr = `\r${logStr}\n`;
+
           this.stdout.write(logStr);
-          if (this.repl) this.repl.displayPrompt();
         }
       };
 
@@ -80,18 +95,26 @@ class Logger {
     }
   }
 
-  public formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {
-    const currentTime = new Date();
-    return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))} ${colourMethod(levelName)}`;
-  }
-
   public startREPL() {
-    this.repl = createREPL(this, this.stdout);
+    this.rl = createInterface({
+      input: process.stdin,
+      output: process.stderr,
+      prompt: `${chalk.blue(">")} `,
+      crlfDelay: Infinity,
+    });
+
+    this.rl.prompt();
+
+    this.rl.on("line", line => this.debug("Line sent to Readline:", line));
   }
 
   public start(text?: string): void {
     if (this.currentOra) this.stopSpinner();
     this.currentOra = ora({ text, spinner: "dots" }).start();
+  }
+
+  public update(text: string): void {
+    if (this.currentOra) this.currentOra.text = text;
   }
 
   public stopSpinner(): void {
@@ -106,7 +129,12 @@ class Logger {
     return this;
   }
 
-  private checkColourSupport(stream: WriteStream): ColourOption | {} {
+  private formatString(levelName: keyof IMethodColours, colourMethod: chalk.Chalk): string {
+    const currentTime = new Date();
+    return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${chalk.green(this.name)}` : ""} ${colourMethod(levelName)}`;
+  }
+
+  private checkColourSupport(stream: WriteStream): IColourOption | {} {
     return stream.isTTY && (typeof stream.getColorDepth === "function" ? stream.getColorDepth() > 2 : true) ?
       { colors: true } :
       {};

@@ -27,6 +27,6 @@
     "target": "es2019",
     "skipLibCheck": true
   },
-  "exclude": ["node_modules"],
-  "include": ["src/**/*", "testing"]
+  "exclude": ["node_modules", "experiments"],
+  "include": ["src/**/*", "testing", "experiments/generateHash.js", "experiments/generateHash.d.ts"]
 }

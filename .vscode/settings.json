@@ -3,5 +3,6 @@
     "Destructurable",
     "Minecraft",
     "Netherite"
-  ]
+  ],
+  "eslint.enable": true
 }

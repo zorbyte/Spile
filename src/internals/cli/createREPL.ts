@@ -5,6 +5,7 @@ import { WriteStream } from "tty";
 import { Transform } from "stream";
 import chalk from "chalk";
 
+// TODO: This needs to be rewritten from scratch.
 function createREPL(log: Logger, stdout: SonicBoom): REPLServer {
   let missingDot = false;
   const filteredStream = new Transform({
@@ -26,7 +27,7 @@ function createREPL(log: Logger, stdout: SonicBoom): REPLServer {
     useColors: true,
     useGlobal: false,
     eval: (cmdStr, _, __, cb) => {
-      if (/^\r?\n|\r$/g.test(cmdStr)) return cb(null, undefined);
+      if (/^\r?\n|\r$/g.test(cmdStr)) return cb(null, void 0);
       let cmd = cmdStr.replace(/\r?\n|\r/, "");
       if (missingDot) {
         cmd = `.${cmd}`;

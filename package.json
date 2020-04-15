@@ -38,6 +38,9 @@
     "eslint-plugin-promise": "^4.2.1",
     "typescript": "^3.8.3"
   },
+  "optionalDependencies": {
+    "java": "^0.12.1"
+  },
   "dependencies": {
     "chainfetch": "^1.2.2",
     "chalk": "^4.0.0",

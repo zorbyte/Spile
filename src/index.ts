@@ -1,23 +1,56 @@
 import Logger from "./internals/cli/Logger";
-import Environment from "./Environment";
+import Environment from "./modules/Environment";
+import createServer from "./internals/server/createServer";
+// import { join } from "path";
+import { generateKeyPair } from "crypto";
+// import { Worker, SHARE_ENV } from "worker_threads";
 
-const log = new Logger(Math.min(Environment.debugSig, Environment.devSig, 1));
+const log = new Logger("Master", Math.min(Environment.debugSig, Environment.devSig, 1));
 
 const { dev } = Environment.get();
 
-// Implicit debug.
-log.debug(`Starting server in ${dev ? "development" : "debug"} mode.`);
-log.info("Starting the Netherite Minecraft Server.");
-log.start("Starting server...");
+(async () => {
+  // Implicit debug.
+  log.debug(`Starting server in ${dev ? "development" : "debug"} mode.`);
+  log.info("Starting the Spile Minecraft Server.");
+  log.start("Generating keypair...");
 
-// log.debug("Version Metadata not found, skipping update check!");
+  // @ts-ignore
+  const _key = await new Promise((resolve, reject) => generateKeyPair("rsa", {
+    modulusLength: 1024,
+    publicKeyEncoding: {
+      type: "spki",
+      format: "der",
+    },
+    privateKeyEncoding: {
+      type: "pkcs8",
+      format: "pem",
+      cipher: "aes-256-cbc",
+      passphrase: "SpileForTheBoys???",
+    },
+  }, (err, publicKey, _privateKey) => {
+    if (err) return reject(err);
+    log.info("Successfully generated keypair.");
+    resolve(publicKey);
+  }));
 
-log.warn("Offline mode is enabled, Yggdrasil will not be used for Authentication.");
-log.error(new Error("Something?"));
+  // log.debug("Version Metadata not found, skipping update check!");
 
-setTimeout(() => log.stop.startREPL(), 3000);
+  log.warn("Offline mode is enabled, Yggdrasil will not be used for Authentication.");
 
-// cluster.fork();
+  log.update("Opening server...");
+  await createServer(log);
+  log.info("Successfully opened server on port 25565.");
 
-// Setup routine, minecraft runs at 50Hz or 20ms per tick.
-// If the Δt <= 1ms.
+  log.stop.startREPL();
+
+  log.info("Spawning in game tick worker.");
+
+  // @ts-ignore
+  // const worker = new Worker(join(__dirname, "internals", "game", "gameLoop.js"), { env: SHARE_ENV, stdout: true, workerData: { fd: process.stdout.fd } });
+
+  // cluster.fork();
+
+  // Setup routine, minecraft runs at 50Hz or 20ms per tick.
+  // If the Δt <= 1ms.
+})();
