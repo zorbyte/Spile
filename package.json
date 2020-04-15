@@ -1,0 +1,48 @@
+{
+  "name": "netherite",
+  "version": "0.0.1",
+  "description": "A Minecraft Server written in TypeScript.",
+  "main": "./dist/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "tsc && cross-env DEVELOPMENT=1 node .",
+    "lint": "eslint src/**/*.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zorbyte/Netherite.git"
+  },
+  "keywords": [
+    "minecraft",
+    "server",
+    "typescript",
+    "threaded"
+  ],
+  "author": "zorbyte",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zorbyte/Netherite/issues"
+  },
+  "homepage": "https://github.com/zorbyte/Netherite#readme",
+  "devDependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/node": "^13.11.1",
+    "@types/sonic-boom": "^0.7.0",
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
+    "cross-env": "^7.0.2",
+    "eslint": "^6.8.0",
+    "eslint-config-alloy": "^3.6.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "chainfetch": "^1.2.2",
+    "chalk": "^4.0.0",
+    "node-fetch": "^2.6.0",
+    "ora": "^4.0.3",
+    "sonic-boom": "^1.0.1"
+  }
+}
