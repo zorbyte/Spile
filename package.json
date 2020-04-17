@@ -3,13 +3,10 @@
   "version": "0.0.1",
   "description": "A Minecraft Server written in TypeScript.",
   "main": "./dist/index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
-    "test": "tsc --project src/tsconfig.json && cross-env DEVELOPMENT=1 node .",
-    "preview": "node fuse.js preview",
-    "build": "node fuse.js build",
+    "dev": "tsc && cross-env DEVELOPMENT=1 node .",
+    "build": "gulp build",
+    "tsBuild": "tsc --project temp/tsconfig.json",
     "lint": "eslint src/**/*.ts"
   },
   "repository": {
@@ -36,21 +33,23 @@
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
     "cross-env": "^7.0.2",
-    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-config-alloy": "^3.6.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-simple-import-sort": "^5.0.2",
-    "fuse-box": "^4.0.0-next.426",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-cli": "^2.2.0",
+    "gulp-json-transform": "^0.4.7",
+    "gulp-terser": "^1.2.0",
+    "gulp-ts-alias": "^1.1.0",
     "module-alias": "^2.2.2",
     "typescript": "^3.8.3"
-  },
-  "optionalDependencies": {
-    "java": "^0.12.1"
   },
   "dependencies": {
     "chainfetch": "^1.2.2",
     "chalk": "^4.0.0",
+    "dotenv": "^8.2.0",
     "node-fetch": "^2.6.0",
     "ora": "^4.0.3",
     "sonic-boom": "^1.0.1"
