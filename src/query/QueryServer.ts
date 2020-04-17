@@ -19,14 +19,26 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-console */
+import Spile from "@lib/Spile";
+import AnyServer from "@lib/types/AnyServer";
 
+/**
+ * This doesn't extend SimpleServer because it listens on the same port as the main server.
+ */
+class QueryServer implements AnyServer {
+  private log = this.spile.log.child("query");
 
-import Environment from "./lib/structures/Environment";
+  public constructor(private spile: Spile) {
+    this.log.info("Starting dummy query server.");
+  }
 
-(async () => {
-  if (Environment) await import("module-alias/register");
-  const Spile = await (await import("./lib/Spile")).default;
-  await (new Spile()).start();
-})().catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));
+  public async listen(): Promise<void> {
+    this.log.info("Dummy query server is \"listening\"!");
+  }
 
+  public async close(): Promise<void> {
+    this.log.info("Dummy query server is \"closing\"!");
+  }
+}
+
+export default QueryServer;

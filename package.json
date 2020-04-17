@@ -7,7 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "tsc && cross-env DEVELOPMENT=1 node .",
+    "test": "tsc --project src/tsconfig.json && cross-env DEVELOPMENT=1 node .",
+    "preview": "node fuse.js preview",
+    "build": "node fuse.js build",
     "lint": "eslint src/**/*.ts"
   },
   "repository": {
@@ -21,21 +23,26 @@
     "threaded"
   ],
   "author": "zorbyte",
-  "license": "LGPL-3.0",
+  "license": "LGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/SpileMC/Spile/issues"
   },
   "homepage": "https://github.com/SpileMC/Spile#readme",
   "devDependencies": {
     "@types/chalk": "^2.2.0",
+    "@types/dotenv": "^8.2.0",
     "@types/node": "^13.11.1",
     "@types/sonic-boom": "^0.7.0",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
     "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
     "eslint": "^6.8.0",
     "eslint-config-alloy": "^3.6.0",
     "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-simple-import-sort": "^5.0.2",
+    "fuse-box": "^4.0.0-next.426",
+    "module-alias": "^2.2.2",
     "typescript": "^3.8.3"
   },
   "optionalDependencies": {
@@ -47,5 +54,11 @@
     "node-fetch": "^2.6.0",
     "ora": "^4.0.3",
     "sonic-boom": "^1.0.1"
+  },
+  "_moduleAliases": {
+    "@root": "./dist",
+    "@lib": "./dist/lib",
+    "@util": "./dist/lib/util",
+    "@structs": "./dist/lib/structures"
   }
 }

@@ -19,14 +19,4 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-console */
-
-
-import Environment from "./lib/structures/Environment";
-
-(async () => {
-  if (Environment) await import("module-alias/register");
-  const Spile = await (await import("./lib/Spile")).default;
-  await (new Spile()).start();
-})().catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));
-
+export const VERSION = "0.0.1";

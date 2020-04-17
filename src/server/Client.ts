@@ -19,14 +19,26 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-console */
+import { EventEmitter } from "events";
+import { Socket } from "net";
 
+export enum State {
+  SHAKE,
+  STATS,
+  LOGIN,
+  PLAY,
+}
 
-import Environment from "./lib/structures/Environment";
+class Client extends EventEmitter {
+  public state = State.SHAKE;
 
-(async () => {
-  if (Environment) await import("module-alias/register");
-  const Spile = await (await import("./lib/Spile")).default;
-  await (new Spile()).start();
-})().catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));
+  public constructor(private socket: Socket) {
+    super();
+    // Consider disabling Naggle's algorithm if the latency isn't good.
+    // this.socket.setNoDelay(true);
+    // @ts-ignore
+    this.socket.on("data", (data: Uint8Array) => { /* noop */ }); // eslint-disable-line no-inline-comments
+  }
+}
 
+export default Client;

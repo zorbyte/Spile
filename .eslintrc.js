@@ -1,6 +1,27 @@
-// Copyright (C) GAwesomeBot Authors, this is a modification of https://github.com/GAwesomeBot/bot/blob/development/.eslintrc.js
-// with the modification of some rules such as indents and the addition of other configurations, plugins for the linting
-// of TypeScript and the upholding of code style opinions elsewhere in the project, of which is licensed under the LGPL-3.0.
+/**
+ * @license (GPL-2.0)
+ * Copyright (C) 2020  GAwesomeBot Authors
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * 
+ * @url https://github.com/GAwesomeBot/bot/blob/development/.eslintrc.js
+ * 
+ * Modifications are as follows:
+ * Rules such as indents and the addition of other configurations, plugins for the linting
+ * of TypeScript and the upholding of code style opinions elsewhere in the project, of which is licensed under the LGPL-3.0.
+ */
 
 module.exports = {
   extends: [
@@ -8,11 +29,38 @@ module.exports = {
     "alloy",
     "alloy/typescript",
   ],
-  plugins: ["promise"],
+  plugins: ["promise", "simple-import-sort"],
   env: {
     node: true,
   },
   rules: {
+    "constructor-super": "off",
+    "simple-import-sort/sort": [
+      "error",
+      {
+        groups: [
+          // Side effect imports.
+          ["^\\u0000"],
+
+          // Node.js builtins.
+          [
+            `^(${require("module").builtinModules.join("|")})(/|$)`,
+          ],
+
+          // Internal packages.
+          ["^(@|@structs|@lib|@root|@utils)(/.*|$)"],
+
+          // Namespaced packages.
+          ["^@?\\w"],
+
+          // Parent imports. Put `..` last.
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+
+          // Other relative imports. Put same-folder imports and `.` last.
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+        ],
+      },
+    ],
     "no-extra-parens": "off",
     "@typescript-eslint/no-extra-parens": ["warn", "all", { nestedBinaryExpressions: false }],
     "accessor-pairs": "warn",
@@ -26,7 +74,7 @@ module.exports = {
     "@typescript-eslint/no-empty-function": ["error"],
     "no-floating-decimal": "error",
     "no-implied-eval": "error",
-    "no-invalid-this": "error",
+    // "@typescript-eslint/no-invalid-this": "error", (Pretty sure TypeScript handles this).
     "no-lone-blocks": "error",
     "no-multi-spaces": "error",
     "no-new-func": "error",
@@ -38,7 +86,8 @@ module.exports = {
     "no-self-compare": "error",
     "no-sequences": "error",
     "no-unmodified-loop-condition": "error",
-    "no-unused-expressions": ["error", { "allowShortCircuit": true }],
+    "no-unused-expressions": "off",
+    "@typescript-eslint/no-unused-expressions": ["error", { "allowShortCircuit": true }],
     "no-useless-call": "error",
     "no-useless-concat": "error",
     "no-useless-escape": "error",
@@ -68,6 +117,7 @@ module.exports = {
     "indent": ["error", 2, { SwitchCase: 1 }],
     "key-spacing": "error",
     "keyword-spacing": "error",
+    "no-param-reassign": "off",
     "max-params": "off",
     "max-depth": ["error", 8],
     "max-len": ["error", 200, 2],
@@ -94,7 +144,7 @@ module.exports = {
     "quote-props": ["error", "as-needed"],
     "quotes": ["error", "double", { avoidEscape: true, allowTemplateLiterals: true }],
     "semi-spacing": "error",
-    "semi": "error",
+    "@typescript-eslint/semi": "error",
     "space-before-blocks": "error",
     "space-before-function-paren": ["error", {
       "anonymous": "never",
@@ -136,7 +186,7 @@ module.exports = {
     "template-curly-spacing": "error",
     "yield-star-spacing": "error",
     "promise/no-return-wrap": "error",
-    "promise/catch-or-return": "error",
+    "promise/catch-or-return": "off",
     "promise/no-native": "off",
     "promise/no-nesting": "warn",
     "promise/no-promise-in-callback": "warn",
@@ -146,6 +196,7 @@ module.exports = {
     "require-atomic-updates": "off",
     "no-useless-catch": "off",
     "no-prototype-builtins": "off",
-    "@typescript-eslint/no-parameter-properties": "off"
+    "@typescript-eslint/no-parameter-properties": "off",
+    "@typescript-eslint/explicit-function-return-type": ["error", { allowExpressions: true }]
   },
 };

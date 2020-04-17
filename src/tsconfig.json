@@ -1,0 +1,17 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"outDir": "../dist",
+		"rootDir": ".",
+		"baseUrl": ".",
+		"paths": {
+      "@structs/*": ["lib/structures/*"],
+			"@utils/*": ["lib/utils/*"],
+			"@lib/*": ["lib/*"],
+			"@root/*": ["*"]
+		},
+		"composite": true,
+		"declaration": true
+	},
+	"include": ["./**/*"]
+}

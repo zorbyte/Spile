@@ -16,10 +16,8 @@
   along with this program.  If not, see <https: //www.gnu.org/licenses/>.
 -->
 
-# Spile Server
+# THIS IS NOT A PLUGINS FOLDER!!!
 
-Spile is a Minecraft Java edition game server, that is written from scratch in TypeScript using Node.js.
+Well, technically it is, but it's the internal plugins used by the server. Your plugins should be installed as a dependency and added to the `plugins` field on the `package.json` file.
 
-## License
-
-This project is licensed under the LGPL-3.0 license. Please check the [LICENSE](./LICENSE) for more information.
+Don't modify any of these unless you know exactly what you are doing!

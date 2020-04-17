@@ -19,14 +19,29 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-console */
+import { Server } from "http";
 
+import Spile from "@lib/Spile";
+import SimpleServer from "@structs/base/SimpleServer";
 
-import Environment from "./lib/structures/Environment";
+class RConServer extends SimpleServer<Server> {
+  protected server = new Server();
 
-(async () => {
-  if (Environment) await import("module-alias/register");
-  const Spile = await (await import("./lib/Spile")).default;
-  await (new Spile()).start();
-})().catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));
+  public constructor(spile: Spile) {
+    // TODO: Use the config to get this value.
+    super("rcon", 25575, spile);
+  }
 
+  public async listen(): Promise<void> {
+    await this._listen();
+    this.log.info(`Rcon server listening on ${this.port}.`);
+  }
+
+  public async close(): Promise<void> {
+    this.log.debug("Closing rcon server.");
+    await this._close();
+    this.log.info("Closed rcon server.");
+  }
+}
+
+export default RConServer;
