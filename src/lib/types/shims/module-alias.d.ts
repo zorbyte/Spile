@@ -9,7 +9,7 @@
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * @url https://github.com/skyra-project/skyra/blob/master/src/lib/types/shims/module-alias.d.ts
- * This file was found in Skyra project by Antonio Román.
+ * This file was sourced from the Skyra project by Antonio Román.
  */
 
 declare module "module-alias/register" {
