@@ -15,7 +15,7 @@ const { dev } = Environment.get();
   log.info("Starting the Spile Minecraft Server.");
   log.start("Generating keypair...");
 
-  // @ts-ignore
+  // @ts-ignore Unused variable...
   const _key = await new Promise((resolve, reject) => generateKeyPair("rsa", {
     modulusLength: 1024,
     publicKeyEncoding: {
@@ -50,7 +50,6 @@ const { dev } = Environment.get();
   // const worker = new Worker(join(__dirname, "internals", "game", "gameLoop.js"), { env: SHARE_ENV, stdout: true, workerData: { fd: process.stdout.fd } });
 
   // cluster.fork();
-
-  // Setup routine, minecraft runs at 50Hz or 20ms per tick.
-  // If the Δt <= 1ms.
-})();
+})().catch(err => {
+  log.error("An error occurred while starting!", err);
+});
