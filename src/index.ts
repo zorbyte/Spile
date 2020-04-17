@@ -25,7 +25,7 @@ import Environment from "./lib/structures/Environment";
 
 (async () => {
   if (Environment) await import("module-alias/register");
-  const Spile = await (await import("./lib/Spile")).default;
+  const Spile = await (await import("@lib/Spile")).default;
   await new Spile().start();
 })().catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));
 
