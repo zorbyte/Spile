@@ -22,7 +22,8 @@ module.exports = {
     "dot-notation": "error",
     "eqeqeq": "error",
     "no-console": "error",
-    "no-empty-function": "error",
+    "no-empty-function": "off",
+    "@typescript-eslint/no-empty-function": ["error"],
     "no-floating-decimal": "error",
     "no-implied-eval": "error",
     "no-invalid-this": "error",
@@ -111,7 +112,7 @@ module.exports = {
     "no-undefined": "error",
     "no-duplicate-imports": "error",
     "no-useless-computed-key": "error",
-    "no-useless-constructor": "error",
+    "no-useless-constructor": "off",
     "prefer-arrow-callback": "error",
     "prefer-const": ["error", { destructuring: "all" }],
     "prefer-destructuring": ["error", {

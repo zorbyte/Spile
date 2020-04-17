@@ -44,7 +44,7 @@ const { dev } = Environment.get();
 
   log.stop.startREPL();
 
-  log.info("Spawning in game tick worker.");
+  // log.info("Spawning in game tick worker.");
 
   // @ts-ignore
   // const worker = new Worker(join(__dirname, "internals", "game", "gameLoop.js"), { env: SHARE_ENV, stdout: true, workerData: { fd: process.stdout.fd } });

@@ -41,6 +41,9 @@ export function calculateLevel(env: typeof Environment): number {
 }
 
 class Logger {
+  public static stdout?: SonicBoom;
+  private static rl?: Interface;
+
   public methodColours: IMethodColours = {
     debug: chalk.grey,
     info: chalk.cyan,
@@ -48,9 +51,7 @@ class Logger {
     error: chalk.red,
   };
 
-  private stdout: SonicBoom;;
   private currentOra: ora.Ora | null = null;
-  private rl?: Interface;
 
   // 1 should only be used in production! Use 0 in development.
   // These still work as numbers, but I recommend you use the enum.
@@ -65,12 +66,14 @@ class Logger {
 
     let i = 0;
 
-    this.stdout = new SonicBoom({ fd: fd || (process.stdout as unknown as { fd: number; }).fd } as unknown as string);
+    if (!Logger.stdout) {
+      Logger.stdout = new SonicBoom({ fd: fd || (process.stdout as unknown as { fd: number; }).fd } as unknown as string);
+    }
 
     const stdoutColours = this.checkColourSupport(process.stdout);
-    this.stdout.on("drain", () => {
-      if (this.rl) {
-        this.rl.prompt(true);
+    Logger.stdout.on("drain", () => {
+      if (Logger.rl) {
+        Logger.rl.prompt(true);
       }
     });
 
@@ -87,7 +90,7 @@ class Logger {
 
           logStr = `\r${logStr}\n`;
 
-          this.stdout.write(logStr);
+          Logger.stdout.write(logStr);
         }
       };
 
@@ -96,16 +99,16 @@ class Logger {
   }
 
   public startREPL() {
-    this.rl = createInterface({
+    Logger.rl = createInterface({
       input: process.stdin,
       output: process.stderr,
       prompt: `${chalk.blue(">")} `,
       crlfDelay: Infinity,
     });
 
-    this.rl.prompt();
+    Logger.rl.prompt();
 
-    this.rl.on("line", line => this.debug("Line sent to Readline:", line));
+    Logger.rl.on("line", line => this.debug("Line sent to Readline:", line));
   }
 
   public start(text?: string): void {
