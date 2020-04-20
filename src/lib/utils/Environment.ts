@@ -25,6 +25,7 @@ type CacheMap = Record<string, CacheItem>;
 interface Destructurable {
   dev: boolean;
   debug: boolean;
+  normal: boolean;
 }
 
 class Environment {
@@ -42,7 +43,12 @@ class Environment {
     return {
       dev: this.dev,
       debug: this.debug,
+      normal: this.normal,
     };
+  }
+
+  public static get normal(): boolean {
+    return !this.dev && !this.debug;
   }
 
   public static get dev(): boolean {
@@ -54,7 +60,7 @@ class Environment {
   }
 
   public static get debugSig(): number {
-    const debugSig = (): number => parseInt(process.env.NETHERITE_DEBUG ?? "2") - 1;
+    const debugSig = (): number => parseInt(process.env.S_DEBUG ?? "2") - 1;
     return this.getOrSetCache("debugSig", debugSig);
   }
 

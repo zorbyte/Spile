@@ -26,16 +26,21 @@ const { src, dest, task, series, parallel } = require("gulp");
 const alias = require("gulp-ts-alias");
 const jsonTransform = require("gulp-json-transform");
 const { readFileSync } = require("fs");
+const { join } = require("path");
 const clean = require("gulp-clean");
 const terser = require("gulp-terser");
 
 task("bundle", () => {
-  execSync("npm run tsBuild");
-  return src("./temp/temp-build/**/*.js")
-    .pipe(terser())
-    .pipe(dest("./dist-prod"));
+  // TODO: Check if this is platform agnostic.
+  const fileToRun = join(__dirname, "node_modules", ".bin", "tsc");
+  execSync(`"${fileToRun}" --incremental --project temp/tsconfig.json`);
+  const prevMode = process.argv[3] === "--preview";
+  const bundlePipeline = src("./temp/temp-build/**/*.js");
+  if (!prevMode) bundlePipeline.pipe(terser());
+  return bundlePipeline.pipe(dest(prevMode ? "./dist-prev" : "./dist"));
 });
 
+// For now, we won't use clean since we want incremental builds.
 task("clean", () => src("temp", { read: false }).pipe(clean()));
 
 task("map", () => {
@@ -66,4 +71,4 @@ task("tsconfig", () => src("./tsconfig.json")
   }))
   .pipe(dest("./temp")));
 
-exports.build = series(parallel("tsconfig", "map"), "bundle", "clean");
+exports.dist = series(parallel("tsconfig", "map"), "bundle");

@@ -19,13 +19,12 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-import { EventEmitter } from "events";
 import { Server } from "net";
 
 import Spile from "@lib/Spile";
-import ProtocolListener from "@lib/types/AnyServer";
+import AnyServer from "@lib/types/AnyServer";
 
-abstract class SimpleServer<S extends Server> extends EventEmitter implements ProtocolListener {
+abstract class SimpleServer<S extends Server> implements AnyServer {
   /**
    * Whether or not the server is listening.
    */
@@ -37,13 +36,18 @@ abstract class SimpleServer<S extends Server> extends EventEmitter implements Pr
   protected log = this.spile.log.child(this.name);
 
   /**
+   * The name of the server to use in log messages (padded with a space for even formatting).
+   */
+  private displayName: string;
+
+  /**
    * The internal server instance.
    */
   protected abstract server: S;
 
   public constructor(protected name: string, protected port: number, protected spile: Spile) {
-    super();
-    this.log.debug(`Initialising${name === "server" ? "" : ` ${name}`} server.`);
+    this.displayName = name === "server" ? " " : ` ${name} `;
+    this.log.debug(`Initialising${this.displayName}server.`);
   }
 
   /**
@@ -62,6 +66,9 @@ abstract class SimpleServer<S extends Server> extends EventEmitter implements Pr
 
       const listenCb = (): void => {
         this.server.off("error", errorCb);
+        this.server.on("error", err => {
+          this.log.error(`An error occurred in the${this.displayName}server!\n`, err);
+        });
         resolve();
       };
 

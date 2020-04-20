@@ -39,9 +39,9 @@ class Server extends SimpleServer<TCPServer> {
   }
 
   public async listen(): Promise<void> {
-    this.log.debug(`Server will listen on ${this.port}`);
+    this.log.debug(`Server will listen on ${this.port}.`);
     await this._listen();
-    this.log.info(`Main server is open now listening on ${this.port}`);
+    this.log.info(`Main server listening on ${this.port}.`);
   }
 
   public async close(): Promise<void> {

@@ -19,26 +19,8 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-import Spile from "@lib/Spile";
-import AnyServer from "@lib/types/AnyServer";
-
 /**
- * This doesn't extend SimpleServer because it listens on the same port as the main server.
+ * Utility types wooot woot!
  */
-class QueryServer implements AnyServer {
-  private log = this.spile.log.child("query");
 
-  public constructor(private spile: Spile) {
-    this.log.debug("Initialising dummy query server.");
-  }
-
-  public async listen(): Promise<void> {
-    this.log.info("Dummy query server is \"listening\".");
-  }
-
-  public async close(): Promise<void> {
-    this.log.info("Dummy query server is \"closing\".");
-  }
-}
-
-export default QueryServer;
+export type Predicate<T extends any[]> = (...args: T) => boolean;

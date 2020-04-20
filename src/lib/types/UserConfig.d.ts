@@ -19,26 +19,30 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-import Spile from "@lib/Spile";
-import AnyServer from "@lib/types/AnyServer";
-
 /**
- * This doesn't extend SimpleServer because it listens on the same port as the main server.
+ * Used for optional servers like rcon.
+ *
+ * @interface
  */
-class QueryServer implements AnyServer {
-  private log = this.spile.log.child("query");
-
-  public constructor(private spile: Spile) {
-    this.log.debug("Initialising dummy query server.");
-  }
-
-  public async listen(): Promise<void> {
-    this.log.info("Dummy query server is \"listening\".");
-  }
-
-  public async close(): Promise<void> {
-    this.log.info("Dummy query server is \"closing\".");
-  }
+interface OptionalServer {
+  port: number;
+  enabled: boolean;
 }
 
-export default QueryServer;
+/**
+ * This configuration is the consumer/user config. Therefore it is not used for @root/config.rs!!!
+ *
+ * @interface
+ */
+export interface UserConfig {
+  port: number;
+  rcon: OptionalServer;
+  query: OptionalServer;
+
+  // Plugins should be optional, as this should be a viable alternative to a notchian server as well!
+  usePlugins: boolean;
+
+  // DANGER: This option disables commands of all other namespaces except minecraft:*!!!
+  // It is best you do not touch this.
+  __notchainCommands: boolean;
+}

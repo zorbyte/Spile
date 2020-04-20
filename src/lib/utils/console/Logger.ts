@@ -19,15 +19,13 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-import { isMaster } from "cluster";
-import { createInterface, Interface } from "readline";
 import { WriteStream } from "tty";
 import { formatWithOptions } from "util";
 
-import Environment from "@structs/Environment";
+import Environment from "@utils/Environment";
+import EventBus from "@utils/EventBus";
 
 import chalk from "chalk";
-import ora from "ora";
 import SonicBoom from "sonic-boom";
 
 interface MethodColours {
@@ -75,11 +73,6 @@ class Logger {
   private static registeredNames: string[] = [];
 
   /**
-   * The Readline instance used for the server input prompt.
-   */
-  private static rl?: Interface;
-
-  /**
    * The colours used for the log levels.
    */
   private methodColours: MethodColours = {
@@ -99,18 +92,12 @@ class Logger {
    */
   private levelMin: LoggerLevels;
 
-  /**
-   * The current ora instance.
-   */
-  private currentOra?: ora.Ora;
-
   // 1 should only be used in production! Use 0 in development.
   // These still work as numbers, but I recommend you use the enum.
-  // @todo Make this an overload when the linter supports it!
+  // Todo: Make this an overload when the linter supports it!
   public constructor(
     name?: string | LoggerLevels,
     levelMin: string | LoggerLevels = LoggerLevels.INFO,
-    private isChild = false,
     private fd?: string | number,
     childName?: string,
   ) {
@@ -124,7 +111,7 @@ class Logger {
         this.warn(`Can not register a logger with ambiguous name ${name}. No name will be used.`);
         name = void 0;
       }
-      if (childName) name += ` ${chalk.gray(">")} ${chalk.dim(childName)}`;
+      if (childName) name += ` ${chalk.gray(">")} ${chalk.green(childName.toLowerCase())}`;
       Logger.registeredNames.push(name as string);
     }
 
@@ -135,11 +122,16 @@ class Logger {
 
     this.fd = fd || (process.stdout as unknown as { fd: number; }).fd;
 
-    if (!Logger.stdout) Logger.stdout = new SonicBoom({ fd: this.fd } as any);
+    if (!Logger.stdout) {
+      Logger.stdout = new SonicBoom({ fd: this.fd } as any);
+      EventBus.on("rawLog", (data: string) => {
+        Logger.stdout.write(`\r${data}\n`);
+      });
+    }
 
     const stdoutColours = this.checkColourSupport(process.stdout);
-    Logger.stdout.on("drain", () => {
-      if (Logger.rl) Logger.rl.prompt(true);
+    Logger.stdout.on("drain", async () => {
+      await EventBus.send("refreshPrompt");
     });
 
     for (const [lvl, colFn] of Object.entries(this.methodColours)) {
@@ -170,61 +162,14 @@ class Logger {
    * @returns {Logger}
    */
   public child(name: string): Logger {
-    return new Logger(this.name, this.levelMin, true, this.fd, name);
-  }
-
-  public startRL(): void {
-    try {
-      this.coreLoggerCheckRL("create");
-      Logger.rl = createInterface({
-        input: process.stdin,
-        output: process.stderr,
-        prompt: `${chalk.blue(">")} `,
-        crlfDelay: Infinity,
-      });
-
-      Logger.rl.prompt();
-
-      Logger.rl.on("line", line => this.debug("Line sent to Readline:", line));
-    } catch (err) {
-      this.error("An error occurred while creating the Readline instance!", err);
-    }
-  }
-
-  public closeRL(): void {
-    try {
-      this.coreLoggerCheckRL("close");
-      Logger.rl?.close();
-      Logger.rl = void 0;
-    } catch (err) {
-      this.error("An error occurred while closing the Readline instance!", err);
-    }
-  }
-
-  public start(text?: string): void {
-    if (this.currentOra) this.stopSpinner();
-    this.currentOra = ora({ text, spinner: "dots" }).start();
-  }
-
-  public update(text: string): void {
-    if (this.currentOra) this.currentOra.text = text;
-  }
-
-  public stopSpinner(): void {
-    this.currentOra?.stop();
-    this.currentOra = void 0;
-  }
-
-  public get stop(): Logger {
-    this.stopSpinner();
-    return this;
+    return new Logger(this.name, this.levelMin, this.fd, name);
   }
 
   public close(): void {
     Logger.stdout.end();
   }
 
-  public emergencyDestroy(): void {
+  public finalDestroy(): void {
     try {
       Logger.stdout.flushSync();
     } finally {
@@ -232,15 +177,9 @@ class Logger {
     }
   }
 
-  private coreLoggerCheckRL(action: "create" | "close"): void {
-    if (!isMaster) throw new Error(`A non-master process can not ${action} a Readline instance!`);
-    if (this.isChild) throw new Error(`Child loggers can not ${action} Readline instances!`);
-    if (action === "create" && Logger.rl) throw new Error("Can not create a new Readline instance when one already exists!");
-  }
-
   private formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {
     const currentTime = new Date();
-    return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${chalk.green(this.name)}` : ""} ${colourMethod(levelName)}`;
+    return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${this.name}` : ""} ${colourMethod(levelName)}`;
   }
 
   private checkColourSupport(stream: WriteStream): ColourOption | {} {

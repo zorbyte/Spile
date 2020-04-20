@@ -21,11 +21,8 @@
 
 /* eslint-disable no-console */
 
-import Environment from "./lib/structures/Environment";
+import Spile from "@lib/Spile";
 
-(async () => {
-  if (Environment.dev) await import("module-alias/register");
-  const Spile = await (await import("@lib/Spile")).default;
-  await new Spile().start();
-})().catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));
-
+new Spile()
+  .start()
+  .catch(err => console.error("An error occurred pre-bootstrap! Have you run \"npm install\"?\n", err));

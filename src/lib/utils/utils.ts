@@ -21,7 +21,7 @@
 
 import { constants, PathLike, promises } from "fs";
 
-import Environment from "@structs/Environment";
+import Environment from "@utils/Environment";
 
 export function getLoggerLevel(): number {
   return Math.min(Environment.debugSig, Environment.devSig, 1);

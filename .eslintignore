@@ -1,3 +1,5 @@
 dist/
-dist-prod/
+dist-prev/
+build/
+temp/
 node_modules/

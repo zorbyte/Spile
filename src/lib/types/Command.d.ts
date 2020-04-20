@@ -19,26 +19,21 @@
  * along with this program. If not, see <https: //www.gnu.org/licenses/>.
  */
 
-import Spile from "@lib/Spile";
-import AnyServer from "@lib/types/AnyServer";
+import { Predicate } from "./utils";
 
 /**
- * This doesn't extend SimpleServer because it listens on the same port as the main server.
+ * fn: (ctx: C)
+ * @type {CommandExecutor}
  */
-class QueryServer implements AnyServer {
-  private log = this.spile.log.child("query");
+type CommandExecutor<C> = (ctx: C, msg: string, args: string[]) => Promise<string | void> | string | void;
 
-  public constructor(private spile: Spile) {
-    this.log.debug("Initialising dummy query server.");
-  }
-
-  public async listen(): Promise<void> {
-    this.log.info("Dummy query server is \"listening\".");
-  }
-
-  public async close(): Promise<void> {
-    this.log.info("Dummy query server is \"closing\".");
-  }
+/**
+ * The command interface.
+ *
+ * @interface
+ */
+export default interface Command<C> {
+  name: string;
+  inhibitors: Predicate<C>[];
+  fn: CommandExecutor<C>;
 }
-
-export default QueryServer;

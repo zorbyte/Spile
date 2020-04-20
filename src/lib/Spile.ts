@@ -25,8 +25,12 @@ import { VERSION } from "@root/config";
 import QueryServer from "@root/query/QueryServer";
 import RConServer from "@root/rcon/RconServer";
 import Server from "@root/server/Server";
-import Environment from "@structs/Environment";
-import Logger, { calculateLevel } from "@structs/Logger";
+import CLI from "@utils/console/CLI";
+import Logger, { calculateLevel } from "@utils/console/Logger";
+import Environment from "@utils/Environment";
+import EventBus from "@utils/EventBus";
+
+import chalk from "chalk";
 
 class Spile extends EventEmitter {
   /**
@@ -38,6 +42,11 @@ class Spile extends EventEmitter {
    * Logger instance for the master.
    */
   public log = new Logger("Master", calculateLevel(Environment));
+
+  /**
+   * The CLI for loading animations and the command prompt.
+   */
+  private cli = new CLI(this);
 
   /**
    * The rcon server.
@@ -58,15 +67,33 @@ class Spile extends EventEmitter {
 
   public constructor() {
     super();
-    this.log.start("Bootstrapping server...");
+    this.log.info(
+      "Welcome to Spile, this software is licensed under the LGPL-3.0 license.",
+      `For more information, type ${chalk.grey(".credits")} into the prompt.`,
+    );
+    if (Environment.normal) {
+      this.log.info(
+        "To enable debug logging,",
+        `configure your environment variables to include ${chalk.grey("R_DEBUG=1")}.`,
+      );
+    }
+
+    this.cli.startSpinner("Bootstrapping server...");
   }
 
   public async start(): Promise<void> {
     try {
       await Promise.all([this.rcon.listen(), this.server.listen(), this.query.listen()]);
       this.isBooting = false;
-      this.log.stop.info("We're ready to roll boss!");
-      this.log.startRL();
+      this.log.debug("Registering critical error handler.");
+      EventBus.on("critical", async err => {
+        this.log.error("A critical error has occurred! Spile will now shut down.\n", err);
+        await this.stop();
+      });
+      this.cli.stopSpinner();
+      this.log.info("We're ready to roll boss!");
+      this.cli.openPrompt();
+      await EventBus.send("ready");
     } catch (err) {
       if (this.isBooting) {
         this.log.error("An error occurred while booting!", err);
@@ -78,20 +105,26 @@ class Spile extends EventEmitter {
     }
   }
 
-  public async stop(): Promise<void> {
+  public async stop(): Promise<never> {
     try {
-      this.log.closeRL();
-      this.log.warn("Stopping server!!!");
-      this.log.start("Cleaning up server...");
+      this.cli.closePrompt();
+      this.log.warn("Stopping server.");
+      this.cli.startSpinner("Cleaning up server...");
       this.log.debug("Closing all servers.");
-      await Promise.all([this.rcon.close, this.server.close, this.query.close]);
-      this.log.info("Successfully closed all servers!");
-      this.log.stop.debug("Thanks for playing!");
-      this.log.close();
-      process.exit(0);
+      await Promise.all([this.rcon.close(), this.server.close(), this.query.close()]);
+      this.log.debug("Successfully closed all servers!");
+      this.cli.stopSpinner();
+      this.log.info("Thanks for playing!");
+      this.log.finalDestroy();
+      process.exit();
     } catch (err) {
-      this.log.error(`An error occurred while stopping the server! Please report this! The server will now close dirtily.`, err);
-      this.log.emergencyDestroy();
+      // Don't use the logger, as an error as severe as this could be caused by the logger itself!
+      // eslint-disable-next-line no-console
+      console.error(
+        "An error occurred while stopping the server!",
+        "Please report this! The server will now close dirtily.\n",
+        err,
+      );
       process.exit(1);
     }
   }

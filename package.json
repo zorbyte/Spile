@@ -4,9 +4,9 @@
   "description": "A Minecraft Server written in TypeScript.",
   "main": "./dist/index.js",
   "scripts": {
-    "dev": "tsc && cross-env DEVELOPMENT=1 node .",
-    "build": "gulp build",
-    "tsBuild": "tsc --project temp/tsconfig.json",
+    "dev": "cross-env DEVELOPMENT=1 ts-node -r module-alias/register --files ./src/index",
+    "dist": "gulp dist",
+    "dist:preview": "gulp dist --preview",
     "lint": "eslint src/**/*.ts"
   },
   "repository": {
@@ -44,20 +44,22 @@
     "gulp-terser": "^1.2.0",
     "gulp-ts-alias": "^1.1.0",
     "module-alias": "^2.2.2",
+    "ts-node": "^8.8.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
     "chainfetch": "^1.2.2",
     "chalk": "^4.0.0",
     "dotenv": "^8.2.0",
+    "is-promise": "^2.1.0",
     "node-fetch": "^2.6.0",
     "ora": "^4.0.3",
     "sonic-boom": "^1.0.1"
   },
   "_moduleAliases": {
-    "@root": "./dist",
-    "@lib": "./dist/lib",
-    "@util": "./dist/lib/util",
-    "@structs": "./dist/lib/structures"
+    "@root": "./src",
+    "@lib": "./src/lib",
+    "@utils": "./src/lib/utils",
+    "@structs": "./src/lib/structures"
   }
 }
