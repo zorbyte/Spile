@@ -23,6 +23,7 @@ import { isMaster } from "cluster";
 import { createInterface, Interface } from "readline";
 
 import Spile from "@lib/Spile";
+import Environment from "@utils/Environment";
 import EventBus from "@utils/EventBus";
 
 import chalk from "chalk";
@@ -82,6 +83,8 @@ class CLI {
         } else if (line === "stop") {
           this.rl.pause();
           this.spile.stop();
+        } else if (Environment.normal) {
+          this.rl.prompt();
         }
         await EventBus.send("line", line);
       });
