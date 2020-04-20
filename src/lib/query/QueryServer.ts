@@ -28,9 +28,7 @@ import AnyServer from "@lib/types/AnyServer";
 class QueryServer implements AnyServer {
   private log = this.spile.log.child("query");
 
-  public constructor(private spile: Spile) {
-    this.log.debug("Initialising dummy query server.");
-  }
+  public constructor(private spile: Spile) { }
 
   public async listen(): Promise<void> {
     this.log.info("Dummy query server is \"listening\".");

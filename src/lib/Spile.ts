@@ -21,10 +21,10 @@
 
 import { EventEmitter } from "events";
 
+import QueryServer from "@lib/query/QueryServer";
+import RConServer from "@lib/rcon/RconServer";
+import Server from "@lib/server/Server";
 import { VERSION } from "@root/config";
-import QueryServer from "@root/query/QueryServer";
-import RConServer from "@root/rcon/RconServer";
-import Server from "@root/server/Server";
 import CLI from "@utils/console/CLI";
 import Logger, { calculateLevel } from "@utils/console/Logger";
 import Environment from "@utils/Environment";
@@ -68,7 +68,7 @@ class Spile extends EventEmitter {
   public constructor() {
     super();
     this.log.info(
-      "Welcome to Spile, this software is licensed under the LGPL-3.0 license.",
+      `Welcome to Spile v${this.version}, this software is licensed under the LGPL-3.0 license.`,
       `For more information, type ${chalk.grey(".credits")} into the prompt.`,
     );
     if (Environment.normal) {
@@ -109,10 +109,8 @@ class Spile extends EventEmitter {
     try {
       this.cli.closePrompt();
       this.log.warn("Stopping server.");
-      this.cli.startSpinner("Cleaning up server...");
-      this.log.debug("Closing all servers.");
+      this.cli.startSpinner("Cleaning up...");
       await Promise.all([this.rcon.close(), this.server.close(), this.query.close()]);
-      this.log.debug("Successfully closed all servers!");
       this.cli.stopSpinner();
       this.log.info("Thanks for playing!");
       this.log.finalDestroy();

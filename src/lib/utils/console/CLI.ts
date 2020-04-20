@@ -80,7 +80,8 @@ class CLI {
           );
           return;
         } else if (line === "stop") {
-          await this.spile.stop();
+          this.rl.pause();
+          this.spile.stop();
         }
         await EventBus.send("line", line);
       });

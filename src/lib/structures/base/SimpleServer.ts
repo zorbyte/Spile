@@ -47,7 +47,6 @@ abstract class SimpleServer<S extends Server> implements AnyServer {
 
   public constructor(protected name: string, protected port: number, protected spile: Spile) {
     this.displayName = name === "server" ? " " : ` ${name} `;
-    this.log.debug(`Initialising${this.displayName}server.`);
   }
 
   /**

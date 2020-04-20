@@ -121,7 +121,7 @@ module.exports = {
     "max-params": "off",
     "max-depth": ["error", 8],
     "max-len": ["error", 140, 2],
-    "max-nested-callbacks": ["error", { max: 4 }],
+    "max-nested-callbacks": ["error", { max: 6 }],
     "max-statements-per-line": ["error", { max: 2 }],
     "new-cap": "off",
     "newline-per-chained-call": ["error", { ignoreChainWithDepth: 3 }],

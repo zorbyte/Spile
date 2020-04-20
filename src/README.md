@@ -16,8 +16,9 @@
   along with this program.  If not, see <https: //www.gnu.org/licenses/>.
 -->
 
-# THIS IS NOT A PLUGINS FOLDER!!!
+# Source code
 
-Well, technically it is, but it's the internal plugins used by the server. Your plugins should be installed as a dependency and added to the `plugins` field on the `package.json` file.
+The src folder holds modules of certain types in their respective sub directories.
+You can write a module and you should expect it to be automatically registered and ready to rock in the server.
 
-Don't modify any of these unless you know exactly what you are doing!
+The `lib` directory is where all the internals for the server reside. They run modules, schedule execution and process requests.

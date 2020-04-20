@@ -33,14 +33,13 @@ class RConServer extends SimpleServer<Server> {
   }
 
   public async listen(): Promise<void> {
+    this.log.info(`Opening rcon server on ${this.port}.`);
     await this._listen();
-    this.log.info(`Rcon server listening on ${this.port}.`);
   }
 
   public async close(): Promise<void> {
     this.log.debug("Closing rcon server.");
     await this._close();
-    this.log.info("Closed rcon server.");
   }
 }
 

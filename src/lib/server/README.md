@@ -16,8 +16,6 @@
   along with this program.  If not, see <https: //www.gnu.org/licenses/>.
 -->
 
-# THIS IS NOT A PLUGINS FOLDER!!!
+# Server
 
-Well, technically it is, but it's the internal plugins used by the server. Your plugins should be installed as a dependency and added to the `plugins` field on the `package.json` file.
-
-Don't modify any of these unless you know exactly what you are doing!
+This is the heart of Spile. The minecraft server. Each fork will have one of these.
