@@ -22,15 +22,18 @@
 /* eslint-disable @typescript-eslint/no-require-imports, promise/no-promise-in-callback, @typescript-eslint/explicit-function-return-type */
 
 const { exec } = require("child_process");
-const { src, dest, task, series, parallel } = require("gulp");
-const alias = require("gulp-ts-alias");
-const jsonTransform = require("gulp-json-transform");
-const change = require("gulp-change");
 const { readFileSync, constants, promises } = require("fs");
 const { join, resolve: resolvePath, relative } = require("path");
+
+const through2 = require("through2");
+
 const { compile } = require("nexe");
+const { src, dest, task, series, parallel } = require("gulp");
+const alias = require("gulp-ts-alias");
 const zip = require("gulp-zip");
 const cache = require("gulp-cache");
+const jsonTransform = require("gulp-json-transform");
+
 const { hashElement } = require("folder-hash");
 const package = require("./package.json");
 
@@ -127,13 +130,22 @@ task("map", () => {
   };
 
   return src("./src/**/*.ts")
-    .pipe(change(function mapOver(content, done) {
-      if (this.fname.slice(1) === "config.ts") {
-        content = content
-          .replace("export const VERSION = \"unknown-SNAPSHOT\";", `export const VERSION = "${package.version}";`);
-      }
-      done(null, content);
-    }))
+    .pipe(
+      through2.obj((file, _, cb) => {
+        let contents = file.contents.toString();
+
+        if (relative(join(__dirname, "src"), file.path) === "config.ts") {
+          contents = contents
+            .replace("export const VERSION = \"unknown-SNAPSHOT\";", `export const VERSION = "${package.version}";`);
+        }
+
+        if (file.isBuffer()) {
+          file.contents = Buffer.from(contents);
+        }
+
+        cb(null, file);
+      }),
+    )
     .pipe(cache(
       alias({ configuration: tsConf, base: "./src" }),
       {
