@@ -22,7 +22,7 @@
 import { createServer, Server as TCPServer } from "net";
 
 import Spile from "@lib/Spile";
-import Codec from "@structs/base/PacketCodec";
+import Codec from "@structs/base/Packet";
 import SimpleServer from "@structs/base/SimpleServer";
 
 class Server extends SimpleServer<TCPServer> {
