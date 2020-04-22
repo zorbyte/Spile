@@ -48,7 +48,7 @@ module.exports = {
           ],
 
           // Internal packages.
-          ["^(@|@internals|@net|@root|@utils)(/.*|$)"],
+          ["^(@|@internals|@net|@codecs|@root|@utils)(/.*|$)"],
 
           // Namespaced packages.
           ["^@?\\w"],

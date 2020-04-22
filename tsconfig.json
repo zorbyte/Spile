@@ -30,6 +30,7 @@
 		"baseUrl": "src/",
 		"paths": {
       "@net/*": ["net/*"],
+      "@codecs/*": ["net/server/codecs/*"],
 			"@utils/*": ["utils/*"],
 			"@internals/*": ["internals/*"],
 			"@root/*": ["*"]

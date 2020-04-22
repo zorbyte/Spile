@@ -1,4 +1,5 @@
 import { constants, PathLike, promises } from "fs";
+import { constants as zConst, deflate as deflateCb, unzip as unzipCb } from "zlib";
 
 import Environment from "./Environment";
 
@@ -37,6 +38,29 @@ export async function dependencyPresent(dependencyName: string): Promise<boolean
   } catch {
     return false;
   }
+}
+
+export function concatUint8Array(arrays: Uint8Array[]): Uint8Array {
+  return arrays
+    .reduce((acc, arr) => Uint8Array.from([...acc, ...arr]), [] as unknown as Uint8Array);
+}
+
+export function deflate(data: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    deflateCb(data, (err, res) => {
+      if (err) reject(err);
+      resolve(res);
+    });
+  });
+}
+
+export function inflate(data: Buffer): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    unzipCb(data, { finishFlush: zConst.Z_SYNC_FLUSH }, (err, res) => {
+      if (err) reject(err);
+      resolve(res);
+    });
+  });
 }
 
 export default createJavaHash;
