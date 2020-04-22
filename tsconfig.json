@@ -29,9 +29,9 @@
 		"rootDir": "src/",
 		"baseUrl": "src/",
 		"paths": {
-      "@structs/*": ["lib/structures/*"],
-			"@utils/*": ["lib/utils/*"],
-			"@lib/*": ["lib/*"],
+      "@net/*": ["net/*"],
+			"@utils/*": ["utils/*"],
+			"@internals/*": ["internals/*"],
 			"@root/*": ["*"]
 		}
   },

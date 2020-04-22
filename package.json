@@ -5,6 +5,7 @@
   "main": "./build/index.js",
   "scripts": {
     "dev": "cross-env DEVELOPMENT=1 ts-node -r module-alias/register --files ./src/index",
+    "test": "tsc --noEmit && eslint src/**/*.ts",
     "build": "gulp build",
     "build:current": "gulp build --current",
     "lint": "eslint src/**/*.ts"
@@ -33,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
     "cross-env": "^7.0.2",
+    "discord.js": "^12.2.0",
     "eslint": "^6.8.0",
     "eslint-config-alloy": "^3.6.0",
     "eslint-plugin-promise": "^4.2.1",
@@ -71,8 +73,8 @@
   ],
   "_moduleAliases": {
     "@root": "./src",
-    "@lib": "./src/lib",
-    "@utils": "./src/lib/utils",
-    "@structs": "./src/lib/structures"
+    "@internals": "./src/internals",
+    "@utils": "./src/utils",
+    "@net": "./src/net"
   }
 }
