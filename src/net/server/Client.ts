@@ -6,6 +6,7 @@ import { inflate } from "@utils/utils";
 
 import VarInt from "./codecs/types/VarInt";
 import ByteConsumer from "./ByteConsumer";
+import packetMap from "./packetMap";
 
 export enum State {
   SHAKE,
@@ -37,6 +38,9 @@ class Client extends EventEmitter {
       } else {
         id = dataLengthOrId;
       }
+
+      // @ts-ignore
+      const _p = new packetMap.inbound[this.state][id]();
     });
   }
 }

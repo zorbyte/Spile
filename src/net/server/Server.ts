@@ -9,6 +9,8 @@ import Packet from "./Packet";
 
 class Server extends SimpleServer<TCPServer> {
   protected server = createServer();
+
+  // @ts-ignore
   private clients: Client[];
 
   public constructor(spile: Spile) {
@@ -34,6 +36,8 @@ class Server extends SimpleServer<TCPServer> {
 
   private handleConnection(socket: Socket): void {
     this.log.debug("Connection established!");
+
+    // @ts-ignore
     const newClient = new Client(socket, this.log);
   }
 }
