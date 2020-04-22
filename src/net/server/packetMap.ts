@@ -1,18 +1,16 @@
-import { $TSFix } from "@utils/typeUtils";
-
 import Handshake from "./packets/inbound/Handshake";
 import { State } from "./Client";
 import Packet from "./Packet";
 
-type MapMember<T extends typeof Packet> = {
+type MapMember = {
   [key in State]?: {
-    [id: number]: T;
+    [id: number]: new () => Packet<any>;
   }
 };
 
 export interface PacketMap {
-  inbound: MapMember<Handshake | $TSFix>;
-  outbound: MapMember<Handshake | $TSFix>;
+  inbound: MapMember;
+  outbound: MapMember;
 }
 
 const packetMap: PacketMap = {
