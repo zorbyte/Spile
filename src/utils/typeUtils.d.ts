@@ -1,4 +1,4 @@
-import Packet from "@net/server/Packet";
+import Packet from "@net/server/packets/Packet";
 
 export type Predicate<T extends any[]> = (...args: T) => boolean;
 export type $TSFix = any;

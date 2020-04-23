@@ -2,9 +2,9 @@ import PacketCodec from "@codecs/PacketCodec";
 import MCString from "@codecs/types/MCString";
 import UShort from "@codecs/types/UShort";
 import VarInt from "@codecs/types/VarInt";
-import ByteConsumer from "@net/server/ByteConsumer";
 import { State } from "@net/server/Client";
-import Packet from "@net/server/Packet";
+import ByteConsumer from "@net/server/codecs/ByteConsumer";
+import Packet from "@net/server/packets/Packet";
 import { $TSFix, PacketKeys } from "@utils/typeUtils";
 
 class Handshake extends Packet<Handshake> {

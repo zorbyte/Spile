@@ -1,4 +1,4 @@
-import ByteConsumer from "@net/server/ByteConsumer";
+import ByteConsumer from "@net/server/codecs/ByteConsumer";
 
 import fjs from "fast-json-stringify";
 import secJsonParse from "secure-json-parse";

@@ -4,8 +4,8 @@ import Spile from "@internals/Spile";
 import Codec from "@net/server/codecs/PacketCodec";
 import SimpleServer from "@net/SimpleServer";
 
+import Packet from "./packets/Packet";
 import Client from "./Client";
-import Packet from "./Packet";
 
 class Server extends SimpleServer<TCPServer> {
   protected server = createServer();

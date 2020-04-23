@@ -1,10 +1,9 @@
 import { $TSFix } from "@utils/typeUtils";
 import { deflate } from "@utils/utils";
 
-import ByteConsumer from "../ByteConsumer";
-
 import MCJSON from "./types/MCJSON";
 import VarInt from "./types/VarInt";
+import ByteConsumer from "./ByteConsumer";
 import TypeCodec from "./TypeCodec";
 
 type TCodecGen<T> = T extends TypeCodec<infer TCodecGen> ? TCodecGen : never;

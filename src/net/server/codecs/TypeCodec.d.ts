@@ -1,4 +1,4 @@
-import ByteConsumer from "../ByteConsumer";
+import ByteConsumer from "./ByteConsumer";
 
 export type StringLength<T> = T extends string ? [number] : [undefined?];
 export default interface TypeCodec<T> {

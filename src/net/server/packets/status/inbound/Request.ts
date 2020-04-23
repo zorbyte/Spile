@@ -1,8 +1,8 @@
-import Packet from "@net/server/Packet";
+import Packet from "@net/server/packets/Packet";
 
 class Request extends Packet<Request> {
   public static id = 0x0;
-  
+
   public constructor() {
     super(Request.id);
   }

@@ -1,6 +1,6 @@
 import Logger from "@internals/console/Logger";
 
-import ByteConsumer from "./ByteConsumer";
+import ByteConsumer from "../codecs/ByteConsumer";
 abstract class Packet<P extends Packet<P>> {
   public static id: number;
   private static log: Logger;

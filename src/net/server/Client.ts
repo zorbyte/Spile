@@ -4,9 +4,9 @@ import { Socket } from "net";
 import Logger from "@internals/console/Logger";
 import { inflate } from "@utils/utils";
 
+import ByteConsumer from "./codecs/ByteConsumer";
 import VarInt from "./codecs/types/VarInt";
-import ByteConsumer from "./ByteConsumer";
-import packetMap from "./packetMap";
+import packetMap from "./packets/packetMap";
 
 export enum State {
   SHAKE,

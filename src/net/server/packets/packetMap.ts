@@ -1,7 +1,8 @@
-import Handshake from "./packets/shake/inbound/Handshake";
-import Request from "./packets/status/inbound/Request";
-import Response from "./packets/status/outbound/Response";
-import { State } from "./Client";
+import { State } from "../Client";
+
+import Handshake from "./shake/inbound/Handshake";
+import Request from "./status/inbound/Request";
+import Response from "./status/outbound/Response";
 import Packet from "./Packet";
 
 type MapMember = {

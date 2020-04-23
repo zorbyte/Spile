@@ -1,7 +1,7 @@
 import PacketCodec from "@net/server/codecs/PacketCodec";
 import TypeCodec from "@net/server/codecs/TypeCodec";
 import MCJSON from "@net/server/codecs/types/MCJSON";
-import Packet from "@net/server/Packet";
+import Packet from "@net/server/packets/Packet";
 import ResponseSchema, { ResponseData } from "@net/server/schemas/Response";
 
 class Response extends Packet<Response> {
