@@ -33,7 +33,7 @@ class PacketCodec<T extends TypeCodec<any>[]> {
     const accumulated: Buffer[] = [];
     for (const codec of [VarInt, ...this.codecs]) {
       const isStr = codec.serialise.length > 1 && !(codec instanceof MCJSON);
-      const serData = await codec.serialise(args[i] as $TSFix, isStr ? stringLens[strsProcessed] as $TSFix : void 0);
+      const serData = await codec.serialise(args[i], isStr ? stringLens[strsProcessed] as $TSFix : void 0);
       byteSize += serData.byteLength;
       uncompSize += serData.length;
 
