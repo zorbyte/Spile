@@ -1,8 +1,9 @@
+import { $TSFix } from "@utils/typeUtils";
 import { deflate } from "@utils/utils";
 
 import ByteConsumer from "../ByteConsumer";
 
-import MCString from "./types/MCString";
+import MCJSON from "./types/MCJSON";
 import VarInt from "./types/VarInt";
 import TypeCodec from "./TypeCodec";
 
@@ -10,7 +11,12 @@ type TCodecGen<T> = T extends TypeCodec<infer TCodecGen> ? TCodecGen : never;
 type TypeCodecGenerics<T> = { [P in keyof T]: TCodecGen<T[P]> };
 
 class PacketCodec<T extends TypeCodec<any>[]> {
-  public constructor(public id: number, private codecs: T) {}
+  public gay: TypeCodecGenerics<T>;
+  private codecs: T;
+
+  public constructor(public id: number, ...codecs: T) {
+    this.codecs = codecs;
+  }
 
   /**
    * serialise
@@ -18,19 +24,22 @@ class PacketCodec<T extends TypeCodec<any>[]> {
    * @param compressionThreshold The threshold for compression.
    * @param args The arguments to serialise... ORDER IS IMPORTANT
    */
-  public async serialise(compressionThreshold: number, ...args: TypeCodecGenerics<T>): Promise<Buffer> {
+  public async serialise(compressionThreshold: number, stringLens: number[], ...args: TypeCodecGenerics<T>): Promise<Buffer> {
     args = [this.id, ...args] as TypeCodecGenerics<T>;
 
     let i = 0;
+    let strsProcessed = 0;
     let byteSize = 0;
     let uncompSize = 0;
     const accumulated: Buffer[] = [];
     for (const codec of [VarInt, ...this.codecs]) {
-      const serData = await codec.serialise(args[i]);
+      const isStr = codec.serialise.length > 1 && !(codec instanceof MCJSON);
+      const serData = await codec.serialise(args[i] as $TSFix, isStr ? stringLens[strsProcessed] as $TSFix : void 0);
       byteSize += serData.byteLength;
       uncompSize += serData.length;
 
       accumulated.push(serData);
+      if (isStr) strsProcessed++;
       i++;
     }
 
@@ -56,15 +65,16 @@ class PacketCodec<T extends TypeCodec<any>[]> {
   }
 
   public async *deserialise(
-    _length: boolean,
     consumer: ByteConsumer,
-  ): AsyncGenerator<TypeCodecGenerics<T>, void, void> {
+    stringLens: number[],
+  ): AsyncGenerator<any, void, void> {
+    let strsProcessed = 0;
     for (const codec of this.codecs) {
-      yield await codec.deserialise(consumer);
+      const isStr = codec.deserialise.length > 1 && !(codec instanceof MCJSON);
+      yield await codec.deserialise(consumer, isStr ? stringLens[strsProcessed] as $TSFix : void 0);
+      if (isStr) strsProcessed++;
     }
   }
 }
-
-new PacketCodec(0x0, [VarInt, MCString]).serialise(3);
 
 export default PacketCodec;

@@ -1,4 +1,6 @@
-import Handshake from "./packets/inbound/Handshake";
+import Handshake from "./packets/shake/inbound/Handshake";
+import Request from "./packets/status/inbound/Request";
+import Response from "./packets/status/outbound/Response";
 import { State } from "./Client";
 import Packet from "./Packet";
 
@@ -18,10 +20,13 @@ const packetMap: PacketMap = {
     [State.SHAKE]: {
       [Handshake.id]: Handshake,
     },
+    [State.STATS]: {
+      [Request.id]: Request,
+    },
   },
   outbound: {
-    [State.SHAKE]: {
-      [Handshake.id]: Handshake,
+    [State.STATS]: {
+      [Response.id]: Response,
     },
   },
 };

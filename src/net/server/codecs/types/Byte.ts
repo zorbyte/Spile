@@ -1,8 +1,8 @@
 import TypeCodec from "../TypeCodec";
 
-const UShort: TypeCodec<number> = {
+const Byte: TypeCodec<number> = {
   async serialise(value) {
-    if (value > 65535 || value < 0) throw new Error("A UShort may only be an integer between 0 and 65535!");
+    if (value > 127 || value < -128) throw new Error("A Byte may only be an integer between -128 and 127!");
     const buff = Buffer.alloc(2);
     buff.writeInt16BE(value);
     return buff;

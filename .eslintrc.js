@@ -97,6 +97,7 @@ module.exports = {
     "yoda": "error",
     "no-label-var": "error",
     "no-shadow": "error",
+    "no-undef": "off",
     "no-undef-init": "error",
     "callback-return": "error",
     "handle-callback-err": "error",
