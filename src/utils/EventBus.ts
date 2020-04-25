@@ -11,7 +11,7 @@ type EventListener = (...args: any[]) => void | Promise<void>;
 /**
  * This event bus is used for global event dispatching, therefore protecting the encapsulation of Spile.
  */
-class EventBus {
+class EventBus extends null {
   /**
    * The listeners of this event bus.
    */

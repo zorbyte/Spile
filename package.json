@@ -80,8 +80,6 @@
     "@internals": "./src/internals",
     "@utils": "./src/utils",
     "@net": "./src/net",
-    "@codecs": [
-      "./src/net/server/codecs"
-    ]
+    "@codecs": "./src/net/server/codecs"
   }
 }
