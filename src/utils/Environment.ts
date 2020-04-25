@@ -7,7 +7,7 @@ interface Destructurable {
   normal: boolean;
 }
 
-class Environment {
+class Environment extends null {
   private static cacheMap: CacheMap = {};
   private static envLoaded = false;
 
