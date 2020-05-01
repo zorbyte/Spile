@@ -43,4 +43,3 @@ class Server extends SimpleServer<TCPServer> {
 }
 
 export default Server;
-

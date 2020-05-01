@@ -5,3 +5,5 @@ temp/
 experiments/
 node_modules/
 yarn-err.log
+nsrc/
+asrc/

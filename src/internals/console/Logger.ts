@@ -37,9 +37,6 @@ interface ColourOption {
   colors?: boolean;
 }
 
-/**
- * @class {Logger}
- */
 class Logger {
   /**
    * The sonicboom stream, much faster than using process.stdout.

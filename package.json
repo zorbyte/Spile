@@ -57,6 +57,7 @@
     "dotenv": "^8.2.0",
     "fast-json-stringify": "^2.0.0",
     "flatstr": "^1.0.12",
+    "fs-nextra": "^0.4.7",
     "is-promise": "^2.1.0",
     "ora": "^4.0.3",
     "secure-json-parse": "^2.1.0",

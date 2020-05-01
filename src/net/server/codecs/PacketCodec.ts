@@ -10,7 +10,6 @@ type TCodecGen<T> = T extends TypeCodec<infer TCodecGen> ? TCodecGen : never;
 type TypeCodecGenerics<T> = { [P in keyof T]: TCodecGen<T[P]> };
 
 class PacketCodec<T extends TypeCodec<any>[]> {
-  public gay: TypeCodecGenerics<T>;
   private codecs: T;
 
   public constructor(public id: number, ...codecs: T) {

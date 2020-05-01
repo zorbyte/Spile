@@ -1,5 +1,5 @@
 class Permissions<T extends (string | number), TEnumValue extends number, E = { [key in T]: TEnumValue }> {
-  private rawPerms: Array<0 | 1>;
+  private rawPerms: (0 | 1)[];
   private acceptedLength: number;
 
   public constructor(private permEnum: E) {
