@@ -96,7 +96,7 @@ class Logger {
 
     let i = 0;
 
-    this.fd = fd || (process.stdout as unknown as { fd: number; }).fd;
+    this.fd = fd || (process.stdout as unknown as { fd: number }).fd;
 
     if (!Logger.stdout) {
       Logger.stdout = new SonicBoom({ fd: this.fd } as any);
@@ -155,13 +155,14 @@ class Logger {
 
   private formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {
     const currentTime = new Date();
+    // eslint-disable-next-line max-len
     return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${this.name}` : ""} ${colourMethod(levelName)}`;
   }
 
   private checkColourSupport(stream: WriteStream): ColourOption | {} {
-    return stream.isTTY && (typeof stream.getColorDepth === "function" ? stream.getColorDepth() > 2 : true) ?
-      { colors: true } :
-      {};
+    return stream.isTTY && (typeof stream.getColorDepth === "function" ? stream.getColorDepth() > 2 : true)
+      ? { colors: true }
+      : {};
   }
 }
 

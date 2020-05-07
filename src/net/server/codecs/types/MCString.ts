@@ -21,7 +21,7 @@ const MCString: MCString = {
     n = n ?? str.length;
     if (n * 4 > encStr.byteLength) throw new Error("Invalid MCString! n * 4 > bytes(n)");
     const into = Buffer.concat([encLenOfStr, encStr], encLenOfStr.length + encStr.length);
-    
+
     return into;
   },
 

@@ -40,12 +40,12 @@ class Environment extends null {
   }
 
   public static get debugSig(): number {
-    const debugSig = (): number => Math.abs(parseInt(process.env.S_DEBUG ?? "2") - 1);
+    const debugSig = (): number => Math.abs(parseInt(process.env.S_DEBUG ?? "2", 10) - 1);
     return this.getOrSetCache("debugSig", debugSig);
   }
 
   public static get devSig(): number {
-    const devSig = (): number => Math.abs(parseInt(process.env.DEVELOPMENT ?? "2") - 1);
+    const devSig = (): number => Math.abs(parseInt(process.env.DEVELOPMENT ?? "2", 10) - 1);
     return this.getOrSetCache("devSig", devSig);
   }
 

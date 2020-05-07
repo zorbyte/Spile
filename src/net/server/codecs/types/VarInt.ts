@@ -1,7 +1,7 @@
 import TypeCodec from "../TypeCodec";
 
 const VarInt: TypeCodec<number> = {
-  async serialise(value) {
+  serialise(value) {
     const byteArr = [];
     while (value !== 0) {
       let temp = value & 0x7F;
@@ -14,7 +14,7 @@ const VarInt: TypeCodec<number> = {
     return Buffer.from(byteArr);
   },
 
-  async deserialise(consumer) {
+  deserialise(consumer) {
     let numRead = 0;
     let result = 0;
     for (let [read] = consumer.consume(1); (read & 0x80) !== 0; [read] = consumer.consume(1)) {

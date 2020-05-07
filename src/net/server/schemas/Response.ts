@@ -16,9 +16,9 @@ export interface ResponseData {
     sample?: PlayerSample[];
   };
   description: {
-    text?: string,
-  },
-  favicon?: string,
+    text?: string;
+  };
+  favicon?: string;
 }
 
 const ResponseSchema: ObjectSchema = {
@@ -39,17 +39,17 @@ const ResponseSchema: ObjectSchema = {
       type: "object",
       properties: {
         max: {
-          type: "number",
-          default: 20,
+          "type": "number",
+          "default": 20,
         },
         online: {
-          type: "number",
-          default: 0,
+          "type": "number",
+          "default": 0,
         },
         sample: {
-          type: "array",
-          default: [],
-          items: {
+          "type": "array",
+          "default": [],
+          "items": {
             type: "object",
             properties: {
               name: {
@@ -68,8 +68,8 @@ const ResponseSchema: ObjectSchema = {
       properties: {
         // TODO: Implement chat objects.
         text: {
-          type: "string",
-          default: "A Minecraft server.",
+          "type": "string",
+          "default": "A Minecraft server.",
         },
       },
     },

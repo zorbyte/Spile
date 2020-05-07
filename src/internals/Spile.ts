@@ -46,10 +46,7 @@ class Spile extends EventEmitter {
 
   public constructor() {
     super();
-    this.log.info(
-      `Welcome to Spile v${this.version}, this software is licensed under the LGPL-3.0 license.`,
-      `For more information, type ${chalk.grey(".credits")} into the prompt.`,
-    );
+    this.log.info(`Welcome to Spile v${this.version}, written by zorbyte.`);
     if (Environment.normal) {
       this.log.info(
         "To enable debug logging,",
@@ -77,7 +74,7 @@ class Spile extends EventEmitter {
       if (this.isBooting) {
         this.log.error("An error occurred while booting!", err);
         this.log.warn("The server will now stop.");
-        this.stop();
+        await this.stop();
       } else {
         this.log.error("An error occurred in Spile! Please report this to the developers.", err);
       }

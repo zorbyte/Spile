@@ -4,7 +4,9 @@
     "MCJSON",
     "Minecraft",
     "Netherite",
-    "rcon"
+    "rcon",
+    "zorbyte"
   ],
-  "eslint.enable": true
+  "eslint.enable": true,
+  "files.eol": "\n"
 }

@@ -7,6 +7,7 @@ class Request extends Packet<Request> {
     super(Request.id);
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   public async deserialise(): Promise<Request> {
     return this;
   }

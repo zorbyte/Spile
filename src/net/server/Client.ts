@@ -28,7 +28,7 @@ class Client extends EventEmitter {
       const consumer = new ByteConsumer(data);
       await VarInt.deserialise(consumer);
       const dataLengthOrId = await VarInt.deserialise(consumer);
-      
+
       let id: number;
       if (this.compression && dataLengthOrId !== 0) {
         const remaining = consumer.drain();
@@ -39,8 +39,10 @@ class Client extends EventEmitter {
         id = dataLengthOrId;
       }
 
+      /* eslint-disable @typescript-eslint/ban-ts-ignore, @typescript-eslint/no-unused-vars */
       // @ts-ignore
       const _p = new packetMap.inbound[this.state][id]();
+      /* eslint-enable @typescript-eslint/ban-ts-ignore, @typescript-eslint/no-unused-vars */
     });
   }
 }

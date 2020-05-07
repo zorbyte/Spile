@@ -6,7 +6,10 @@ import ResponseSchema, { ResponseData } from "@net/server/schemas/Response";
 
 class Response extends Packet<Response> {
   public static id = 0x0;
-  private static codec = new PacketCodec(Response.id, new MCJSON<ResponseData>(ResponseSchema) as TypeCodec<ResponseData>);
+  private static codec = new PacketCodec(
+    Response.id,
+    new MCJSON<ResponseData>(ResponseSchema) as TypeCodec<ResponseData>,
+  );
 
   public data: ResponseData;
 

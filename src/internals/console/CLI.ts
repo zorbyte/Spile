@@ -47,20 +47,9 @@ class CLI {
 
       this.rl.on("line", async line => {
         this.log.debug("Line sent:", line);
-        if (line === ".credits") {
-          await EventBus.send(
-            "rawLog",
-            "Spile is created by zorbyte [https://github.com/zorbyte] " +
-            "and the contributors of the code at https://github.com/SpileMC/Spile\n" +
-            "Spile is licensed under the LGPL-3.0 license:\n" +
-            "Spile Minecraft Server  Copyright (C) 2020  The Spile Developers\n" +
-            "This program comes with ABSOLUTELY NO WARRANTY.\n" +
-            "This is free software, and you are welcome to redistribute it\n" +
-            "under certain conditions; see the license that was included with this software.",
-          );
-          return;
-        } else if (line === "stop") {
+        if (line === "stop") {
           this.rl.pause();
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.spile.stop();
         } else if (Environment.normal) {
           this.rl.prompt();

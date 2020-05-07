@@ -6,7 +6,8 @@ import isPromise from "is-promise";
 type EventId = string | number | symbol;
 type EventListener = (...args: any[]) => void | Promise<void>;
 
-// TODO: Make the event types added via a generic of some sorts? That's probably not a good idea... Find something better... Eventually.
+// TODO: Make the event types added via a generic of some sorts? That's probably not a good idea...
+// Find something better... Eventually.
 
 /**
  * This event bus is used for global event dispatching, therefore protecting the encapsulation of Spile.
@@ -29,7 +30,7 @@ class EventBus extends null {
   public static async send(id: EventId, ...args: any[]): Promise<void> {
     const foundListeners = [...EventBus.listeners.entries()]
       .filter(([evId]) => evId === id)
-      .flatMap(([_, lsFn]) => lsFn)
+      .flatMap(([, lsFn]) => lsFn)
       .map(listener => (async () => {
         const res = listener(...args);
         if (isPromise) await res;

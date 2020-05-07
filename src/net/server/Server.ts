@@ -10,6 +10,7 @@ import Client from "./Client";
 class Server extends SimpleServer<TCPServer> {
   protected server = createServer();
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore
   private clients: Client[];
 
@@ -17,7 +18,7 @@ class Server extends SimpleServer<TCPServer> {
     // TODO; Do not hard code this.
     super("server", 25565, spile);
     Packet.bindLogger(this.log);
-    this.server.on("connection", this.handleConnection);
+    this.server.on("connection", this.handleConnection.bind(this));
   }
 
   public encode(_packet: Codec<any>): void {
@@ -37,8 +38,10 @@ class Server extends SimpleServer<TCPServer> {
   private handleConnection(socket: Socket): void {
     this.log.debug("Connection established!");
 
+    /* eslint-disable @typescript-eslint/ban-ts-ignore, @typescript-eslint/no-unused-vars */
     // @ts-ignore
-    const newClient = new Client(socket, this.log);
+    const _newClient = new Client(socket, this.log);
+    /* eslint-enable @typescript-eslint/ban-ts-ignore, @typescript-eslint/no-unused-vars */
   }
 }
 

@@ -22,7 +22,11 @@ class PacketCodec<T extends TypeCodec<any>[]> {
    * @param compressionThreshold The threshold for compression.
    * @param args The arguments to serialise... ORDER IS IMPORTANT
    */
-  public async serialise(compressionThreshold: number, stringLens: number[], ...args: TypeCodecGenerics<T>): Promise<Buffer> {
+  public async serialise(
+    compressionThreshold: number,
+    stringLens: number[],
+    ...args: TypeCodecGenerics<T>
+  ): Promise<Buffer> {
     args = [this.id, ...args] as TypeCodecGenerics<T>;
 
     let i = 0;

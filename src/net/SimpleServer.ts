@@ -39,6 +39,7 @@ abstract class SimpleServer<S extends Server> implements AnyServer {
   protected _listen(hostname?: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const errorCb = (err: Error): void => {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         this.server.off("listening", listenCb);
         reject(err);
       };
