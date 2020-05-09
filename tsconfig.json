@@ -31,11 +31,11 @@
 		"rootDir": "src/",
 		"baseUrl": "src/",
 		"paths": {
-      "@root/*": ["*"],
-      "@lib/*": ["lib/*"],
-      "@lib/net/*": ["lib/net/*"],
       "@utils/*": ["lib/utils/*"],
+      "@net/*": ["net/*"],
       "@marshal": ["src/marshal/commands"],
+      "@lib/*": ["lib/*"],
+      "@root/*": ["*"],
       "@_types/*": ["lib/types/*"],
 		}
   },

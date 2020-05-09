@@ -1,5 +1,8 @@
+import ProtoServer from "@net/protocol/ProtoServer";
+import RConServer from "@net/rcon/RconServer";
 import Command from "@root/marshal/Command";
 import { CommandContext } from "@root/marshal/CommandContext";
+import QueryServer from "@root/net/query/QueryServer";
 import Logger, { LoggerLevels } from "@utils/Logger";
 import { isDebug } from "@utils/utils";
 
@@ -14,9 +17,11 @@ export const commands = new Map<string, Command<CommandContext>>();
 
 let isBooting = true;
 
+const [rcon, proto, query] = [new RConServer(), new ProtoServer(), new QueryServer()];
+
 export async function bootstrap() {
   try {
-    // await Promise.all([rcon!.listen(), this.server.listen(), this.query.listen()]);
+    await Promise.all([rcon.listen(), proto.listen(), query.listen()]);
     isBooting = false;
     log.debug("Registering critical error handler.");
     log.info("We're ready to roll boss!");
@@ -33,11 +38,10 @@ export async function bootstrap() {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export async function stop() {
   try {
     log.warn("Stopping server.");
-    // await Promise.all([this.rcon.close(), this.server.close(), this.query.close()]);
+    await Promise.all([rcon.close(), proto.close(), query.close()]);
     log.info("Thanks for playing!");
     log.destroySyncUnsafe();
     // eslint-disable-next-line no-process-exit
@@ -53,21 +57,4 @@ export async function stop() {
     // eslint-disable-next-line no-process-exit
     process.exit(1);
   }
-}
-
-// @link https://github.com/skyra-project/skyra/blob/ac8d0f42270cb45fd1f2e9869fd3d7176c021d8e/src/lib/util/util.ts#L596
-export function Enumerable(value: boolean) {
-  return (target: unknown, key: string) => {
-    Object.defineProperty(target, key, {
-      enumerable: value,
-      set(this: unknown, val: unknown) {
-        Object.defineProperty(this, key, {
-          configurable: true,
-          enumerable: value,
-          value: val,
-          writable: true,
-        });
-      },
-    });
-  };
 }

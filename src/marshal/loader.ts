@@ -1,12 +1,12 @@
 import {
   extname,
+  join,
   relative,
-  resolve,
   sep,
 } from "path";
 
+import { STypeError } from "@lib/errors";
 import { commands, mainLog } from "@lib/mediator";
-import { STypeError } from "@root/lib/errors";
 
 import { scan } from "fs-nextra";
 
@@ -15,7 +15,7 @@ import { CommandContext } from "./CommandContext";
 
 const log = mainLog.child("marshal");
 
-const CMD_DIR = resolve("commands");
+const CMD_DIR = join(__dirname, "commands");
 
 export async function initMarshal() {
   log.info("Initialising the Marshal command library.");

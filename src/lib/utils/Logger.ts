@@ -3,7 +3,6 @@ import { formatWithOptions } from "util";
 
 import chalk from "chalk";
 import SonicBoom from "sonic-boom";
-import { Container } from "typedi";
 
 interface MethodColours {
   [k: string]: chalk.Chalk;
@@ -103,16 +102,7 @@ class Logger {
   }
 
   public child(name: string): Logger {
-    const dependencyId = `log.${this.name}.${name}`;
-    let childLogger = Container.get<Logger>(dependencyId);
-    const loggerExists = !!childLogger;
-
-    if (!loggerExists) {
-      childLogger = new Logger(this.name, this.levelMin, this.fd, name);
-      Container.set(dependencyId, childLogger);
-    }
-
-    return childLogger;
+    return new Logger(this.name, this.levelMin, this.fd, name);
   }
 
   public close(): void {
