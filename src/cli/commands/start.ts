@@ -1,3 +1,5 @@
+// USING THE FUNC MODULE IN FUTURE!!!
+
 import { bootstrap } from "@lib/mediator";
 
 import { CommandModule } from "yargs";
