@@ -1,5 +1,3 @@
-import { constants, PathLike, promises } from "fs";
-
 import { argv } from "yargs";
 
 // This is a replica of Java's Object.hashCode() method.
@@ -18,24 +16,15 @@ export function createJavaHash(strToHash: string): number {
   return hash;
 }
 
-export async function fileExists(fileName: PathLike): Promise<boolean> {
-  try {
-    await promises.access(fileName, constants.F_OK);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export async function dependencyPresent(dependencyName: string): Promise<boolean> {
   try {
     await import(dependencyName);
+
     return true;
   } catch {
     return false;
   }
 }
-
 
 export function checkEnvBool(envVar?: string): boolean {
   return !!envVar && envVar === "yes"

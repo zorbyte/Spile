@@ -31,10 +31,12 @@
 		"rootDir": "src/",
 		"baseUrl": "src/",
 		"paths": {
+      "@root/*": ["*"],
+      "@lib/*": ["lib/*"],
+      "@lib/net/*": ["lib/net/*"],
+      "@utils/*": ["lib/utils/*"],
+      "@marshal": ["src/marshal/commands"],
       "@_types/*": ["lib/types/*"],
-			"@utils/*": ["lib/utils/*"],
-			"@lib/*": ["lib/*"],
-			"@root/*": ["*"]
 		}
   },
   "exclude": ["node_modules", "experiments"],

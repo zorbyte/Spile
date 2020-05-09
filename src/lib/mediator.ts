@@ -1,3 +1,5 @@
+import Command from "@root/marshal/Command";
+import { CommandContext } from "@root/marshal/CommandContext";
 import Logger, { LoggerLevels } from "@utils/Logger";
 import { isDebug } from "@utils/utils";
 
@@ -6,7 +8,9 @@ import { isDebug } from "@utils/utils";
 const log = new Logger("master", isDebug ? LoggerLevels.DEBUG : LoggerLevels.WARN);
 
 // Make it easier for other modules to use the logger without actually naming it log.
-export const masterLog = log;
+export const mainLog = log;
+
+export const commands = new Map<string, Command<CommandContext>>();
 
 let isBooting = true;
 
@@ -51,3 +55,19 @@ export async function stop() {
   }
 }
 
+// @link https://github.com/skyra-project/skyra/blob/ac8d0f42270cb45fd1f2e9869fd3d7176c021d8e/src/lib/util/util.ts#L596
+export function Enumerable(value: boolean) {
+  return (target: unknown, key: string) => {
+    Object.defineProperty(target, key, {
+      enumerable: value,
+      set(this: unknown, val: unknown) {
+        Object.defineProperty(this, key, {
+          configurable: true,
+          enumerable: value,
+          value: val,
+          writable: true,
+        });
+      },
+    });
+  };
+}

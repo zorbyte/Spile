@@ -1,10 +1,10 @@
-import { masterLog } from "@lib/mediator";
+import { mainLog } from "@lib/mediator";
 
 import AnyServer from "../BaseServer";
 
 // This doesn't extend SimpleServer because it listens on the same port as the main server in some cases.
 class QueryServer implements AnyServer {
-  private log = masterLog.child("query");
+  private log = mainLog.child("query");
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async listen(): Promise<void> {

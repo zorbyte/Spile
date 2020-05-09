@@ -1,13 +1,13 @@
 import { Server } from "net";
 
-import { masterLog } from "@lib/mediator";
+import { mainLog } from "@lib/mediator";
 
 import BaseServer from "./BaseServer";
 
 abstract class SimpleServer<S extends Server> implements BaseServer {
   public listening = false;
 
-  protected log = masterLog.child(this.name);
+  protected log = mainLog.child(this.name);
 
   // Message to use when the log messages refer to itself (grammar and formatting purposes mostly).
   private displayName: string;

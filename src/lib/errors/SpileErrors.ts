@@ -63,8 +63,6 @@ export function isError(error: Record<string, any> | InstanceType<SpileErrorCtor
     || error instanceof Error;
 }
 
-export default {
-  Error: createCustomError(Error),
-  TypeError: createCustomError(TypeError),
-  RangeError: createCustomError(RangeError),
-};
+export const SError = createCustomError(Error);
+export const STypeError = createCustomError(TypeError);
+export const SRangeError = createCustomError(RangeError);

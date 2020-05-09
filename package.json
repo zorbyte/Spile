@@ -67,9 +67,10 @@
   ],
   "_moduleAliases": {
     "@root": "./src",
-    "@internals": "./src/internals",
-    "@utils": "./src/utils",
+    "@lib": "./src/lib",
+    "@utils": "./src/lib/utils",
     "@net": "./src/net",
-    "@codecs": "./src/net/server/codecs"
+    "@marshal": "./src/marshal",
+    "@_types": "./src/lib/types"
   }
 }
