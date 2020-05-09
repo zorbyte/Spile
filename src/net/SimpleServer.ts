@@ -1,54 +1,39 @@
 import { Server } from "net";
 
-import Spile from "@internals/Spile";
+import { masterLog } from "@lib/mediator";
 
-import AnyServer from "./AnyServer";
+import BaseServer from "./BaseServer";
 
-abstract class SimpleServer<S extends Server> implements AnyServer {
-  /**
-   * Whether or not the server is listening.
-   */
+abstract class SimpleServer<S extends Server> implements BaseServer {
   public listening = false;
 
-  /**
-   * The logger for this server.
-   */
-  protected log = this.spile.log.child(this.name);
+  protected log = masterLog.child(this.name);
 
-  /**
-   * The name of the server to use in log messages (padded with a space for even formatting).
-   */
+  // Message to use when the log messages refer to itself (grammar and formatting purposes mostly).
   private displayName: string;
 
-  /**
-   * The internal server instance.
-   */
-  protected abstract server: S;
+  // The internal server instance.
+  public abstract server: S;
 
-  public constructor(protected name: string, protected port: number, protected spile: Spile) {
+  public constructor(protected name: string, protected port: number) {
     this.displayName = name === "server" ? " " : ` ${name} `;
   }
 
-  /**
-   * Listens on the desired port and hostname.
-   *
-   * @protected
-   * @param port {number} The port to listen on.
-   * @param hostname {string?} The hostname to listen on.
-   */
-  protected _listen(hostname?: string): Promise<void> {
+  // Listens on the desired port and hostname.
+  protected _listen(hostname?: string) {
     return new Promise((resolve, reject) => {
-      const errorCb = (err: Error): void => {
+      const errorCb = (err: Error) => {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         this.server.off("listening", listenCb);
         reject(err);
       };
 
-      const listenCb = (): void => {
+      const listenCb = () => {
         this.server.off("error", errorCb);
         this.server.on("error", err => {
           this.log.error(`An error occurred in the${this.displayName}server!\n`, err);
         });
+
         resolve();
       };
 
@@ -59,7 +44,7 @@ abstract class SimpleServer<S extends Server> implements AnyServer {
     });
   }
 
-  protected _close(): Promise<void> {
+  protected _close() {
     return new Promise((resolve, reject) => {
       this.server.close(err => {
         if (err) reject(err);
@@ -68,22 +53,10 @@ abstract class SimpleServer<S extends Server> implements AnyServer {
     });
   }
 
-  /**
-   * An abstract function that when implemented will call this._listen.
-   *
-   * @abstract
-   * @returns {Promise<void>}
-   * @throws {Error}
-   */
+  // An abstract function that when implemented MUST call this._listen.
   public abstract listen(): Promise<void>;
 
-  /**
-   * An abstract function that when implemented will call this._close.
-   *
-   * @abstract
-   * @returns {Promise<void>}
-   * @throws {Error}
-   */
+  // An abstract function that when implemented MUST call this._close.
   public abstract close(): Promise<void>;
 }
 

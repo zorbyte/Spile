@@ -15,9 +15,10 @@
     "noImplicitAny": true,
     "noImplicitReturns": false,
     "noImplicitThis": true,
-    "noUnusedLocals": true,
+    // NOTE: This is enforced by eslint.
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
-    "outDir": "./build",
+    "outDir": "./dist",
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
@@ -30,10 +31,9 @@
 		"rootDir": "src/",
 		"baseUrl": "src/",
 		"paths": {
-      "@net/*": ["net/*"],
-      "@codecs/*": ["net/server/codecs/*"],
-			"@utils/*": ["utils/*"],
-			"@internals/*": ["internals/*"],
+      "@_types/*": ["lib/types/*"],
+			"@utils/*": ["lib/utils/*"],
+			"@lib/*": ["lib/*"],
 			"@root/*": ["*"]
 		}
   },

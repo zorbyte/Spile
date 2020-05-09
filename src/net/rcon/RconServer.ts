@@ -1,15 +1,13 @@
 import { Server } from "http";
 
-import Spile from "@internals/Spile";
-
 import SimpleServer from "../SimpleServer";
 
 class RConServer extends SimpleServer<Server> {
-  protected server = new Server();
+  public server = new Server();
 
-  public constructor(spile: Spile) {
-    // TODO: Use the config to get this value.
-    super("rcon", 25575, spile);
+  public constructor() {
+    // TODO: Use the config to get the port.
+    super("rcon", 25575);
   }
 
   public async listen(): Promise<void> {

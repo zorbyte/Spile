@@ -1,9 +1,15 @@
 module.exports = {
   extends: [
-    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:security/recommended",
     "bamboo",
   ],
-  plugins: ["simple-import-sort"],
+  plugins: [
+    "simple-import-sort",
+    "security",
+    "perf-standard"
+  ],
   env: {
     es6: true,
     node: true,
@@ -14,6 +20,32 @@ module.exports = {
     project: "./tsconfig.eslint.json"
   },
   rules: {
+    "object-curly-newline": ["error", {
+      ImportDeclaration: {
+        multiline: true,
+        minProperties: 4,
+        consistent: true,
+      },
+      ExportDeclaration: "never",
+    }],
+    "padding-line-between-statements": [
+      "error",
+      { blankLine: "always", prev: "block-like", next: "*" },
+      { blankLine: "always", prev: "*", next: "return" },
+      { blankLine: "always", prev: ["const", "let", "var"], next: "*" },
+      { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var", "for"] }
+    ],
+    // TODO: Set this up on files which handle inbound data.
+    "security/detect-object-injection": "off",
+    "space-before-function-paren": "off",
+    "@typescript-eslint/space-before-function-paren": ["error", "never"],
+    "perf-standard/no-instanceof-guard": "error",
+    "perf-standard/no-self-in-constructor": "error",
+    "perf-standard/check-function-inline": "off",
+    "operator-linebreak": ["error", "before"],
+    "sort-imports": "off",
+    "import/order": "off",
+    "no-implicit-coercion": "off",
     "@typescript-eslint/restrict-plus-operands": 0,
     "comma-dangle": ["error", "always-multiline"],
     // Keep this at the top for convenience.
@@ -45,8 +77,12 @@ module.exports = {
     ],
     quotes: ["error", "double", { avoidEscape: true }],
     "max-len": ["error", 120, 2],
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/indent": ["error", 2],
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "no-process-exit": ["error"],
+    "@typescript-eslint/indent": ["error", 2, {
+      // flatTernaryExpressions: true,
+      SwitchCase: 1,
+    }],
     "@typescript-eslint/member-ordering": ["error", {
       default: [
         "public-static-field",

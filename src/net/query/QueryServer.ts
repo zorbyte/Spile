@@ -1,14 +1,10 @@
-import Spile from "@internals/Spile";
+import { masterLog } from "@lib/mediator";
 
-import AnyServer from "../AnyServer";
+import AnyServer from "../BaseServer";
 
-/**
- * This doesn't extend SimpleServer because it listens on the same port as the main server.
- */
+// This doesn't extend SimpleServer because it listens on the same port as the main server in some cases.
 class QueryServer implements AnyServer {
-  private log = this.spile.log.child("query");
-
-  public constructor(private spile: Spile) { }
+  private log = masterLog.child("query");
 
   // eslint-disable-next-line @typescript-eslint/require-await
   public async listen(): Promise<void> {

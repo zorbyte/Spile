@@ -1,4 +1,4 @@
-import { Predicate } from "@utils/typeUtils";
+import { Predicate } from "@root/lib/utils/typeUtils";
 
 type CommandExecutor<C> = (ctx: C, msg: string, args: string[]) => Promise<string | void> | string | void;
 

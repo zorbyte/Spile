@@ -4,9 +4,11 @@
     "MCJSON",
     "Minecraft",
     "Netherite",
+    "protoserver",
     "rcon",
     "zorbyte"
   ],
   "eslint.enable": true,
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }
