@@ -45,6 +45,7 @@ module.exports = {
     "operator-linebreak": ["error", "before"],
     "sort-imports": "off",
     "import/order": "off",
+    "no-console": "error",
     "no-implicit-coercion": "off",
     "@typescript-eslint/restrict-plus-operands": 0,
     "comma-dangle": ["error", "always-multiline"],
@@ -128,4 +129,21 @@ module.exports = {
       }
     ],
   },
+  overrides: [
+    {
+      // Using the func module has its costs, but it is worth it.
+      files: ["./src/cli/commands/*.ts", "./src/cli/options/*.ts"],
+      rules: {
+        "@typescript-eslint/no-extraneous-class": "off",
+        "no-console": "off",
+      },
+    },
+    {
+      // Using the func module has its costs, but it is worth it.
+      files: ["./src/index.ts"],
+      rules: {
+        "no-console": ["error", { allow: ["error"] }],
+      },
+    },
+  ],
 };

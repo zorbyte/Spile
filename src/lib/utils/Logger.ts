@@ -1,8 +1,9 @@
-import { WriteStream } from "tty";
 import { formatWithOptions } from "util";
 
 import chalk from "chalk";
 import SonicBoom from "sonic-boom";
+
+import { streamSupportsColour } from "./utils";
 
 interface MethodColours {
   [k: string]: chalk.Chalk;
@@ -78,7 +79,7 @@ class Logger {
 
     if (!Logger.stdout) Logger.stdout = new SonicBoom({ fd: this.fd } as any);
 
-    const stdoutColours = this.checkColourSupport(process.stdout);
+    const stdoutColours = streamSupportsColour(process.stdout);
 
     for (const [lvl, colFn] of Object.entries(METHOD_COLOURS)) {
       const levelIndex = i;
@@ -122,11 +123,6 @@ class Logger {
 
     // eslint-disable-next-line max-len
     return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${this.name}` : ""} ${colourMethod(levelName)}`;
-  }
-
-  private checkColourSupport(stream: WriteStream): boolean {
-    return stream.isTTY
-      && (typeof stream.getColorDepth === "function" ? stream.getColorDepth() > 2 : true);
   }
 }
 

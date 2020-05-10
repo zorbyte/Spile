@@ -1,19 +1,13 @@
-// USING THE FUNC MODULE IN FUTURE!!!
-
 import { bootstrap } from "@lib/mediator";
 
-import { CommandModule } from "yargs";
+import { Command } from "func";
 
-const startCommand: CommandModule = {
-  command: "start",
-  aliases: ["s"],
-  builder: yargs => yargs
-    .option("something", {
-      desc: "Does something",
-    }),
-  async handler() {
-    await bootstrap();
-  },
-};
+@Command({ name: "start" })
+class StartSpile {
+  public constructor() {
+    bootstrap()
+      .catch(err => console.error("An error occurred pre-bootstrap!", err));
+  }
+}
 
-module.exports = startCommand;
+export default StartSpile;

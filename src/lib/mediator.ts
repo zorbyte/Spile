@@ -23,7 +23,6 @@ export async function bootstrap() {
   try {
     await Promise.all([rcon.listen(), proto.listen(), query.listen()]);
     isBooting = false;
-    log.debug("Registering critical error handler.");
     log.info("We're ready to roll boss!");
   } catch (err) {
     // Should also use the error lib to check if this is a critical/terminal error.

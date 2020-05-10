@@ -1,10 +1,11 @@
 import { join } from "path";
+import { WriteStream } from "tty";
 
 import RoughPackageJson from "@_types/common/RoughPackageJson";
 
 import { readFile } from "fs-nextra";
+import getopts from "getopts";
 import jsonParse from "secure-json-parse";
-import { argv } from "yargs";
 
 // This is a replica of Java's Object.hashCode() method.
 export function createJavaHash(strToHash: string): number {
@@ -36,8 +37,10 @@ export async function getPackageJson() {
   const packageJsonLoc = join(__dirname, "..", "..", "..", "package.json");
   const contents = await readFile(packageJsonLoc, { encoding: "utf-8" });
 
-  return jsonParse(contents) as RoughPackageJson;
+  return jsonParse.parse(contents) as RoughPackageJson;
 }
+
+export const opts = getopts(process.argv.slice(2));
 
 export function checkEnvBool(envVar?: string): boolean {
   return !!envVar && envVar === "yes"
@@ -47,8 +50,10 @@ export function checkEnvBool(envVar?: string): boolean {
 }
 
 export const isDebug = checkEnvBool(process.env.S_DEBUG)
-  || !!argv.debug
-  || !!argv.develop;
+  || !!opts.debug
+  || !!opts.d
+  || !!opts.dev
+  || !!opts.development;
 
 // @link https://github.com/skyra-project/skyra/blob/ac8d0f42270cb45fd1f2e9869fd3d7176c021d8e/src/lib/util/util.ts#L596
 // @license MIT - Copyright Skyra Developers.
@@ -66,6 +71,11 @@ export function Enumerable(value: boolean) {
       },
     });
   };
+}
+
+export function streamSupportsColour(stream: WriteStream) {
+  return stream.isTTY
+      && (typeof stream.getColorDepth === "function" ? stream.getColorDepth() > 2 : true);
 }
 
 export default createJavaHash;

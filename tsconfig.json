@@ -33,10 +33,10 @@
 		"paths": {
       "@utils/*": ["lib/utils/*"],
       "@net/*": ["net/*"],
-      "@marshal": ["src/marshal/commands"],
-      "@lib/*": ["lib/*"],
-      "@root/*": ["*"],
+      "@marshal": ["marshal/commands"],
       "@_types/*": ["lib/types/*"],
+      "@lib/*": ["lib/*"],
+      "@root/*": ["*"]
 		}
   },
   "exclude": ["node_modules", "experiments"],
