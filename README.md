@@ -14,12 +14,12 @@ src - The source code for Spile. Top level folder for modules that deserve their
 │   ├───commands - The commands used to run Spile.
 │   │   └───base - Base command classes for the CLI.
 │   └───options - The flags/options used on the root command (e.g. "spile -v").
-├───lib - The library, you could say that the stuff that "does things" reside here.
+├───lib - The library, you could say that the stuff that "does things" and can be reused reside here.
 │   ├───errors - Custom errors used throughout Spile.
 │   ├───types - Types, including typescript shims, common typings, validators and schemas for data.
-│   │   ├───common - Common typings.
+│   │   ├───common - Common typings that can be used anywhere.
 │   │   ├───schemas - Schemas for JSON validation.
-│   │   ├───shims - Type definitions for libraries that do not ship with any.
+│   │   ├───shims - Type definitions for libraries that do not ship with their own.
 │   │   └───validators - Validators for data structures using the ow validator.
 │   └───utils - Utilities used globally.
 ├───marshal - The command framework created for Spile.
