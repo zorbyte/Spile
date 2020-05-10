@@ -21,7 +21,7 @@ src - Here, the library, certain modules that deserve their own namespace like n
 │   │   ├───schemas - Schemas for JSON validation.
 │   │   ├───shims - Shims for typescript types.
 │   │   └───validators - Validators for data structures using the ow validator.
-│   └───utils
+│   └───utils - Utilities used globally.
 ├───marshal - The command framework created for Spile.
 │   └───commands - The commands for the game itself.
 │       ├───minecraft - NMS commands.
