@@ -1,4 +1,5 @@
 import { SError } from "@lib/errors";
+import { Enumerable } from "@utils/utils";
 
 import Client from "./Client";
 import Field from "./Field";
@@ -24,7 +25,10 @@ class Packet {
     return packet.fields;
   }
 
+  @Enumerable(false)
   private fields = new Map<string, Field<unknown>>();
+
+  @Enumerable(false)
   private runHook?: PacketHook<this>;
 
   // eslint-disable-next-line constructor-super
@@ -34,6 +38,7 @@ class Packet {
     private readonly direction: "I" | "O",
   ) {}
 
+  @Enumerable(false)
   public addField<T extends string, F extends Field<any>, FT = FieldGeneric<F>>(
     key: T,
     field: F,
@@ -47,13 +52,14 @@ class Packet {
     return this as this & Record<T, FT>;
   }
 
-  // This doesn't work with type aliases, sorry! :(
+  @Enumerable(false)
   public onRun(hook: PacketHook<this>) {
     this.runHook = hook;
 
     return this;
   }
 
+  @Enumerable(false)
   public build(): BuiltPacket<this> {
     // Inbound packets need a hook.
     if (!this.runHook && this.direction === "I") throw new SError("PACKET_BUILDER_LAST_NOT_RUN");
