@@ -1,13 +1,8 @@
 import { CommandMissing } from "func";
 
-import showHelpMenu from "../showHelpMenu";
+import BaseHelp from "./base/BaseHelp";
 
 @CommandMissing()
-class NotFound {
-  public constructor() {
-    showHelpMenu()
-      .catch(err => console.error("Error showing help menu!\n", err));
-  }
-}
+class NotFound extends BaseHelp { }
 
 export default NotFound;

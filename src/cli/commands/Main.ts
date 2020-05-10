@@ -1,13 +1,8 @@
 import { CommandMajor } from "func";
 
-import showHelpMenu from "../showHelpMenu";
+import BaseHelp from "./base/BaseHelp";
 
 @CommandMajor()
-class Main {
-  public constructor() {
-    showHelpMenu()
-      .catch(err => console.error("Error showing help menu!\n", err));
-  }
-}
+class Main extends BaseHelp { }
 
 export default Main;

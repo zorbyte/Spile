@@ -2,7 +2,7 @@ import { bootstrap } from "@lib/mediator";
 
 import { Command } from "func";
 
-@Command({ name: "start" })
+@Command({ name: "start", alias: "s" })
 class StartSpile {
   public constructor() {
     bootstrap()

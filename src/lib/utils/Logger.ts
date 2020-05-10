@@ -54,6 +54,7 @@ class Logger {
     private fd?: string | number,
     childName?: string,
   ) {
+    // TODO: Refactor this cancer.
     const nameType = typeof name;
 
     if (nameType === "undefined" && typeof levelMin === "undefined") levelMin = LoggerLevels.INFO;
