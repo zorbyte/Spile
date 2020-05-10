@@ -1,8 +1,8 @@
+import Command from "@marshal/Command";
+import { CommandContext } from "@marshal/CommandContext";
 import ProtoServer from "@net/protocol/ProtoServer";
+import QueryServer from "@net/query/QueryServer";
 import RConServer from "@net/rcon/RconServer";
-import Command from "@root/marshal/Command";
-import { CommandContext } from "@root/marshal/CommandContext";
-import QueryServer from "@root/net/query/QueryServer";
 import Logger, { LoggerLevels } from "@utils/Logger";
 import { isDebug } from "@utils/utils";
 

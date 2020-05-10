@@ -2,7 +2,6 @@ import { getPackageJson } from "@utils/utils";
 
 import { Option } from "func";
 
-// Something, use the func module.
 @Option({
   name: "version",
   alias: "v",

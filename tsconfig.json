@@ -33,7 +33,7 @@
 		"paths": {
       "@utils/*": ["lib/utils/*"],
       "@net/*": ["net/*"],
-      "@marshal": ["marshal/commands"],
+      "@marshal/*": ["marshal/*"],
       "@_types/*": ["lib/types/*"],
       "@lib/*": ["lib/*"],
       "@root/*": ["*"]
