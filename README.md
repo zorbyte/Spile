@@ -8,34 +8,30 @@ Check out issue #1 for more info (yes I'm that lazy I'm not going to link to it,
 
 ## File Organisation
 
-Source code goes in an src folder.
 ```
-src - Here, the library, certain modules that deserve their own namespace like net and structures like commands reside here.
-├───commands
-│   ├───minecraft - nms commands
-│   └───spile - spile related commands
+src - Here, the library, certain modules that deserve their own namespace like net and cli reside here.
+├───cli - CLI used to run Spile.
+│   ├───commands - The commands used to run Spile.
+│   │   └───base - Base command classes for the CLI.
+│   └───options
 ├───lib - The library, you could say that the stuff that "does things" reside here.
-│   ├───errors - Custom errors used throughout spile. 
+│   ├───errors - Custom errors used throughout Spile.
 │   ├───types - Types, including typescript shims, common typings, validators and schemas for data.
 │   │   ├───common - Common typings.
-│   │   ├───schemas - Schemas for JSON.
+│   │   ├───schemas - Schemas for JSON validation.
 │   │   ├───shims - Shims for typescript types.
 │   │   └───validators - Validators for datastructures using ow.
 │   └───utils
-└───net
-    ├───query
-    ├───rcon
-    ├───server
-    │   ├───codecs
-    │   │   └───types
-    │   ├───packets
-    │   │   ├───shake
-    │   │   │   └───inbound
-    │   │   └───status
-    │   │       ├───inbound
-    │   │       └───outbound
-    │   └───schemas
-    └───typings
+├───marshal - The command framework created for Spile.
+│   └───commands - The commands for the game itself.
+│       ├───minecraft - NMS commands.
+│       └───spile - Spile related commands.
+└───net - Network related.
+    ├───protocol - Networking related to the Minecraft protocol.
+    │   ├───fields - Data fields on packets.
+    │   └───packets - Data structures to easily interact with packets.
+    ├───query - Query server.
+    └───rcon - Remote control server.
 ```
 
 ## License
