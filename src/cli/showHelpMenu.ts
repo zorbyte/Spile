@@ -10,7 +10,7 @@ async function showHelpMenu() {
   console.log(
     // eslint-disable-next-line prefer-template
     "Hello, this doesn't look like a help menu, rather a feeble dump of data. "
-    + "Well glad you noticed! This isn't finished yet.\n"
+    + "Well I'm glad you noticed! This isn't finished yet.\n"
     + inspect(helpData, { colors: streamSupportsColour(process.stdout), depth: Infinity }),
   );
 }
