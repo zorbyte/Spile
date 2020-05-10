@@ -25,7 +25,7 @@ src - Here, the library, certain modules that deserve their own namespace like n
 ├───marshal - The command framework created for Spile.
 │   └───commands - The commands for the game itself.
 │       ├───minecraft - NMS commands.
-│       └───spile - Spile related commands.
+│       └───spile - Spile's commands.
 └───net - Network related.
     ├───protocol - Networking related to the Minecraft protocol.
     │   ├───fields - Data fields on packets.
