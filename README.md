@@ -13,7 +13,7 @@ src - Here, the library, certain modules that deserve their own namespace like n
 ├───cli - CLI used to run Spile.
 │   ├───commands - The commands used to run Spile.
 │   │   └───base - Base command classes for the CLI.
-│   └───options
+│   └───options - The flags/options used on the root command (e.g. "spile -v").
 ├───lib - The library, you could say that the stuff that "does things" reside here.
 │   ├───errors - Custom errors used throughout Spile.
 │   ├───types - Types, including typescript shims, common typings, validators and schemas for data.
