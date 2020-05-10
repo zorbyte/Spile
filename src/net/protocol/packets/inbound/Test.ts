@@ -8,6 +8,7 @@ const testPacket = new Packet(0x0, "test", "I")
   .onRun((_client, packet) => {
     packet.playerCount;
     packet.playerOnline;
+    packet.id;
   })
   .build();
 

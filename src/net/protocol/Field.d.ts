@@ -1,8 +1,8 @@
+import { Asyncable } from "@utils/typeUtils";
+
 import ByteConsumer from "./ByteConsumer";
 
-export type StringLength<T> = T extends string ? [number] : [undefined?];
 export default interface Field<T extends unknown> {
-  serialise: (data: T, ...n: StringLength<T>) => Promise<Buffer> | Buffer;
-  deserialise: (consumer: ByteConsumer, ...n: StringLength<T>) => Promise<T> | T;
+  serialise: (data: T) => Asyncable<Buffer>;
+  deserialise: (consumer: ByteConsumer) => Asyncable<T>;
 }
-

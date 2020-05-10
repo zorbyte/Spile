@@ -11,7 +11,7 @@ type SpileErrorCtor = new (key: ErrorMessageKeys, ...args: string[]) => Error;
 // require("@lib/errors/errorUtils") will return Cache A of the module.
 // require("spile/errors/errorUtils") will return Cache B of the module.
 // Since this is the only way that an external caller can resolve this module, they will never get the original symbol.
-export const kSpileError = Symbol("kSpileError");
+export const kSpileError = Symbol.for("kSpileError");
 const ERROR_PROPS = Object.keys(Error.prototype);
 
 /**

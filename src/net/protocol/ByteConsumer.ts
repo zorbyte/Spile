@@ -4,13 +4,13 @@ class ByteConsumer {
 
   public constructor(public raw: Buffer, private size = raw.byteLength) {}
 
-  public replaceBuffer(newBuff: Buffer, size: number): void {
+  public replaceBuffer(newBuff: Buffer, size: number) {
     this.current = newBuff;
     this.size = size;
     this.pos = 0;
   }
 
-  public consume(amnt: number): Buffer {
+  public consume(amnt: number) {
     if (amnt > this.size) throw new Error("Not enough bytes left to be consumed!");
     const section = this.current.slice(this.pos, amnt);
 
@@ -20,7 +20,7 @@ class ByteConsumer {
     return section;
   }
 
-  public drain(): Buffer {
+  public drain() {
     this.pos = this.current.length - 1;
     this.size = 0;
 

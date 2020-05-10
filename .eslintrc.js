@@ -33,7 +33,9 @@ module.exports = {
       { blankLine: "always", prev: "block-like", next: "*" },
       { blankLine: "always", prev: "*", next: "return" },
       { blankLine: "always", prev: ["const", "let", "var"], next: "*" },
-      { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var", "for"] }
+      { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var", "for", "return"] },
+      { blankLine: "always", prev: "import", next: "*" },
+      { blankLine: "any", prev: "import", next: "import" },
     ],
     // TODO: Set this up on files which handle inbound data.
     "security/detect-object-injection": "off",
