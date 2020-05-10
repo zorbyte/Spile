@@ -27,7 +27,7 @@ function createCustomError<E extends SpileErrorCtor>(DummyBaseCtor: E) {
     public readonly [kSpileError] = true;
 
     public constructor(
-      private readonly key: ErrorMessageKeys,
+      public readonly key: ErrorMessageKeys,
       ...args: string[]
     ) {
       // Error thrown further down the stack if need be.

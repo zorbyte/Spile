@@ -4,6 +4,9 @@ export type SpileErrorMessage = ((...args: any[]) => string) | string;
 const _ERROR_MESSAGES = {
   FEATURE_TODO: "This feature is currently not implemented. It will be implemented eventually...",
   INVALID_COMMAND_BUILDER: (cmdFileName: string) => `The file ${cmdFileName} is not a valid CommandBuilder.`,
+
+  // eslint-disable-next-line max-len
+  PACKET_BUILDER_LAST_NOT_RUN: (name: string) => `The last item that was built onto the packet builder ${name} was not the run function!`,
 };
 
 export type ErrorMessageKeys = keyof typeof _ERROR_MESSAGES;

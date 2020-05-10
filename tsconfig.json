@@ -3,7 +3,7 @@
   "compilerOptions": {
     "allowJs": true,
     "alwaysStrict": true,
-    "declaration": false,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "emitDecoratorMetadata": true,
@@ -22,7 +22,7 @@
     "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "strict": true,
     "strictBindCallApply": true,
     "strictNullChecks": false,

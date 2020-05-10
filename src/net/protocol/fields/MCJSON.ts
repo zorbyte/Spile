@@ -27,7 +27,7 @@ class MCJSON<T> implements Field<T> {
     const len = await VarInt.deserialise(consumer);
     const rawJson = await MCString.deserialise(consumer, len);
 
-    return secJsonParse(rawJson);
+    return secJsonParse.parse(rawJson);
   }
 }
 

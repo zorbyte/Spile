@@ -34,6 +34,14 @@ src - Here, the library, certain modules that deserve their own namespace like n
     └───rcon - Remote control server.
 ```
 
+## Credits
+
+This project would be impossible without these amazing people, resources, communities and projects:
+  - [wiki.vg](https://wiki.vg) - Documentation on the Minecraft protocol.
+  - [Mojang](https://www.mojang.com) - Mojang for such a cool game.
+  - [GlowstoneMC](https://github.com/GlowstoneMC/Glowstone) - For countless inspirations on how I should go about creating certain aspects on this project.
+  - [PrismarineJS](https://github.com/PrismarineJS) - Existing JS code to help me gain insight on how things are done through JS in the MC protocol.
+
 ## License
 
 This project is licensed under the MIT license. Please consider its existence... See [LICENSE](./LICENSE) for more information.
