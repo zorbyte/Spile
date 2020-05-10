@@ -30,6 +30,8 @@ src - Here, the library, certain modules that deserve their own namespace like n
     ├───protocol - Networking related to the Minecraft protocol.
     │   ├───fields - Data fields on packets.
     │   └───packets - Data structures to easily interact with packets.
+    │       ├───inbound - Packets that inbound to the server.
+    │       └───outbound - Packets that are outbound to the client.
     ├───query - Query server.
     └───rcon - Remote control server.
 ```
