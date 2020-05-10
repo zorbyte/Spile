@@ -9,7 +9,7 @@ Check out issue #1 for more info (yes I'm that lazy I'm not going to link to it,
 ## File Organisation
 
 ```
-src - Here, the library, certain modules that deserve their own namespace like net and cli reside here.
+src - The source code for Spile. The library and certain modules that deserve their own namespaces like net and cli reside here.
 ├───cli - CLI used to run Spile.
 │   ├───commands - The commands used to run Spile.
 │   │   └───base - Base command classes for the CLI.
