@@ -19,7 +19,7 @@ src - Here, the library, certain modules that deserve their own namespace like n
 │   ├───types - Types, including typescript shims, common typings, validators and schemas for data.
 │   │   ├───common - Common typings.
 │   │   ├───schemas - Schemas for JSON validation.
-│   │   ├───shims - Shims for typescript types.
+│   │   ├───shims - Type definitions for libraries that do not ship with any.
 │   │   └───validators - Validators for data structures using the ow validator.
 │   └───utils - Utilities used globally.
 ├───marshal - The command framework created for Spile.
