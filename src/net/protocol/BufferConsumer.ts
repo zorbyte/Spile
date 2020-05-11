@@ -1,12 +1,12 @@
-class ByteConsumer {
+class BufferConsumer {
   public pos = 0;
   private current = this.raw;
 
   public constructor(public raw: Buffer, private size = raw.byteLength) {}
 
-  public replaceBuffer(newBuff: Buffer, size: number) {
+  public replaceBuffer(newBuff: Buffer, size?: number) {
     this.current = newBuff;
-    this.size = size;
+    this.size = size || newBuff.length;
     this.pos = 0;
   }
 
@@ -28,4 +28,4 @@ class ByteConsumer {
   }
 }
 
-export default ByteConsumer;
+export default BufferConsumer;

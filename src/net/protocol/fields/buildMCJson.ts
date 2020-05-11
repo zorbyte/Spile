@@ -1,7 +1,6 @@
 import fjs from "fast-json-stringify";
 import secJsonParse from "secure-json-parse";
 
-import ByteConsumer from "../ByteConsumer";
 import Field from "../Field";
 
 import buildMCString from "./buildMCString";
@@ -11,7 +10,7 @@ function buildMCJson<T>(schema: fjs.Schema): Field<T> {
   const stringify = fjs(schema) as unknown as (doc: T) => string;
 
   return {
-    async serialise(data: T): Promise<Buffer> {
+    async serialise(data): Promise<Buffer> {
       const jAsStr = stringify(data);
       const len = jAsStr.length;
       const lenBuff = await VarInt.serialise(len);
@@ -21,7 +20,7 @@ function buildMCJson<T>(schema: fjs.Schema): Field<T> {
       return Buffer.concat([lenBuff, jsonBuff], lenBuff.length + jsonBuff.length);
     },
 
-    async deserialise(consumer: ByteConsumer): Promise<T> {
+    async deserialise(consumer): Promise<T> {
       const len = await VarInt.deserialise(consumer);
       const MCString = buildMCString(len);
       const rawJson = await MCString.deserialise(consumer);

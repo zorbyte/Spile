@@ -5,7 +5,7 @@ import { protocolInflate } from "@utils/compression";
 import Logger from "@utils/Logger";
 
 import VarInt from "./fields/VarInt";
-import ByteConsumer from "./ByteConsumer";
+import BufferConsumer from "./BufferConsumer";
 
 export enum State {
   SHAKE,
@@ -25,7 +25,7 @@ class Client extends EventEmitter {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.socket.on("data", async data => {
       this.log.debug(`Incoming Packet. compressed=${this.compression}`);
-      const consumer = new ByteConsumer(data);
+      const consumer = new BufferConsumer(data);
 
       await VarInt.deserialise(consumer);
       const dataLengthOrId = await VarInt.deserialise(consumer);

@@ -1,8 +1,8 @@
 import { Asyncable } from "@utils/typeUtils";
 
-import ByteConsumer from "./ByteConsumer";
+import BufferConsumer from "./BufferConsumer";
 
 export default interface Field<T extends unknown> {
   serialise: (data: T) => Asyncable<Buffer>;
-  deserialise: (consumer: ByteConsumer) => Asyncable<T>;
+  deserialise: (consumer: BufferConsumer) => Asyncable<T>;
 }
