@@ -78,8 +78,8 @@ class Packet {
   ): this & Record<T, FT> {
     this.fields.set(key, field);
 
-    // @ts-expect-error - This is valid, as the returned type by this function has this property.
-    this[key] = defaultVal;
+    // This is valid, as the returned type by this function has this property.
+    this[key as keyof this] = defaultVal as any;
 
     return this as this & Record<T, FT>;
   }
