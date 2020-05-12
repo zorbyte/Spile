@@ -5,7 +5,7 @@ import { stop } from "@lib/mediator";
 import SimpleServer from "../SimpleServer";
 
 import Client from "./Client";
-import { initPacketCodec } from "./PacketCodec";
+import { initPacketCodec } from "./packetCodec";
 
 class ProtoServer extends SimpleServer<TCPServer> {
   public server = createServer();

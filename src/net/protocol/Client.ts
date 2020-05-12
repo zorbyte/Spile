@@ -5,7 +5,7 @@ import Logger from "@utils/Logger";
 import Player from "@game/Player";
 
 import Packet from "./Packet";
-import { deserialise, serialise } from "./PacketCodec";
+import { deserialise, serialise } from "./packetCodec";
 
 export enum State {
   SHAKE,
