@@ -30,8 +30,7 @@ src - The source code for Spile. Top level folder for modules that deserve their
     ├───protocol - Networking related to the Minecraft protocol.
     │   ├───fields - Data fields on packets.
     │   └───packets - Data structures to easily interact with packets.
-    │       ├───inbound - Packets that inbound to the server.
-    │       └───outbound - Packets that are outbound to the client.
+    │       └───[...] - Folders for the respective protocol states.
     ├───query - Query server.
     └───rcon - Remote control server.
 ```
