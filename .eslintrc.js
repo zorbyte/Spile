@@ -79,6 +79,7 @@ module.exports = {
       },
     ],
     quotes: ["error", "double", { avoidEscape: true }],
+    "multiline-ternary": "off",
     "max-len": ["error", 120, 2],
     "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     "no-process-exit": ["error"],

@@ -68,6 +68,7 @@
     "@lib": "./src/lib",
     "@utils": "./src/lib/utils",
     "@net": "./src/net",
+    "@game": "./src/game",
     "@marshal": "./src/marshal",
     "@_types": "./src/lib/types"
   }

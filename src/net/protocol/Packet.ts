@@ -33,12 +33,6 @@ class Packet {
     return packet[kDirection];
   }
 
-  public static setDirection(packet: Packet, direction: PacketDirection) {
-    // Great place to check if it is a valid inbound hook.
-    if (direction === "I" && packet[kRunHook]) throw new STypeError("INBOUND_PACKET_HOOK_ABSENT", packet[kName]);
-    packet[kDirection] = direction;
-  }
-
   public static setState(packet: Packet, state: State) {
     packet[kState] = state;
   }
@@ -87,8 +81,9 @@ class Packet {
   @Enumerable(false)
   private [kDataLength] = 0;
 
-  public constructor(public readonly id: number, name: string) {
+  public constructor(public readonly id: number, name: string, direction: PacketDirection) {
     this[kName] = name;
+    this[kDirection] = direction;
 
     this[kFields].set("id", VarInt);
   }
@@ -124,6 +119,9 @@ class Packet {
 
   @Enumerable(false)
   public build(): BuiltPacket<this> {
+    // Great place to check if it is a valid inbound hook.
+    if (this[kDirection] === "I" && this[kRunHook]) throw new STypeError("INBOUND_PACKET_HOOK_ABSENT", this[kName]);
+
     return this;
   }
 }

@@ -33,6 +33,7 @@
 		"paths": {
       "@utils/*": ["lib/utils/*"],
       "@net/*": ["net/*"],
+      "@game/*": ["game/*"],
       "@marshal/*": ["marshal/*"],
       "@_types/*": ["lib/types/*"],
       "@lib/*": ["lib/*"],

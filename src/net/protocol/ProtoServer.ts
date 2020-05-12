@@ -8,7 +8,6 @@ import Client from "./Client";
 
 type ErrorHandler = (err: Error) => void;
 
-
 class ProtoServer extends SimpleServer<TCPServer> {
   public server = createServer();
   private handleError = buildDefErrHandler(this.log);
