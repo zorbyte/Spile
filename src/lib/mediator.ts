@@ -6,9 +6,7 @@ import RConServer from "@net/rcon/RconServer";
 import Logger, { LoggerLevels } from "@utils/Logger";
 import { isDebug } from "@utils/utils";
 
-// Prefer using warnings only in production, I need to emphasise that this is a no-bs server.
-// If people want to enable info logs as the default they can gladly open an issue and I will setup a poll for it.
-const log = new Logger("master", isDebug ? LoggerLevels.DEBUG : LoggerLevels.WARN);
+const log = new Logger("master", isDebug ? LoggerLevels.DEBUG : LoggerLevels.INFO);
 
 // Make it easier for other modules to use the logger without actually naming it log.
 export const mainLog = log;
@@ -43,6 +41,7 @@ export async function stop() {
     await Promise.all([rcon.close(), proto.close(), query.close()]);
     log.info("Thanks for playing!");
     log.destroySyncUnsafe();
+
     // eslint-disable-next-line no-process-exit
     process.exit();
   } catch (err) {
@@ -53,6 +52,7 @@ export async function stop() {
       "Please report this! The server will now close dirtily.\n",
       err,
     );
+
     // eslint-disable-next-line no-process-exit
     process.exit(1);
   }

@@ -21,12 +21,14 @@ const log = mainLog.child("packetCodec");
 
 const PACKET_DIR = join(__dirname, "packets");
 
+// Maps a state enum to an object of ids and in turn Packet instances.
 interface PacketStateMap {
   [state: number]: {
     [id: number]: Packet;
   };
 }
 
+// Inbound and Outbound.
 interface PacketMap {
   I: PacketStateMap;
   O: PacketStateMap;
@@ -39,6 +41,7 @@ const BASE_PACKET_STATE_MAP: PacketStateMap = {
   [State.PLAY]: {},
 };
 
+// Maps folder names to state enum values.
 const STATE_STRING_MAP: Record<string, State> = {
   shake: State.SHAKE,
   stats: State.STATS,
@@ -128,14 +131,19 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
   }
 }
 
-export async function deserialise(buffer: Buffer, state: State, compressThresh: number): Promise<Packet | void> {
+export async function deserialise<P extends Packet>(
+  buffer: Buffer,
+  state: State,
+  compressThresh: number,
+): Promise<P | void> {
   const consumer = new BufferConsumer(buffer);
 
   // Negative values mean that compression is disabled.
   let compressMode = compressThresh >= 0;
   const packetLength = await VarInt.deserialise(consumer);
+
+  // Depending if the packet is compressed or not, the id or data length can be in the same sector of the packet.
   let dataLength = await VarInt.deserialise(consumer);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let id: number;
 
   compressMode = compressMode && dataLength !== 0;
@@ -146,11 +154,23 @@ export async function deserialise(buffer: Buffer, state: State, compressThresh: 
     consumer.replaceBuffer(await protocolInflate(remaining));
     id = await VarInt.deserialise(consumer);
   } else {
+    // The data length read is actually the id in this case.
     id = dataLength;
     dataLength = packetLength;
   }
 
-  const potentialPacket = packets.I[state][id];
+  // Get the packet from the incoming packets list.
+  const packet = packets.I[state][id] as P;
 
-  return potentialPacket;
+  if (!packet) return;
+
+  // Set the hidden properties of packet and data length.
+  Packet.setPacketLength(packet, packetLength);
+  Packet.setDataLength(packet, dataLength);
+
+  for (const [key, field] of Packet.getFields(packet).entries()) {
+    packet[key as keyof P] = await field.deserialise(consumer);
+  }
+
+  return packet;
 }
