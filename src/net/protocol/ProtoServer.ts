@@ -31,7 +31,6 @@ class ProtoServer extends SimpleServer<TCPServer> {
     this.log.debug("Connection established!");
 
     const newClient = new Client(socket, this.log);
-
     this.clients.push(newClient);
   }
 }

@@ -13,7 +13,6 @@ import Field from "../Field";
 const MCUuid: Field<UUID> = {
   serialise(value) {
     const validityCheck = uuid.check(value);
-
     if (!validityCheck) throw new STypeError("INVALID_FIELD", "An invalid UUID was provided!");
 
     const buff = uuid.parse(value);
@@ -23,9 +22,7 @@ const MCUuid: Field<UUID> = {
 
   deserialise(consumer) {
     const bytes = consumer.consume(16);
-
     const validityCheck = uuid.check(bytes);
-
     if (!validityCheck) throw new STypeError("INVALID_FIELD", "An invalid UUID was received!");
 
     return uuid.stringify(bytes);

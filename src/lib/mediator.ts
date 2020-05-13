@@ -19,9 +19,9 @@ const [rcon, proto, query] = [new RConServer(), new ProtoServer(), new QueryServ
 export async function bootstrap() {
   try {
     const { version } = await getPackageJson();
+    log.info(`Welcome to Spile version v${version} written by zorbyte`);
+    log.info(`Give us a star on Github at ${GITHUB_URL}`);
 
-    log.info(`Hey there! Welcome to Spile version v${version} written by zorbyte.`);
-    log.info(`Give us a star on Github at ${GITHUB_URL}!`);
     await Promise.all([initMarshal(), rcon.listen(), proto.listen(), query.listen()]);
     isBooting = false;
     log.info("We're ready to roll boss!");

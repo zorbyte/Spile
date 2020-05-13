@@ -125,13 +125,11 @@ class Packet {
 
   @Enumerable(false)
   public skipField<P extends BuiltPacket<this>>(key: Exclude<keyof P, RestrictedKeys>, predicate: Predicate<P>) {
-    const field = this[kFields].get(key as string);
+    const fieldData = this[kFields].get(key as string);
+    if (!fieldData) throw new SError("INVALID_FIELD_KEY", key as string);
 
-    if (!field) throw new SError("INVALID_FIELD_KEY", key as string);
-
-    field.skipFieldOn = predicate as Predicate<BuiltPacket<this>>;
-
-    this[kFields].set(key as string, field);
+    fieldData.skipFieldOn = predicate as Predicate<BuiltPacket<this>>;
+    this[kFields].set(key as string, fieldData);
 
     return this;
   }

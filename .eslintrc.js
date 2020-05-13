@@ -33,7 +33,7 @@ module.exports = {
       "named": "never",
       "asyncArrow": "always"
     }],
-    "padding-line-between-statements": [
+    /*"padding-line-between-statements": [
       "error",
       { blankLine: "always", prev: "block-like", next: "*" },
       { blankLine: "always", prev: "*", next: "return" },
@@ -41,7 +41,7 @@ module.exports = {
       { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var", "for", "return", "if"] },
       { blankLine: "always", prev: "import", next: "*" },
       { blankLine: "any", prev: "import", next: "import" },
-    ],
+    ],*/
     // TODO: Set this up on files which handle inbound data.
     "security/detect-object-injection": "off",
     "space-before-function-paren": "off",

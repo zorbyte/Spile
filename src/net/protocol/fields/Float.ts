@@ -3,7 +3,6 @@ import Field from "../Field";
 const Float: Field<number> = {
   serialise(value) {
     const buff = Buffer.alloc(4);
-
     buff.writeFloatBE(value);
 
     return buff;

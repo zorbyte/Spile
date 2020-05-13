@@ -2,13 +2,9 @@ import { STypeError } from "@lib/errors";
 
 import Field from "../Field";
 
-// TODO: Investigate whether or not the documented values of 0x01 and 0x00 on wiki.vg have any effects on endianness.
-// Almost certain they don't, but if it does, would try parsing with as a Uint8BE with the buffer interface.
 const MCBoolean: Field<boolean> = {
   serialise(value) {
-    const buff = Buffer.alloc(1, value ? 0x01 : 0x00);
-
-    return buff;
+    return Buffer.alloc(1, value ? 0x01 : 0x00);
   },
 
   deserialise(consumer) {

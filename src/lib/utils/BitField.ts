@@ -24,7 +24,6 @@ class BitField<T extends (string | number), TEnumValue extends number, E = { [ke
     return this.rawValues
       .findIndex((_, i) => {
         const ind = i > this.acceptedLength - 1 ? i - this.acceptedLength : i;
-
         return (this.fieldEnum as unknown as Record<T, TEnumValue>)[ind as unknown as T] === perm;
       });
   }

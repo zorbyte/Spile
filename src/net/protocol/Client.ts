@@ -61,7 +61,6 @@ class Client {
         if (err) {
           this.log.quickError("An error occurred while writing to a socket!", err);
           this.close();
-        } else {
         }
       });
     } catch (err) {

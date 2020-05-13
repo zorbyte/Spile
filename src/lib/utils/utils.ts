@@ -11,7 +11,6 @@ import jsonParse from "secure-json-parse";
 export function createJavaHash(strToHash: string): number {
   let hash = 0;
   let char: number;
-
   for (const charStr of strToHash) {
     char = charStr.charCodeAt(0);
     hash = hash * 31 + char;

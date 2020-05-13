@@ -86,16 +86,13 @@ class Logger {
 
     this.name = name as string | undefined;
     this.levelMin = levelMin as LoggerLevels;
-
-    let i = 0;
-
     this.fd = fd || (process.stdout as unknown as { fd: number }).fd;
 
     if (!Logger.stdout) Logger.stdout = new SonicBoom({ fd: this.fd } as any);
 
+    let i = 0;
     for (const [lvl, colFn] of Object.entries(METHOD_COLOURS)) {
       const levelIndex = i;
-
       this[lvl as keyof LoggerMethods] = (...args: any[]): void => {
         if (levelIndex >= levelMin) {
           // eslint-disable-next-line no-console
@@ -139,8 +136,6 @@ class Logger {
 
   private formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {
     const currentTime = new Date();
-
-    // eslint-disable-next-line max-len
     return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${this.name}` : ""} ${colourMethod(levelName)}`;
   }
 }

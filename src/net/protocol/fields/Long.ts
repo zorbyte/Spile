@@ -17,7 +17,6 @@ const Long: Long = {
     }
 
     const buff = Buffer.alloc(8);
-
     buff.writeBigInt64BE(value);
 
     return buff;

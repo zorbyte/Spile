@@ -9,7 +9,6 @@ const Int: Field<number> = {
     }
 
     const buff = Buffer.alloc(4);
-
     buff.writeInt32BE(value);
 
     return buff;
