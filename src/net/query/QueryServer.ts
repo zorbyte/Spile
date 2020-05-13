@@ -1,4 +1,4 @@
-import { mainLog } from "@lib/mediator";
+import { mainLog } from "@lib/mainLog";
 
 import AnyServer from "../BaseServer";
 

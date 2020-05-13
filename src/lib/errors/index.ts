@@ -45,9 +45,19 @@ function createCustomError<E extends SpileErrorCtor>(DummyBaseCtor: E) {
   };
 }
 
+export const SError = createCustomError(Error);
+export const STypeError = createCustomError(TypeError);
+export const SRangeError = createCustomError(RangeError);
+
+export function isError(error: Record<string, any> | InstanceType<SpileErrorCtor>, errSymbol = kSpileError) {
+  return error
+    && [...ERROR_PROPS, errSymbol].every(propName => error.hasOwnProperty(propName))
+    || error instanceof Error;
+}
+
 function message(key: ErrorMessageKeys, args: any[]) {
   ow(key, ow.string);
-  if (!(key in ERROR_MESSAGES)) throw new Error(`An invalid error message key was used: ${key}.`);
+  if (!(key in ERROR_MESSAGES)) throw new SError("INVALID_ERROR_KEY", key);
   const msg = ERROR_MESSAGES[key];
 
   if (typeof msg === "function") return msg(...args);
@@ -56,13 +66,3 @@ function message(key: ErrorMessageKeys, args: any[]) {
 
   return String(...args);
 }
-
-export function isError(error: Record<string, any> | InstanceType<SpileErrorCtor>, errSymbol = kSpileError) {
-  return error
-    && [...ERROR_PROPS, errSymbol].every(propName => error.hasOwnProperty(propName))
-    || error instanceof Error;
-}
-
-export const SError = createCustomError(Error);
-export const STypeError = createCustomError(TypeError);
-export const SRangeError = createCustomError(RangeError);

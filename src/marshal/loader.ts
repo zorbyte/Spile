@@ -6,7 +6,8 @@ import {
 } from "path";
 
 import { STypeError } from "@lib/errors";
-import { commands, mainLog } from "@lib/mediator";
+import { mainLog } from "@lib/mainLog";
+import { commands } from "@lib/mediator";
 
 import { scan } from "fs-nextra";
 
@@ -18,13 +19,13 @@ const log = mainLog.child("marshal");
 const CMD_DIR = join(__dirname, "commands");
 
 export async function initMarshal() {
-  log.info("Initialising the Marshal command library.");
-  log.info("Querying commands directory...");
+  log.debug("Initialising the Marshal command library.");
+  log.debug("Querying commands directory...");
   const files = await scan(CMD_DIR, {
     filter: (stats, path) => stats.isFile() && extname(path) === ".js",
   });
 
-  log.info("Registering commands...");
+  log.debug("Registering commands...");
   await Promise.all([...files.keys()]
     .map(async loc => {
       const cmdName = relative(CMD_DIR, loc).slice(0, -3);
@@ -37,7 +38,7 @@ export async function initMarshal() {
       if (!fileObj.default) return log.warn(`The command ${cmdName} has no default export!`);
       const cmd = fileObj.default as CommandBuilder<CommandContext>;
 
-      if (!(cmd instanceof CommandBuilder)) throw new STypeError("INVALID_COMMAND_BUILDER", cmdName);
+      if (!(cmd instanceof CommandBuilder)) return log.error(new STypeError("INVALID_COMMAND_BUILDER", cmdName));
 
       const category = cmdName.split(sep)[0];
 

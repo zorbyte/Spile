@@ -1,6 +1,7 @@
 import { Server } from "net";
 
-import { mainLog } from "@lib/mediator";
+import { mainLog } from "@lib/mainLog";
+import { stop } from "@lib/mediator";
 
 import BaseServer from "./BaseServer";
 
@@ -30,8 +31,10 @@ abstract class SimpleServer<S extends Server> implements BaseServer {
 
       const listenCb = () => {
         this.server.off("error", errorCb);
-        this.server.on("error", err => {
-          this.log.error(`An error occurred in the${this.displayName}server!\n`, err);
+        this.server.once("error", err => {
+          this.log.quickError(`An error occurred in the${this.displayName}server!`, err);
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          stop();
         });
 
         resolve();
@@ -46,6 +49,7 @@ abstract class SimpleServer<S extends Server> implements BaseServer {
 
   protected _close() {
     return new Promise((resolve, reject) => {
+      if (!this.listening) return resolve();
       this.server.close(err => {
         if (err) reject(err);
         resolve();

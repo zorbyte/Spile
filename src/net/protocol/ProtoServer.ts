@@ -22,18 +22,18 @@ class ProtoServer extends SimpleServer<TCPServer> {
         this.server.on("connection", this.handleConnection.bind(this));
       })
       .catch(async err => {
-        this.log.error("Failed to initialise packet codec!", err);
+        this.log.quickError("Failed to initialise packet codec!", err);
         await stop();
       });
   }
 
   public async listen() {
-    this.log.info(`Opening main server on ${this.port}.`);
+    this.log.debug(`Opening main server on ${this.port}.`);
     await this._listen();
   }
 
   public async close() {
-    this.log.info("Closing main server.");
+    this.log.debug("Closing main server.");
     await this._close();
   }
 

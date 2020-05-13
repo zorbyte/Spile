@@ -40,8 +40,19 @@ const METHOD_COLOURS: MethodColours = {
 
 class Logger {
   public static stdout?: SonicBoom;
+  private static destroyed = false;
+  private static stdoutColours = streamSupportsColour(process.stdout);
 
   private static registeredNames: string[] = [];
+
+  public static destroySync(): void {
+    try {
+      Logger.destroyed = true;
+      Logger.stdout.flushSync();
+    } finally {
+      Logger.stdout.destroy();
+    }
+  }
 
   private name?: string;
   private levelMin: LoggerLevels;
@@ -80,15 +91,16 @@ class Logger {
 
     if (!Logger.stdout) Logger.stdout = new SonicBoom({ fd: this.fd } as any);
 
-    const stdoutColours = streamSupportsColour(process.stdout);
-
     for (const [lvl, colFn] of Object.entries(METHOD_COLOURS)) {
       const levelIndex = i;
 
       this[lvl as keyof LoggerMethods] = (...args: any[]): void => {
         if (levelIndex >= levelMin) {
+          // eslint-disable-next-line no-console
+          if (Logger.destroyed) return console.log(`[DESTROYED LOGGER]: ${lvl}`, ...args);
+
           let logStr = formatWithOptions(
-            { colors: stdoutColours },
+            { colors: Logger.stdoutColours },
             this.formatString(lvl, colFn),
             ...args,
           );
@@ -107,16 +119,12 @@ class Logger {
     return new Logger(this.name, this.levelMin, this.fd, name);
   }
 
-  public close(): void {
-    Logger.stdout.end();
-  }
-
-  public destroySyncUnsafe(): void {
-    try {
-      Logger.stdout.flushSync();
-    } finally {
-      Logger.stdout.destroy();
-    }
+  public quickError(msg: string, err: Error) {
+    this.error(msg);
+    Logger.stdout.write(`${formatWithOptions(
+      { colors: Logger.stdoutColours },
+      err as unknown as string,
+    )}\n`);
   }
 
   private formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {

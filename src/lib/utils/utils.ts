@@ -1,7 +1,7 @@
 import { join } from "path";
 import { WriteStream } from "tty";
 
-import RoughPackageJson from "@_types/common/RoughPackageJson";
+import RoughPackageJson from "@type/common/RoughPackageJson";
 
 import { readFile } from "fs-nextra";
 import getopts from "getopts";
@@ -29,6 +29,7 @@ export async function dependencyPresent(dependencyName: string): Promise<boolean
 
     return true;
   } catch {
+    // When an error is thrown, that's generally a good indicator that the dependency doesn't exist.
     return false;
   }
 }
@@ -39,6 +40,17 @@ export async function getPackageJson() {
 
   return jsonParse.parse(contents) as RoughPackageJson;
 }
+
+// @link https://stackoverflow.com/a/52827031
+export const isLittleEndian = (() => {
+  const array = new Uint8Array(4);
+  const view = new Uint32Array(array.buffer);
+
+  return !!((view[0] = 1) & array[0]);
+})();
+
+// Laziness! Why use !isLittleEndian when you can just use "asBigEndian" on your DataViews!
+export const asBigEndian = !isLittleEndian;
 
 export const opts = getopts(process.argv.slice(2));
 

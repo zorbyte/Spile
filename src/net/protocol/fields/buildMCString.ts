@@ -1,14 +1,10 @@
 import { TextDecoder, TextEncoder } from "util";
 
+import { STypeError } from "@lib/errors";
+
 import Field from "../Field";
 
 import VarInt from "./VarInt";
-
-interface MCString extends Field<string> {
-  decoder: TextDecoder;
-  encoder: TextEncoder;
-  maxLen: (n?: number) => number;
-}
 
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
@@ -19,8 +15,10 @@ const buildMCString = (n = 32767): Field<string> => ({
     const encStr = encoder.encode(str);
     const totalLength = encLenOfStr.length + encStr.length;
 
+    // See https://wiki.vg/Protocol#Data_types - Checkout string!
+    // String lengths are kinda strange, but logical, check docs for more info!
     n = n ?? str.length;
-    if (maxLen(n) > totalLength) throw new Error("Invalid MCString! (n * 4) + 3 > byteLen(outbound.n)");
+    if (maxLen(n) > totalLength) throw new STypeError("INVALID_FIELD", "An MCString must comply with: (n * 4) + 3 > byteLen(outbound.n)");
     const into = Buffer.concat([encLenOfStr, encStr], totalLength);
 
     return into;
@@ -31,13 +29,17 @@ const buildMCString = (n = 32767): Field<string> => ({
     const data = consumer.consume(len);
     const str = decoder.decode(data);
 
+    // Do I really have to say this again?
     n = n ?? str.length;
-    if (data.byteLength > maxLen(n)) throw new Error("Invalid MCString! (n * 4) + 3 > byteLen(incoming.n)");
+    if (data.byteLength > maxLen(n)) {
+      throw new STypeError("INVALID_FIELD", "An MCString must comply with: (n * 4) + 3 > byteLen(incoming.n)");
+    }
 
     return str;
   },
 });
 
+// Yes, the beloved max string length formula, also specified on wiki.vg!
 function maxLen(n = 32767) {
   return (n * 4) + 3;
 }

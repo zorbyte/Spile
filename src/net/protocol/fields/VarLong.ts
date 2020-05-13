@@ -1,3 +1,5 @@
+import { STypeError } from "@lib/errors";
+
 import Field from "../Field";
 
 const VarLong: Field<number> = {
@@ -25,7 +27,7 @@ const VarLong: Field<number> = {
       result |= value << (7 * numRead);
 
       numRead++;
-      if (numRead > 10) throw new Error("Invalid VarLong supplied! A VarLong can not have more than 10 bytes!");
+      if (numRead > 10) throw new STypeError("INVALID_FIELD", "A VarLong can not have more than 10 bytes!");
     }
 
     return result;

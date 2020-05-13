@@ -35,7 +35,7 @@
       "@net/*": ["net/*"],
       "@game/*": ["game/*"],
       "@marshal/*": ["marshal/*"],
-      "@_types/*": ["lib/types/*"],
+      "@type/*": ["lib/types/*"],
       "@lib/*": ["lib/*"],
       "@root/*": ["*"]
 		}

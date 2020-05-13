@@ -1,15 +1,14 @@
 import Command from "@marshal/Command";
 import { CommandContext } from "@marshal/CommandContext";
+import { initMarshal } from "@marshal/loader";
 import ProtoServer from "@net/protocol/ProtoServer";
 import QueryServer from "@net/query/QueryServer";
 import RConServer from "@net/rcon/RconServer";
-import Logger, { LoggerLevels } from "@utils/Logger";
-import { isDebug } from "@utils/utils";
+import Logger from "@utils/Logger";
+import { getPackageJson } from "@utils/utils";
 
-const log = new Logger("master", isDebug ? LoggerLevels.DEBUG : LoggerLevels.INFO);
-
-// Make it easier for other modules to use the logger without actually naming it log.
-export const mainLog = log;
+import { GITHUB_URL } from "./constants";
+import { mainLog as log } from "./mainLog";
 
 export const commands = new Map<string, Command<CommandContext>>();
 
@@ -19,28 +18,31 @@ const [rcon, proto, query] = [new RConServer(), new ProtoServer(), new QueryServ
 
 export async function bootstrap() {
   try {
-    await Promise.all([rcon.listen(), proto.listen(), query.listen()]);
+    const { version } = await getPackageJson();
+
+    log.info(`Hey there! Welcome to Spile version v${version} written by zorbyte.`);
+    log.info(`Give us a star on Github at ${GITHUB_URL}!`);
+    await Promise.all([initMarshal(), rcon.listen(), proto.listen(), query.listen()]);
     isBooting = false;
     log.info("We're ready to roll boss!");
   } catch (err) {
     // Should also use the error lib to check if this is a critical/terminal error.
     if (isBooting) {
-      log.error("An error occurred while booting!", err);
-      log.warn("The server will now stop.");
+      log.quickError("An error occurred while booting!", err);
       await stop();
     } else {
       // I want to see if this can recover.
-      log.error("An error occurred in Spile! Please report this to the developers.", err);
+      log.quickError("An error occurred in Spile! Please report this to the developers.", err);
     }
   }
 }
 
-export async function stop() {
+export async function stop(): Promise<never> {
   try {
     log.warn("Stopping server.");
     await Promise.all([rcon.close(), proto.close(), query.close()]);
     log.info("Thanks for playing!");
-    log.destroySyncUnsafe();
+    Logger.destroySync();
 
     // eslint-disable-next-line no-process-exit
     process.exit();
@@ -53,6 +55,10 @@ export async function stop() {
       err,
     );
 
+    // eslint-disable-next-line no-process-exit
+    process.exit(1);
+  } finally {
+    // Unreachable, but I'm going to play it safe.
     // eslint-disable-next-line no-process-exit
     process.exit(1);
   }

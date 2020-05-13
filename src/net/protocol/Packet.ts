@@ -1,15 +1,25 @@
 import { STypeError } from "@lib/errors";
-import { Asyncable } from "@utils/typeUtils";
+import { Asyncable, Predicate } from "@utils/typeUtils";
 import { Enumerable } from "@utils/utils";
 
+import { Predicate as OwPredicate } from "ow";
+
 import VarInt from "./fields/VarInt";
-import Client, { State } from "./Client";
+import Client from "./Client";
 import Field from "./Field";
+import State from "./State";
 
 type BuilderMethods = "addField" | "build" | "onRun";
 type FieldGeneric<T> = T extends Field<infer FType> ? FType : never;
 type BuiltPacket<P extends Packet> = Omit<P, Readonly<BuilderMethods>>;
-type PacketHook<P extends Packet> = (client: Client, packet: BuiltPacket<P>) => Asyncable<Packet | void>;
+type PacketHook<P extends Packet> = (packet: BuiltPacket<P>, client: Client) => Asyncable<Packet | void>;
+
+interface FieldData<T, P extends Packet> {
+  validator?: OwPredicate<T>;
+  isOptional?: Predicate<[T, BuiltPacket<P>]>;
+  hasDefault: boolean;
+  field: Field<T>;
+}
 
 export type PacketDirection = "I" | "O";
 
@@ -25,6 +35,7 @@ const kPacketLength = Symbol("kPacketLength");
 const kDataLength = Symbol("packetDataLength");
 
 class Packet {
+  // #region Getters and setters.
   public static getName(packet: Packet) {
     return packet[kName];
   }
@@ -57,6 +68,8 @@ class Packet {
     packet[kDataLength] = newLen;
   }
 
+  // #endregion
+
   @Enumerable(false)
   private [kName]: string;
 
@@ -67,7 +80,7 @@ class Packet {
   private [kState]: State;
 
   @Enumerable(false)
-  private [kFields] = new Map<string | symbol, Field<any>>();
+  private [kFields] = new Map<string | symbol, FieldData<any, this>>();
 
   @Enumerable(false)
   private [kRunHook]?: PacketHook<this>;
@@ -85,7 +98,7 @@ class Packet {
     this[kName] = name;
     this[kDirection] = direction;
 
-    this[kFields].set("id", VarInt);
+    this.addField("id", VarInt);
   }
 
   public get packetLength() {
@@ -97,17 +110,23 @@ class Packet {
   }
 
   @Enumerable(false)
-  public addField<T extends string, F extends Field<any>, FT = FieldGeneric<F>>(
+  public addField<T extends string, F extends Field<any>, FT extends FieldGeneric<F>, P extends this & Record<T, FT>>(
     key: T,
     field: F,
-    defaultVal?: FT,
-  ): this & Record<T, FT> {
-    this[kFields].set(key, field);
+    validator?: OwPredicate<FT>,
+    defaultVal?: typeof validator extends undefined ? void : FT,
+    isOptional?: Predicate<[T, BuiltPacket<this>]>,
+  ): P {
+    const fieldData: FieldData<FT, this> = { field, hasDefault: !!defaultVal };
 
-    // This is valid, as the returned type by this function has this property.
-    this[key as keyof this] = defaultVal as any;
+    if (validator) fieldData.validator = validator;
+    if (isOptional) fieldData.isOptional = isOptional;
 
-    return this as this & Record<T, FT>;
+    this[kFields].set(key, fieldData);
+
+    this[key as keyof this] = defaultVal;
+
+    return this as P;
   }
 
   @Enumerable(false)
@@ -120,7 +139,7 @@ class Packet {
   @Enumerable(false)
   public build(): BuiltPacket<this> {
     // Great place to check if it is a valid inbound hook.
-    if (this[kDirection] === "I" && this[kRunHook]) throw new STypeError("INBOUND_PACKET_HOOK_ABSENT", this[kName]);
+    if (this[kDirection] === "I" && !this[kRunHook]) throw new STypeError("INBOUND_PACKET_HOOK_ABSENT", this[kName]);
 
     return this;
   }

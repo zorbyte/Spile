@@ -1,3 +1,5 @@
+import { STypeError } from "@lib/errors";
+
 import Field from "../Field";
 
 const VarInt: Field<number> = {
@@ -25,7 +27,7 @@ const VarInt: Field<number> = {
       result |= value << (7 * numRead);
 
       numRead++;
-      if (numRead > 5) throw new Error("Invalid VarInt supplied! A VarInt can not have more than 5 bytes!");
+      if (numRead > 5) throw new STypeError("INVALID_FIELD", "A VarInt can not have more than 5 bytes!");
     }
 
     return result;

@@ -1,6 +1,6 @@
-import { Predicate } from "@utils/typeUtils";
+import { Asyncable, Predicate } from "@utils/typeUtils";
 
-type CommandExecutor<C> = (ctx: C, msg: string, args: string[]) => Promise<string | void> | string | void;
+type CommandExecutor<C> = (ctx: C, msg: string, args: string[]) => Asyncable<string | void>;
 
 export default interface Command<C> {
   name: string;

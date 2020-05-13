@@ -6,6 +6,8 @@ import { CommandContext } from "./CommandContext";
 class CommandBuilder<C extends CommandContext> {
   private commandData: Command<C>;
 
+  // The word condition looks kinda ugly so I used checkIf,
+  // if anyone has better ideas, please enlighten me!
   public checkIf(predicate: Predicate<[C]>): CommandBuilder<C> {
     this.commandData.inhibitors.push(predicate);
 

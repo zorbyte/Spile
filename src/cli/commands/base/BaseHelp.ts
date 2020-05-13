@@ -1,6 +1,6 @@
 import { inspect } from "util";
 
-import { CommandDataItem } from "@_types/schemas/CommandData";
+import { CommandDataItem } from "@type/schemas/CommandData";
 import { streamSupportsColour } from "@utils/utils";
 
 class BaseHelp {
