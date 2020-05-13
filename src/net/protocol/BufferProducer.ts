@@ -27,7 +27,6 @@ class BufferProducer {
 
   public compile(): Buffer {
     const newBuffer = Buffer.concat(this.raw, this[kLength]);
-
     return newBuffer;
   }
 

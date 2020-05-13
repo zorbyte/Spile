@@ -11,8 +11,15 @@ const HandshakePacket = new Packet(0x00, "handshake", "I")
   .addField("version", VarInt)
   .addField("address", buildMCString())
   .addField("port", UShort)
-  .addField("nextState", VarInt as Field<State.STATS | State.LOGIN>, ow.number.inRange(State.STATS, State.LOGIN))
+  .addField(
+    "nextState",
+    VarInt as Field<State.STATS | State.LOGIN>,
+    ow.number.inRange(State.STATS, State.LOGIN),
+    State.STATS,
+  )
+  .skipField("nextState", packet => packet.version < 1_15_2)
   .onRun((packet, client) => {
+    // TODO: Remove me, this is just testing.
     client.log.debug(packet);
     client.state = packet.nextState;
   })

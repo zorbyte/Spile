@@ -1,4 +1,4 @@
-import { STypeError } from "@lib/errors";
+import { SError, STypeError } from "@lib/errors";
 import { Asyncable, Predicate } from "@utils/typeUtils";
 import { Enumerable } from "@utils/utils";
 
@@ -9,14 +9,14 @@ import Client from "./Client";
 import Field from "./Field";
 import State from "./State";
 
-type BuilderMethods = "addField" | "build" | "onRun";
+type BuilderMethods = "addField" | "build" | "onRun" | "skipField";
 type FieldGeneric<T> = T extends Field<infer FType> ? FType : never;
 type BuiltPacket<P extends Packet> = Omit<P, Readonly<BuilderMethods>>;
 type PacketHook<P extends Packet> = (packet: BuiltPacket<P>, client: Client) => Asyncable<Packet | void>;
 
 interface FieldData<T, P extends Packet> {
   validator?: OwPredicate<T>;
-  isOptional?: Predicate<[T, BuiltPacket<P>]>;
+  skipFieldOn?: Predicate<BuiltPacket<P>>;
   hasDefault: boolean;
   field: Field<T>;
 }
@@ -114,19 +114,28 @@ class Packet {
     key: T,
     field: F,
     validator?: OwPredicate<FT>,
-    defaultVal?: typeof validator extends undefined ? void : FT,
-    isOptional?: Predicate<[T, BuiltPacket<this>]>,
+    defaultVal?: FT,
   ): P {
-    const fieldData: FieldData<FT, this> = { field, hasDefault: !!defaultVal };
+    const fieldData: FieldData<FT, P> = { field, hasDefault: !!defaultVal };
 
     if (validator) fieldData.validator = validator;
-    if (isOptional) fieldData.isOptional = isOptional;
-
-    this[kFields].set(key, fieldData);
-
+    this[kFields].set(key, fieldData as FieldData<FT, this>);
     this[key as keyof this] = defaultVal;
 
     return this as P;
+  }
+
+  @Enumerable(false)
+  public skipField<P extends BuiltPacket<this>>(key: Exclude<keyof P, "packetLength" | "id" | "dataLength">, predicate: Predicate<P>) {
+    const field = this[kFields].get(key as string);
+
+    if (!field) throw new SError("INVALID_FIELD_KEY", key as string);
+
+    field.skipFieldOn = predicate as Predicate<BuiltPacket<this>>;
+
+    this[kFields].set(key as string, field);
+
+    return this;
   }
 
   @Enumerable(false)

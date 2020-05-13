@@ -106,8 +106,16 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
   try {
     const producer = new BufferProducer();
 
-    for (const [key, { field }] of Packet.getFields(packet).entries()) {
-      const serialised = await field.serialise(packet[key as keyof P]);
+    for (const [key, fieldData] of Packet.getFields(packet).entries()) {
+      // TODO: Probably worth making a function for this, since the code is similar to deserialise.
+      const { field, hasDefault } = fieldData;
+      const data = packet[key as keyof P];
+
+      if (fieldData.validator) ow(data, fieldData.validator);
+      const required = !fieldData.skipFieldOn?.(packet);
+
+      if (!required && !hasDefault) continue;
+      const serialised = await field.serialise(data);
 
       producer.append(serialised);
     }
@@ -182,7 +190,7 @@ export async function deserialise<P extends Packet>(
 
     if (fieldData.validator) ow(desVal, fieldData.validator);
 
-    const required = !fieldData.isOptional?.(desVal, packet);
+    const required = !fieldData.skipFieldOn?.(packet);
 
     if (!required && hasDefault) continue;
 

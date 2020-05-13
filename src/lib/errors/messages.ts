@@ -12,6 +12,7 @@ const _ERROR_MESSAGES = {
   // Protocol.
   INVALID_PACKET_SCHEMA: (cmdFileName: string) => `The file ${cmdFileName} is not a valid Packet Schema.`,
   INBOUND_PACKET_HOOK_ABSENT: (name: string) => `The inbound packet ${name} must have a hook attached to it.`,
+  INVALID_FIELD_KEY: (key: string) => `An invalid field key was used: ${key}.`,
   INVALID_FIELD: (errStr: string) => errStr,
 };
 
