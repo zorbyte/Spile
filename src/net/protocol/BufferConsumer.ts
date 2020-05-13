@@ -1,30 +1,27 @@
 class BufferConsumer {
   public offset = 0;
-  private current = this.raw;
 
-  public constructor(public raw: Buffer, private size = raw.byteLength) {}
+  public constructor(public raw: Buffer) {}
 
-  public replaceBuffer(newBuff: Buffer, size?: number) {
-    this.current = newBuff;
-    this.size = size || newBuff.length;
+  public replaceBuffer(newBuff: Buffer) {
+    this.raw = newBuff;
     this.offset = 0;
   }
 
   public consume(amnt: number) {
-    if (amnt > this.size) throw new Error("Not enough bytes left to be consumed!");
-    const section = this.current.slice(this.offset, amnt);
+    const endLoc = this.offset + amnt;
+    if (endLoc > this.raw.length) throw new Error("Not enough bytes left to be consumed!");
+    const section = this.raw.slice(this.offset, endLoc);
 
-    this.size -= amnt;
-    this.offset += amnt;
+    this.offset = endLoc;
 
     return section;
   }
 
   public drain() {
-    this.offset = this.current.length - 1;
-    this.size = 0;
+    this.offset = this.raw.length - 1;
 
-    return this.current;
+    return this.raw;
   }
 }
 

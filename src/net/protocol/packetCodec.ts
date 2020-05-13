@@ -33,19 +33,13 @@ interface PacketStateMap {
   };
 }
 
-// Inbound and Outbound.
-interface PacketMap {
-  I: PacketStateMap;
-  O: PacketStateMap;
-}
-
 // Maps folder names to state enum values.
 const STATE_STRING_MAP: Record<string, State> | Record<string, any> = {
   shake: State.SHAKE,
   stats: State.STATS,
   login: State.LOGIN,
   play: State.PLAY,
-  _: "noState",
+  noState: "noState",
 };
 
 const packets: PacketStateMap = {

@@ -1,5 +1,7 @@
 import { formatWithOptions } from "util";
 
+import Packet from "@net/protocol/Packet";
+
 import chalk from "chalk";
 import SonicBoom from "sonic-boom";
 
@@ -119,11 +121,19 @@ class Logger {
     return new Logger(this.name, this.levelMin, this.fd, name);
   }
 
+  public logPacket(msg: string, packet: Packet) {
+    this.twoPieceLog("debug", msg, packet);
+  }
+
   public quickError(msg: string, err: Error) {
-    this.error(msg);
+    this.twoPieceLog("error", msg, err);
+  }
+
+  public twoPieceLog(method: keyof LoggerMethods, msg: string, data: unknown) {
+    this[method](msg);
     Logger.stdout.write(`${formatWithOptions(
       { colors: Logger.stdoutColours },
-      err as unknown as string,
+      data as string,
     )}\n`);
   }
 

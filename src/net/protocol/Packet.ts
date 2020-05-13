@@ -4,7 +4,6 @@ import { Enumerable } from "@utils/utils";
 
 import { Predicate as OwPredicate } from "ow";
 
-import VarInt from "./fields/VarInt";
 import Client from "./Client";
 import Field from "./Field";
 import State from "./State";
@@ -13,6 +12,7 @@ type BuilderMethods = "addField" | "build" | "onRun" | "skipField";
 type FieldGeneric<T> = T extends Field<infer FType> ? FType : never;
 type BuiltPacket<P extends Packet> = Omit<P, Readonly<BuilderMethods>>;
 type PacketHook<P extends Packet> = (packet: BuiltPacket<P>, client: Client) => Asyncable<Packet | void>;
+type RestrictedKeys = BuilderMethods | "packetLength" | "dataLength" | "id";
 
 interface FieldData<T, P extends Packet> {
   validator?: OwPredicate<T>;
@@ -97,8 +97,6 @@ class Packet {
   public constructor(public readonly id: number, name: string, direction: PacketDirection) {
     this[kName] = name;
     this[kDirection] = direction;
-
-    this.addField("id", VarInt);
   }
 
   public get packetLength() {
@@ -111,22 +109,22 @@ class Packet {
 
   @Enumerable(false)
   public addField<T extends string, F extends Field<any>, FT extends FieldGeneric<F>, P extends this & Record<T, FT>>(
-    key: T,
+    key: T & (T extends RestrictedKeys ? "Invalid key" : {}),
     field: F,
-    validator?: OwPredicate<FT>,
     defaultVal?: FT,
+    validator?: OwPredicate<FT>,
   ): P {
-    const fieldData: FieldData<FT, P> = { field, hasDefault: !!defaultVal };
+    const fieldData: FieldData<FT, this> = { field, hasDefault: !!defaultVal };
 
     if (validator) fieldData.validator = validator;
-    this[kFields].set(key, fieldData as FieldData<FT, this>);
+    this[kFields].set(key, fieldData);
     this[key as keyof this] = defaultVal;
 
     return this as P;
   }
 
   @Enumerable(false)
-  public skipField<P extends BuiltPacket<this>>(key: Exclude<keyof P, "packetLength" | "id" | "dataLength">, predicate: Predicate<P>) {
+  public skipField<P extends BuiltPacket<this>>(key: Exclude<keyof P, RestrictedKeys>, predicate: Predicate<P>) {
     const field = this[kFields].get(key as string);
 
     if (!field) throw new SError("INVALID_FIELD_KEY", key as string);

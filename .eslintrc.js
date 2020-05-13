@@ -28,19 +28,23 @@ module.exports = {
       },
       ExportDeclaration: "never",
     }],
+    "@typescript-eslint/space-before-function-paren": ["error", {
+      "anonymous": "never",
+      "named": "never",
+      "asyncArrow": "always"
+    }],
     "padding-line-between-statements": [
       "error",
       { blankLine: "always", prev: "block-like", next: "*" },
       { blankLine: "always", prev: "*", next: "return" },
       { blankLine: "always", prev: ["const", "let", "var"], next: "*" },
-      { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var", "for", "return"] },
+      { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var", "for", "return", "if"] },
       { blankLine: "always", prev: "import", next: "*" },
       { blankLine: "any", prev: "import", next: "import" },
     ],
     // TODO: Set this up on files which handle inbound data.
     "security/detect-object-injection": "off",
     "space-before-function-paren": "off",
-    "@typescript-eslint/space-before-function-paren": ["error", "never"],
     "perf-standard/no-instanceof-guard": "error",
     "perf-standard/no-self-in-constructor": "error",
     "perf-standard/check-function-inline": "off",

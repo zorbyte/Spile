@@ -10,12 +10,11 @@ import { initPacketCodec } from "./packetCodec";
 class ProtoServer extends SimpleServer<TCPServer> {
   public server = createServer();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  private clients: Client[];
+  private clients: Client[] = [];
 
   public constructor() {
     // TODO; Do not hard code this port, retrieve it form the user config.
-    super("server", 25565);
+    super("protocol", 25565);
 
     initPacketCodec()
       .then(() => {
@@ -25,16 +24,6 @@ class ProtoServer extends SimpleServer<TCPServer> {
         this.log.quickError("Failed to initialise packet codec!", err);
         await stop();
       });
-  }
-
-  public async listen() {
-    this.log.debug(`Opening main server on ${this.port}.`);
-    await this._listen();
-  }
-
-  public async close() {
-    this.log.debug("Closing main server.");
-    await this._close();
   }
 
   // Called when a socket connects.
