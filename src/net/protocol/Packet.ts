@@ -35,7 +35,9 @@ const kPacketLength = Symbol("kPacketLength");
 const kDataLength = Symbol("packetDataLength");
 
 class Packet {
+
   // #region Getters and setters.
+
   public static getName(packet: Packet) {
     return packet[kName];
   }
