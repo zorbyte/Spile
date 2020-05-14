@@ -6,6 +6,23 @@ Spile is a Minecraft Java edition game server. The goal of it is to slowly errod
 
 Check out issue #1 for more info (yes I'm that lazy I'm not going to link to it, please have fun finding it, as at the time of writing it is the only issue.)
 
+## Note on debug logging and windows:
+
+If you want to use debug logs on windows with full support for the characters in it:
+
+If you are using windows and a TTY shell, you should enable the following for powershell:
+```
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+```
+
+or for cmd:
+
+```
+chcp 65001
+```
+
+This is to allow special characters such as the section symbol (§) work in the debug logs.
+
 ## File Organisation
 
 ```

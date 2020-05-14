@@ -5,6 +5,7 @@ temp/
 experiments/
 node_modules/
 yarn-err.log
+yarn-error.log
 nsrc/
 asrc/
 tsconfig.tsbuildinfo

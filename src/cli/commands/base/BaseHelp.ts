@@ -14,8 +14,7 @@ class BaseHelp {
 
     console.log(
       // eslint-disable-next-line prefer-template
-      "Hello, this doesn't look like a help menu, rather a feeble dump of data. "
-        + "Well I'm glad you noticed! This isn't finished yet.\n"
+      "This help menu is a WIP, as such it is just a dump of the help data which will become a user friendly menu in future. "
         + inspect(helpData, { colors: streamSupportsColour(process.stdout), depth: Infinity }),
     );
   }

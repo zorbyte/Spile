@@ -62,8 +62,12 @@ export async function initPacketCodec() {
     .map(async loc => {
       const packetName = relative(PACKET_DIR, loc).slice(0, -3);
 
+      const directory = packetName.split(sep);
+
+      const [stateName] = directory.length > 1 ? directory : ["noState"];
+
       // Packet schemas prefixed with "_" are ignored.
-      if (packetName.startsWith("_")) return log.debug(`Skipping packet ${packetName}.`);
+      if ((directory?.[1] ?? packetName).startsWith("_")) return log.debug(`Skipping packet ${packetName}.`);
 
       const fileObj = await import(loc);
 
@@ -75,10 +79,6 @@ export async function initPacketCodec() {
       const dir = Packet.getDirection(packet);
 
       if (dir !== "I") return;
-
-      const directory = packetName.split(sep);
-
-      const [stateName] = directory.length > 1 ? directory : ["noState"];
 
       if (!STATE_STRING_MAP.hasOwnProperty(stateName)) {
         return log.warn(`The packet ${packetName} was placed in a folder which is not a valid state!`);
@@ -122,7 +122,7 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
     const dataLengthBuf = await VarInt.serialise(dataLength);
 
     if (willCompress) {
-      const compressedData = await protocolDeflate(producer.compile());
+      const compressedData = await protocolDeflate(producer.complete());
 
       producer.replace(compressedData);
     }
@@ -133,7 +133,7 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
     // Set the packet length.
     if (willCompress) producer.prepend(await VarInt.serialise(producer.byteLength));
 
-    return producer.compile();
+    return producer.complete();
   } catch (err) {
     // We wouldn't want to terminate the connection now would we?
     log.quickError("An error occurred while serialising a packet!", err);
