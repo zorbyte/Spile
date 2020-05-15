@@ -34,16 +34,16 @@ class Client {
     this.socket.on("error", err => {
       // @ts-expect-error
       if (err.code && err.code === "ECONNRESET") {
-        this.log.debug("Connection was terminated prematurely by the remote host.");
+        this.log.debug("Connection was terminated prematurely by the remote host");
       } else {
-        this.log.quickError("An error occurred in a socket.", err);
+        this.log.quickError("An error occurred in a socket", err);
       }
     });
   }
 
   public close(_reason?: string) {
     // TODO: Send a chat message packet.
-    this.log.debug("Terminated a socket.");
+    this.log.debug("Terminated a socket");
     this.socket.removeAllListeners("data");
     this.socket.destroy();
   }
@@ -95,12 +95,12 @@ class Client {
           const clsAfterStr = typeof this.scheduledClose === "string";
           if (this.scheduledClose || clsAfterStr) this.close(clsAfterStr ? this.scheduledClose as string : void 0);
         } catch (err) {
-          this.log.quickError("An error occurred while writing to a socket!", err);
+          this.log.quickError("An error occurred while writing to a socket", err);
           this.close();
         }
       });
     } catch (err) {
-      this.log.quickError(`${curDir} An error occurred while handling a packet.`, err);
+      this.log.quickError(`${curDir} An error occurred while handling a packet`, err);
       this.close();
     }
   }
