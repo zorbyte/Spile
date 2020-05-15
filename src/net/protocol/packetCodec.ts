@@ -175,7 +175,7 @@ export async function deserialise<P extends Packet>(
   // Get the packet from the packets object.
   const packetList = (packets?.[state]?.[id] ?? packets.noState[id] ?? []) as P[];
 
-  // TODO: Make this work with more than 2 packets.
+  // TODO: Make this work with more than 2 packets. Also use packet length as a factor.
   const packet = packetList.find(p => !blacklistedNames.includes(Packet.getName(p)));
 
   // No packet to be mapped :(
