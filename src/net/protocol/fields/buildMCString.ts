@@ -15,10 +15,7 @@ const buildMCString = (n = 32767): Field<string> => ({
     const encStr = encoder.encode(str);
     const totalLength = encLenOfStr.length + encStr.length;
 
-    // See https://wiki.vg/Protocol#Data_types - Checkout string!
-    // String lengths are kinda strange, but logical, check docs for more info!
-    n = n ?? str.length;
-    if (maxLen(n) > totalLength) throw new STypeError("INVALID_FIELD", "An MCString must comply with: (n * 4) + 3 > byteLen(outbound.n)");
+    if (maxLen(totalLength) > n) throw new STypeError("INVALID_FIELD", "An MCString must comply with: (n * 4) + 3 > byteLen(outbound.n)");
     const into = Buffer.concat([encLenOfStr, encStr], totalLength);
 
     return into;

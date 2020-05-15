@@ -8,11 +8,12 @@ import Client from "./Client";
 import Field from "./Field";
 import State from "./State";
 
-type BuilderMethods = "addField" | "build" | "onRun" | "skipField";
-type FieldGeneric<T> = T extends Field<infer FType> ? FType : never;
-type BuiltPacket<P extends Packet> = Omit<P, Readonly<BuilderMethods>>;
-type PacketHook<P extends Packet> = (packet: BuiltPacket<P>, client: Client) => Asyncable<Packet | void>;
+type BuilderMethods = "addField" | "compile" | "onBuilt" | "skipField";
 type RestrictedKeys = BuilderMethods | "packetLength" | "dataLength" | "id";
+export type PacketDirection = "I" | "O";
+export type BuiltPacket<P extends Packet> = Omit<P, Readonly<BuilderMethods>>;
+type FieldGeneric<T> = T extends Field<infer FType> ? FType : never;
+type PacketHook<P extends Packet> = (packet: BuiltPacket<P>, client: Client) => Asyncable<BuiltPacket<Packet> | void>;
 
 interface FieldData<T, P extends Packet> {
   validator?: OwPredicate<T>;
@@ -20,8 +21,6 @@ interface FieldData<T, P extends Packet> {
   hasDefault: boolean;
   field: Field<T>;
 }
-
-export type PacketDirection = "I" | "O";
 
 // Metadata, not present on payloads.
 const kName = Symbol("packetName");
@@ -137,14 +136,14 @@ class Packet {
   }
 
   @Enumerable(false)
-  public onRun(hook: PacketHook<this>) {
+  public onBuilt(hook: PacketHook<this>) {
     this[kRunHook] = hook;
 
     return this;
   }
 
   @Enumerable(false)
-  public build(): BuiltPacket<this> {
+  public compile(): BuiltPacket<this> {
     // Great place to check if it is a valid inbound hook.
     if (this[kDirection] === "I" && !this[kRunHook]) throw new STypeError("INBOUND_PACKET_HOOK_ABSENT", this[kName]);
 

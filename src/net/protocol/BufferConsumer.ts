@@ -10,7 +10,7 @@ class BufferConsumer {
 
   public consume(amnt: number) {
     const endLoc = this.offset + amnt;
-    if (endLoc > this.raw.length) throw new Error("Not enough bytes left to be consumed!");
+    if (endLoc > this.raw.length) throw new Error("Not enough bytes left to be consumed");
 
     const section = this.raw.slice(this.offset, endLoc);
     this.offset = endLoc;

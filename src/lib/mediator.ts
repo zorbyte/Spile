@@ -26,15 +26,16 @@ export async function bootstrap(stopwatch: Stopwatch) {
     log.info(`Welcome to Spile version v${version} written by zorbyte`);
     log.info(`Please consider starring this project on Github at ${GITHUB_URL}`);
 
+    [rcon, proto, query] = [new RConServer(), new ProtoServer(), new QueryServer()];
+
     await initPacketCodec()
       .catch(err => {
         // Specify that this is the packet codec that just failed.
         // TODO: Move this to a catch statement in the packet codec and insert this into the Promise.all.
-        log.error("Failed to initialise packet codec!");
+        log.error("Failed to initialise packet codec");
         throw err;
       });
 
-    [rcon, proto, query] = [new RConServer(), new ProtoServer(), new QueryServer()];
     await Promise.all([initMarshal(), rcon.listen(), proto.listen(), query.listen()]);
     isBooting = false;
     stopwatch.stop();
@@ -43,7 +44,7 @@ export async function bootstrap(stopwatch: Stopwatch) {
   } catch (err) {
     // Should also use the error lib to check if this is a critical/terminal error.
     if (isBooting) {
-      log.quickError("An error occurred while booting!", err);
+      log.quickError("An error occurred while booting", err);
       await stop();
     } else {
       // I want to see if this can recover.
@@ -66,7 +67,7 @@ export async function stop(): Promise<never> {
     // eslint-disable-next-line no-console
     console.error(
       "An error occurred while stopping the server!",
-      "Please report this! The server will now close dirtily\n",
+      "Please report this error! The server will now close dirtily\n",
       err,
     );
   } finally {

@@ -19,7 +19,7 @@ const log = mainLog.child("marshal");
 const CMD_DIR = join(__dirname, "commands");
 
 export async function initMarshal() {
-  log.debug("Initialising the Marshal command library.");
+  log.debug("Initialising the Marshal command library");
   log.debug("Querying commands directory...");
   const files = await scan(CMD_DIR, {
     filter: (stats, path) => stats.isFile() && extname(path) === ".js",
@@ -35,7 +35,7 @@ export async function initMarshal() {
 
       const fileObj = await import(loc);
 
-      if (!fileObj.default) return log.warn(`The command ${cmdName} has no default export!`);
+      if (!fileObj.default) return log.warn(`The command ${cmdName} has no default export`);
       const cmd = fileObj.default as CommandBuilder<CommandContext>;
 
       if (!(cmd instanceof CommandBuilder)) return log.error(new STypeError("INVALID_COMMAND_BUILDER", cmdName));
@@ -43,8 +43,8 @@ export async function initMarshal() {
       const category = cmdName.split(sep)[0];
 
       commands.set(cmdName, cmd.compile(category));
-      log.debug(`Registered command ${cmdName}.`);
+      log.debug(`Registered command ${cmdName}`);
     }));
 
-  log.info("Registered all commands!");
+  log.info("Registered all commands");
 }

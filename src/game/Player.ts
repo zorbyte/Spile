@@ -1,5 +1,7 @@
+import { UUID } from "@utils/typeUtils";
+
 class Player {
-  public uuid: string;
+  public uuid: UUID;
 }
 
 export default Player;

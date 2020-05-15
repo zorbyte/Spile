@@ -4,7 +4,7 @@ import Player from "@game/Player";
 import Logger from "@utils/Logger";
 
 import handleLegacyPing from "./handleLegacyPing";
-import Packet from "./Packet";
+import Packet, { BuiltPacket } from "./Packet";
 import { deserialise, serialise } from "./packetCodec";
 import State from "./State";
 
@@ -15,11 +15,14 @@ enum DirectionLabel {
 
 class Client {
   public state = State.SHAKE;
-  public handlingLegacy = false;
-
-  // TODO: Check if this is futile. Probably is since this is runtime related.
+  public scheduledClose: boolean | string = false;
   public player?: Player;
-  private compressionThresh = -1;
+  public compressionThresh = -1;
+
+  // These are the names of the packets that the deserialiser should find an alternative for.
+  // This means for instance if Request occurs, it will ad itself to this list in order for ping (which shares the same ID)
+  // to be ran afterwards.
+  private blacklistedPackets: string[] = [];
 
   public constructor(private socket: Socket, public log: Logger) {
     // Disable Naggle's algorithm so we can serve more users concurrently.
@@ -45,17 +48,22 @@ class Client {
     this.socket.destroy();
   }
 
+  public blacklistPacket(packet: BuiltPacket<Packet>) {
+    this.blacklistedPackets.push(Packet.getName(packet as Packet));
+  }
+
   private async handleRequest(data: Buffer) {
     let curDir = DirectionLabel.I;
     let resBuf: Buffer;
     let resPacket: Packet;
 
     try {
+      this.log.debug("Incoming packet");
       const handlingLegacyPing = data[0] === 0xFE;
       if (handlingLegacyPing) {
         resBuf = await handleLegacyPing(this);
       } else {
-        const packet = await deserialise(data, this.state, this.compressionThresh);
+        const packet = await deserialise(data, this.state, this.blacklistedPackets, this.compressionThresh);
 
         // Invalid packet id.
         if (!packet) return this.close();
@@ -65,8 +73,9 @@ class Client {
         const hook = Packet.getRunHook(packet);
         resPacket = await hook(packet, this) as Packet;
 
-        // If the packet run hook doesn't return a packet to respond with, just stop handling this request.
-        if (!resPacket || this.socket.destroyed) return this.close();
+        if (this.socket.destroyed) return this.close();
+
+        if (!resPacket) return;
 
         curDir = DirectionLabel.O;
 
@@ -79,10 +88,12 @@ class Client {
           if (writeErr) throw writeErr;
           if (handlingLegacyPing) {
             this.log.debug(getHandleMessage({ id: 0xFF } as Packet, DirectionLabel.O, "legacy ping"));
-            this.close();
           } else {
             this.log.logPacket(getHandleMessage(resPacket, DirectionLabel.O), resPacket);
           }
+
+          const clsAfterStr = typeof this.scheduledClose === "string";
+          if (this.scheduledClose || clsAfterStr) this.close(clsAfterStr ? this.scheduledClose as string : void 0);
         } catch (err) {
           this.log.quickError("An error occurred while writing to a socket!", err);
           this.close();
@@ -96,9 +107,7 @@ class Client {
 }
 
 function getHandleMessage(packet: Packet, direction: DirectionLabel, name?: string) {
-  return `${
-    direction === DirectionLabel.I ? "Handling" : "Completed"
-  } packet ${direction} 0x${packet.id.toString(16).toUpperCase()} ${name ?? Packet.getName(packet)}.`;
+  return `${direction} 0x${packet.id.toString(16).toUpperCase()} ${name ?? Packet.getName(packet)}:`;
 }
 
 export default Client;

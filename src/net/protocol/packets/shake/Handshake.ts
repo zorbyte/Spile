@@ -17,9 +17,9 @@ const HandshakePacket = new Packet(0x00, "handshake", "I")
     State.STATS,
     ow.number.inRange(State.STATS, State.LOGIN),
   )
-  .onRun((packet, client) => {
+  .onBuilt((packet, client) => {
     client.state = packet.nextState;
   })
-  .build();
+  .compile();
 
 export default HandshakePacket;

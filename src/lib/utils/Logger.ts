@@ -45,8 +45,6 @@ class Logger {
   private static destroyed = false;
   private static stdoutColours = streamSupportsColour(process.stdout);
 
-  private static registeredNames: string[] = [];
-
   public static destroySync(): void {
     try {
       Logger.destroyed = true;
@@ -74,15 +72,7 @@ class Logger {
     if (name in LoggerLevels) levelMin = name;
     else if (nameType === "string") name = chalk.green((name as string).toLowerCase());
 
-    if (name) {
-      if (Logger.registeredNames.includes(name as string)) {
-        this.warn(`Can not register a logger with ambiguous name ${name}. No name will be used.`);
-        name = void 0;
-      }
-
-      if (childName) name += ` ${chalk.gray(">")} ${chalk.green(childName.toLowerCase())}`;
-      Logger.registeredNames.push(name as string);
-    }
+    if (name && childName) name += ` ${chalk.gray(">")} ${chalk.green(childName.toLowerCase())}`;
 
     this.name = name as string | undefined;
     this.levelMin = levelMin as LoggerLevels;

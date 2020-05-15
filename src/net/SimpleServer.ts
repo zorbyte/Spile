@@ -27,7 +27,7 @@ abstract class SimpleServer<S extends Server> implements BaseServer {
       const listenCb = () => {
         this.server.off("error", errorCb);
         this.server.once("error", err => {
-          this.log.quickError(`An error occurred in the ${this.name} server!`, err);
+          this.log.quickError(`An error occurred in the ${this.name} server`, err);
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           stop();
         });
@@ -38,7 +38,7 @@ abstract class SimpleServer<S extends Server> implements BaseServer {
       this.server.once("listening", listenCb);
       this.server.once("error", errorCb);
 
-      this.log.debug(`Opening ${this.name} server on port ${this.port}.`);
+      this.log.debug(`Opening ${this.name} server on port ${this.port}`);
       this.server.listen(this.port, hostname);
     });
   }
@@ -46,7 +46,7 @@ abstract class SimpleServer<S extends Server> implements BaseServer {
   public close() {
     return new Promise((resolve, reject) => {
       if (!this.listening) return resolve();
-      this.log.debug(`Closing ${this.name} server.`);
+      this.log.debug(`Closing ${this.name} server`);
       this.server.close(err => {
         if (err) reject(err);
         resolve();

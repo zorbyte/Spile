@@ -28,7 +28,7 @@ const VarLong: Field<bigint> = {
       result |= (BigInt(read) & 0x7Fn) << BigIntMath.abs(7n * numRead);
 
       numRead++;
-      if (numRead > 10) throw new STypeError("INVALID_FIELD", "A VarLong can not have more than 10 bytes!");
+      if (numRead > 10) throw new STypeError("INVALID_FIELD", "A VarLong can not have more than 10 bytes");
 
       if ((read & 0x80) !== 0x80) break;
     }

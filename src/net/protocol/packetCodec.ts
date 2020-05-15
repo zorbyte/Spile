@@ -26,10 +26,10 @@ const PACKET_DIR = join(__dirname, "packets");
 // Maps a state enum to an object of ids and in turn Packet instances.
 interface PacketStateMap {
   [state: number]: {
-    [id: number]: Packet;
+    [id: number]: Packet[];
   };
   noState: {
-    [id: number]: Packet;
+    [id: number]: Packet[];
   };
 }
 
@@ -67,32 +67,35 @@ export async function initPacketCodec() {
       const [stateName] = directory.length > 1 ? directory : ["noState"];
 
       // Packet schemas prefixed with "_" are ignored.
-      if ((directory?.[1] ?? packetName).startsWith("_")) return log.debug(`Skipping packet ${packetName}.`);
+      if ((directory?.[1] ?? packetName).startsWith("_")) return log.debug(`Skipping packet ${packetName}`);
 
       const fileObj = await import(loc);
 
-      if (!fileObj.default) return log.warn(`The packet ${packetName} has no default export!`);
+      if (!fileObj.default) return log.warn(`The packet ${packetName} has no default export`);
       const packet = fileObj.default as Packet;
 
-      if (!(packet instanceof Packet)) return log.error(new STypeError("INVALID_PACKET_SCHEMA", packetName));
+      if (!(packet instanceof Packet)) return log.error(new STypeError("INVALID_PACKET", packetName));
 
       const dir = Packet.getDirection(packet);
 
       if (dir !== "I") return;
 
       if (!STATE_STRING_MAP.hasOwnProperty(stateName)) {
-        return log.warn(`The packet ${packetName} was placed in a folder which is not a valid state!`);
+        return log.warn(`The packet ${packetName} was placed in a folder which is not a valid state`);
       }
 
       const packetState = STATE_STRING_MAP[stateName];
 
       Packet.setState(packet, packetState);
-      packets[packetState][packet.id] = packet;
 
-      log.debug(`Registered packet ${packetName}.`);
+      const presentPackets = packets[packetState][packet.id];
+      if (presentPackets?.length) packets[packetState][packet.id].push(packet);
+      else packets[packetState][packet.id] = [packet];
+
+      log.debug(`Registered packet ${packetName}`);
     }));
 
-  log.info("Registered all packets!");
+  log.info("Registered all packets");
 }
 
 
@@ -136,13 +139,14 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
     return producer.complete();
   } catch (err) {
     // We wouldn't want to terminate the connection now would we?
-    log.quickError("An error occurred while serialising a packet!", err);
+    log.quickError("An error occurred while serialising a packet", err);
   }
 }
 
 export async function deserialise<P extends Packet>(
   buffer: Buffer,
   state: State,
+  blacklistedNames: string[],
   compressThresh: number,
 ): Promise<P | void> {
   const consumer = new BufferConsumer(buffer);
@@ -169,7 +173,10 @@ export async function deserialise<P extends Packet>(
   }
 
   // Get the packet from the packets object.
-  const packet = (packets?.[state]?.[id] ?? packets.noState[id]) as P | void;
+  const packetList = (packets?.[state]?.[id] ?? packets.noState[id] ?? []) as P[];
+
+  // TODO: Make this work with more than 2 packets.
+  const packet = packetList.find(p => !blacklistedNames.includes(Packet.getName(p)));
 
   // No packet to be mapped :(
   if (!packet) return;

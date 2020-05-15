@@ -24,7 +24,7 @@ function createCustomError<E extends SpileErrorCtor>(DummyBaseCtor: E) {
   const BaseCtor: Constructor<Error> = DummyBaseCtor;
 
   return class SpileError extends BaseCtor {
-    public readonly [kSpileError] = true;
+    public readonly [kSpileError]: boolean;
 
     public constructor(
       public readonly key: ErrorMessageKeys,
@@ -32,6 +32,14 @@ function createCustomError<E extends SpileErrorCtor>(DummyBaseCtor: E) {
     ) {
       // Error thrown further down the stack if need be.
       super(message(key, args));
+
+      Object.defineProperty(this, kSpileError, {
+        value: true,
+        writable: false,
+        enumerable: false,
+        configurable: false,
+      });
+
       if (Error.captureStackTrace) Error.captureStackTrace(this, SpileError);
     }
 

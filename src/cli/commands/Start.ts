@@ -9,7 +9,7 @@ class StartSpile {
     const stopwatch = new Stopwatch();
 
     bootstrap(stopwatch)
-      .catch(err => console.error("An error occurred pre-bootstrap!", err));
+      .catch(err => console.error("An error occurred pre-bootstrap", err));
   }
 }
 

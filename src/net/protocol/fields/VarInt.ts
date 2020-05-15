@@ -29,7 +29,7 @@ const VarInt: Field<number> = {
       result |= (read & 0x7F) << Math.abs(7 * numRead);
 
       numRead++;
-      if (numRead > 5) throw new STypeError("INVALID_FIELD", "A VarInt can not have more than 5 bytes!");
+      if (numRead > 5) throw new STypeError("INVALID_FIELD", "A VarInt can not have more than 5 bytes");
 
       if ((read & 0x80) !== 0x80) break;
     }
