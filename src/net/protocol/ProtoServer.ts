@@ -12,6 +12,8 @@ class ProtoServer extends SimpleServer<TCPServer> {
   public constructor() {
     // TODO; Do not hard code this port, retrieve it form the user config.
     super("protocol", 25565);
+
+    this.server.on("connection", this.handleConnection.bind(this));
   }
 
   // Called when a socket connects.

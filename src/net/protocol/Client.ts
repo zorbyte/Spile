@@ -18,7 +18,7 @@ class Client {
   public handlingLegacy = false;
 
   // TODO: Check if this is futile. Probably is since this is runtime related.
-  public player: this["state"] extends State.PLAY ? Player : void;
+  public player?: Player;
   private compressionThresh = -1;
 
   public constructor(private socket: Socket, public log: Logger) {
