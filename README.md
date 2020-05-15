@@ -23,6 +23,8 @@ chcp 65001
 
 This is to allow special characters such as the section symbol (§) work in the debug logs.
 
+Why? Spile writes to the file descriptors of stdout asynchronously instead of using the built in methods of logging to make logging less resource intense.
+
 ## File Organisation
 
 ```
