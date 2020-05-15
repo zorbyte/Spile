@@ -107,7 +107,7 @@ class Client {
 }
 
 function getHandleMessage(packet: Packet, direction: DirectionLabel, name?: string) {
-  return `${direction} 0x${packet.id.toString(16).toUpperCase()} ${name ?? Packet.getName(packet)}:`;
+  return `${direction} 0x${packet.id.toString(16).toUpperCase()} ${name ?? Packet.getName(packet)}${name ? ":" : ""}`;
 }
 
 export default Client;
