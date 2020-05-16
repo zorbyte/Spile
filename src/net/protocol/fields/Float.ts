@@ -1,14 +1,14 @@
 import Field from "../Field";
 
 const Float: Field<number> = {
-  serialise(value) {
+  encode(value) {
     const buff = Buffer.alloc(4);
     buff.writeFloatBE(value);
 
     return buff;
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     const bytes = consumer.consume(4);
 
     return bytes.readFloatBE();

@@ -99,12 +99,14 @@ export async function initPacketCodec() {
 }
 
 
-export async function serialise<P extends Packet>(packet: P, compressThresh: number) {
+export async function encode<P extends Packet>(packet: P, compressThresh: number) {
   try {
     const producer = new BufferProducer();
 
+    producer.append(await VarInt.encode(packet.id));
+
     for (const [key, fieldData] of Packet.getFields(packet).entries()) {
-      // TODO: Probably worth making a function for this, since the code is similar to deserialise.
+      // TODO: Probably worth making a function for this, since the code is similar to decode.
       const { field, hasDefault } = fieldData;
       const data = packet[key as keyof P];
 
@@ -112,20 +114,21 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
       const required = !fieldData.skipFieldOn?.(packet);
 
       if (!required && !hasDefault) continue;
-      const serialised = await field.serialise(data);
+      const encoded = await field.encode(data);
 
-      producer.append(serialised);
+      producer.append(encoded);
     }
 
     // In accordance to wiki.vg, if compression is enabled but a packet does not meet the threshold
     // then the data length should be set to 0. Negative values mean that compression is disabled.
-    const compressMode = compressThresh < 0;
-    const willCompress = compressMode && producer.byteLength >= compressThresh;
-    const dataLength = !compressMode || willCompress ? producer.byteLength : 0;
-    const dataLengthBuf = await VarInt.serialise(dataLength);
+    const compressMode = compressThresh >= 0;
+    const willCompress = compressMode && producer.length >= compressThresh;
+    const dataLength = !compressMode || willCompress ? producer.length : 0;
+    const dataLengthBuf = await VarInt.encode(dataLength);
 
     if (willCompress) {
-      const compressedData = await protocolDeflate(producer.complete());
+      log.debug("Compressing packet...");
+      const compressedData = await protocolDeflate(producer.compile());
 
       producer.replace(compressedData);
     }
@@ -134,29 +137,30 @@ export async function serialise<P extends Packet>(packet: P, compressThresh: num
     producer.prepend(dataLengthBuf);
 
     // Set the packet length.
-    if (willCompress) producer.prepend(await VarInt.serialise(producer.byteLength));
+    if (willCompress) producer.prepend(await VarInt.encode(producer.length));
 
-    return producer.complete();
+    return producer.compile();
   } catch (err) {
-    // We wouldn't want to terminate the connection now would we?
     log.quickError("An error occurred while serialising a packet", err);
   }
 }
 
-export async function deserialise<P extends Packet>(
+export async function decode<P extends Packet>(
   buffer: Buffer,
   state: State,
   blacklistedNames: string[],
   compressThresh: number,
-): Promise<P | void> {
+): Promise<P | [P, Buffer] | void> {
   const consumer = new BufferConsumer(buffer);
+
+  // Frame the buffer.
 
   // Negative values mean that compression is disabled.
   let compressMode = compressThresh >= 0;
-  const packetLength = await VarInt.deserialise(consumer);
+  const packetLength = await VarInt.decode(consumer);
 
   // Depending if the packet is compressed or not, the id or data length can be in the same sector of the packet.
-  let dataLength = await VarInt.deserialise(consumer);
+  let dataLength = await VarInt.decode(consumer);
   let id: number;
 
   compressMode = compressMode && dataLength !== 0;
@@ -165,7 +169,7 @@ export async function deserialise<P extends Packet>(
 
     // Replace the content with the now decompressed buffer.
     consumer.replaceBuffer(await protocolInflate(remaining));
-    id = await VarInt.deserialise(consumer);
+    id = await VarInt.decode(consumer);
   } else {
     // The data length read is actually the id in this case.
     id = dataLength;
@@ -178,16 +182,18 @@ export async function deserialise<P extends Packet>(
   // TODO: Make this work with more than 2 packets. Also use packet length as a factor.
   const packet = packetList.find(p => !blacklistedNames.includes(Packet.getName(p)));
 
-  // No packet to be mapped :(
+  // No packet to be mapped.
   if (!packet) return;
 
   // Set the hidden properties of packet and data length.
   Packet.setPacketLength(packet, packetLength);
   Packet.setDataLength(packet, dataLength);
 
+  log.debug(`Found packet id: ${id}`);
+
   for (const [key, fieldData] of Packet.getFields(packet).entries()) {
     const { field, hasDefault } = fieldData;
-    const desVal = await field.deserialise(consumer);
+    const desVal = await field.decode(consumer);
 
     if (fieldData.validator) ow(desVal, fieldData.validator);
 
@@ -196,6 +202,12 @@ export async function deserialise<P extends Packet>(
     if (!required && hasDefault) continue;
 
     packet[key as keyof P] = required ? desVal : void 0;
+  }
+
+  const remaining = consumer.drain();
+  if (remaining.length) {
+    log.debug("Coalesced packet found!");
+    return [packet, remaining];
   }
 
   return packet;

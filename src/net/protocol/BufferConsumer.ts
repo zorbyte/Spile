@@ -19,9 +19,10 @@ class BufferConsumer {
   }
 
   public drain() {
-    this.offset = this.raw.length - 1;
+    const res = this.raw.slice(this.offset);
+    this.offset = this.raw.length;
 
-    return this.raw;
+    return res;
   }
 }
 

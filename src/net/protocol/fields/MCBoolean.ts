@@ -3,11 +3,11 @@ import { STypeError } from "@lib/errors";
 import Field from "../Field";
 
 const MCBoolean: Field<boolean> = {
-  serialise(value) {
+  encode(value) {
     return Buffer.alloc(1, value ? 0x01 : 0x00);
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     const [byte] = consumer.consume(1);
 
     if (byte === 0x01) return true;

@@ -1,14 +1,14 @@
 import Field from "../Field";
 
 const Double: Field<number> = {
-  serialise(value) {
+  encode(value) {
     const buff = Buffer.alloc(8);
     buff.writeDoubleBE(value);
 
     return buff;
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     const bytes = consumer.consume(8);
 
     return bytes.readDoubleBE();

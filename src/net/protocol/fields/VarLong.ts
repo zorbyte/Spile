@@ -4,7 +4,7 @@ import BigIntMath from "@utils/BigIntMath";
 import Field from "../Field";
 
 const VarLong: Field<bigint> = {
-  serialise(value) {
+  encode(value) {
     const byteArr = [];
 
     while (value !== 0n) {
@@ -19,7 +19,7 @@ const VarLong: Field<bigint> = {
     return Buffer.from(byteArr);
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     let numRead = 0n;
     let result = 0n;
 

@@ -11,7 +11,7 @@ import Field from "../Field";
 // https://github.com/PrismarineJS/node-minecraft-protocol/blob/master/src/datatypes/minecraft.js
 // so we'll see later when it breaks!
 const MCUuid: Field<UUID> = {
-  serialise(value) {
+  encode(value) {
     const validityCheck = uuid.check(value);
     if (!validityCheck) throw new STypeError("INVALID_FIELD", "An invalid UUID was provided");
 
@@ -20,7 +20,7 @@ const MCUuid: Field<UUID> = {
     return buff;
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     const bytes = consumer.consume(16);
     const validityCheck = uuid.check(bytes);
     if (!validityCheck) throw new STypeError("INVALID_FIELD", "An invalid UUID was received");

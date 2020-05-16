@@ -3,7 +3,7 @@ import { STypeError } from "@lib/errors";
 import Field from "../Field";
 
 const UByte: Field<number> = {
-  serialise(value) {
+  encode(value) {
     if (value < 0 || value > 255) throw new STypeError("INVALID_FIELD", "A UByte may only be an integer between 0 and 255");
 
     const buff = Buffer.alloc(1);
@@ -12,7 +12,7 @@ const UByte: Field<number> = {
     return buff;
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     const bytes = consumer.consume(1);
 
     return bytes.readUInt8();

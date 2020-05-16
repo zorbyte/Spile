@@ -3,7 +3,7 @@ import { STypeError } from "@lib/errors";
 import Field from "../Field";
 
 const VarInt: Field<number> = {
-  serialise(value) {
+  encode(value) {
     // TODO: Modularise this since it is the same as VarLong and enforce range restrictions.
     const byteArr = [];
 
@@ -20,7 +20,7 @@ const VarInt: Field<number> = {
     return Buffer.from(byteArr);
   },
 
-  deserialise(consumer) {
+  decode(consumer) {
     let numRead = 0;
     let result = 0;
 

@@ -6,7 +6,8 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
+    // Enable this if we use reflect in future.
+    "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "lib": ["esnext"],
     "module": "commonjs",

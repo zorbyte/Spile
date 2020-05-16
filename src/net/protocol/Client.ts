@@ -1,11 +1,12 @@
 import { Socket } from "net";
 
 import Player from "@game/Player";
+import { MAX_PACKET_LEN } from "@lib/constants";
 import Logger from "@utils/Logger";
 
 import handleLegacyPing from "./handleLegacyPing";
 import Packet, { BuiltPacket } from "./Packet";
-import { deserialise, serialise } from "./packetCodec";
+import { decode, encode } from "./packetCodec";
 import State from "./State";
 
 enum DirectionLabel {
@@ -19,17 +20,21 @@ class Client {
   public player?: Player;
   public compressionThresh = -1;
 
-  // These are the names of the packets that the deserialiser should find an alternative for.
+  // These are the names of the packets that the decoder should find an alternative for.
   // This means for instance if Request occurs, it will ad itself to this list in order for ping (which shares the same ID)
   // to be ran afterwards.
   private blacklistedPackets: string[] = [];
 
   public constructor(private socket: Socket, public log: Logger) {
-    // Disable Naggle's algorithm so we can serve more users concurrently.
-    this.socket.setNoDelay(true);
+    // Disable Naggle's algorithm so we have better latency.
+    this.socket.setNoDelay();
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.socket.on("data", this.handleRequest.bind(this));
+
+    this.socket.on("close", () => {
+      this.log.debug("Socket closed.");
+    });
 
     this.socket.on("error", err => {
       // @ts-expect-error
@@ -54,19 +59,27 @@ class Client {
 
   private async handleRequest(data: Buffer) {
     let curDir = DirectionLabel.I;
+    let handleAfter: Buffer;
     let resBuf: Buffer;
     let resPacket: Packet;
 
     try {
       this.log.debug("Incoming packet");
+      // Prevent malicious allocations that slow down the server.
+      if (data.length > MAX_PACKET_LEN) return this.close();
+
       const handlingLegacyPing = data[0] === 0xFE;
       if (handlingLegacyPing) {
         resBuf = await handleLegacyPing(this);
       } else {
-        const packet = await deserialise(data, this.state, this.blacklistedPackets, this.compressionThresh);
+        const decodeRes = await decode(data, this.state, this.blacklistedPackets, this.compressionThresh);
 
-        // Invalid packet id.
-        if (!packet) return this.close();
+        // No packet found.
+        if (!decodeRes) return this.close();
+
+        let packet: Packet;
+        if (Array.isArray(decodeRes)) [packet, handleAfter] = decodeRes;
+        else packet = decodeRes;
 
         this.log.logPacket(getHandleMessage(packet, DirectionLabel.I), packet);
 
@@ -75,15 +88,21 @@ class Client {
 
         if (this.socket.destroyed) return this.close();
 
-        if (!resPacket) return;
+        if (!resPacket) {
+          if (handleAfter) await this.handleRequest(handleAfter);
+          return;
+        }
 
         curDir = DirectionLabel.O;
 
-        // Serialise the response packet.
-        resBuf = await serialise(resPacket, this.compressionThresh);
+        // encode the response packet.
+        resBuf = await encode(resPacket, this.compressionThresh);
+
+        if (!resBuf) return this.close();
       }
 
-      this.socket.write(resBuf, writeErr => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      this.socket.write(resBuf, async writeErr => {
         try {
           if (writeErr) throw writeErr;
           if (handlingLegacyPing) {
@@ -93,11 +112,15 @@ class Client {
           }
 
           const clsAfterStr = typeof this.scheduledClose === "string";
-          if (this.scheduledClose || clsAfterStr) this.close(clsAfterStr ? this.scheduledClose as string : void 0);
+          if (this.scheduledClose || clsAfterStr) return this.close(clsAfterStr ? this.scheduledClose as string : void 0);
         } catch (err) {
           this.log.quickError("An error occurred while writing to a socket", err);
           this.close();
         }
+
+        // Don't worry about catching this, if it has an error it should handle it itself.
+        // If it doesn't, we'd probably want it to fail spectacularly so we'd know about it.
+        if (handleAfter) await this.handleRequest(handleAfter);
       });
     } catch (err) {
       this.log.quickError(`${curDir} An error occurred while handling a packet`, err);
