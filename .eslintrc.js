@@ -33,6 +33,7 @@ module.exports = {
       "named": "never",
       "asyncArrow": "always"
     }],
+    "@typescript-eslint/no-extra-parens": ["error"],
     /*"padding-line-between-statements": [
       "error",
       { blankLine: "always", prev: "block-like", next: "*" },

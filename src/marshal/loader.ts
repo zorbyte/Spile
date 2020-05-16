@@ -23,7 +23,11 @@ export async function initMarshal() {
   log.debug("Initialising the Marshal command library");
   log.debug("Querying commands directory...");
   const files = await scan(CMD_DIR, {
-    filter: (stats, path) => stats.isFile() && extname(path) === (isDebug ? ".ts" : ".js"),
+    filter: (stats, path) => stats.isFile()
+      && extname(path) === ".js"
+      || isDebug
+      && extname(path) === ".ts"
+      && !path.endsWith(".d.ts"),
   });
 
   log.debug("Registering commands...");

@@ -178,7 +178,11 @@ export async function decode<P extends Packet>(
 export async function initPacketCodec() {
   log.debug("Querying packets directory...");
   const files = await scan(PACKET_DIR, {
-    filter: (stats, path) => stats.isFile() && extname(path) === (isDebug ? ".ts" : ".js"),
+    filter: (stats, path) => stats.isFile()
+      && extname(path) === ".js"
+      || isDebug
+      && extname(path) === ".ts"
+      && !path.endsWith(".d.ts"),
   });
 
   log.debug("Registering packets...");
