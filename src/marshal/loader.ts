@@ -8,6 +8,7 @@ import {
 import { STypeError } from "@lib/errors";
 import { mainLog } from "@lib/mainLog";
 import { commands } from "@lib/mediator";
+import { isDebug } from "@utils/utils";
 
 import { scan } from "fs-nextra";
 
@@ -22,7 +23,7 @@ export async function initMarshal() {
   log.debug("Initialising the Marshal command library");
   log.debug("Querying commands directory...");
   const files = await scan(CMD_DIR, {
-    filter: (stats, path) => stats.isFile() && extname(path) === ".js",
+    filter: (stats, path) => stats.isFile() && extname(path) === (isDebug ? ".ts" : ".js"),
   });
 
   log.debug("Registering commands...");

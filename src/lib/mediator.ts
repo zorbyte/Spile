@@ -1,10 +1,7 @@
 import Command from "@marshal/Command";
 import { CommandContext } from "@marshal/CommandContext";
-import { initMarshal } from "@marshal/loader";
 import { initPacketCodec } from "@net/protocol/packetCodec";
 import ProtoServer from "@net/protocol/ProtoServer";
-import QueryServer from "@net/query/QueryServer";
-import RConServer from "@net/rcon/RconServer";
 import Logger from "@utils/Logger";
 import Stopwatch from "@utils/Stopwatch";
 import { getPackageJson } from "@utils/utils";
@@ -17,8 +14,6 @@ export const commands = new Map<string, Command<CommandContext>>();
 let isBooting = true;
 
 let proto: ProtoServer;
-let rcon: RConServer;
-let query: QueryServer;
 
 export async function bootstrap(stopwatch: Stopwatch) {
   try {
@@ -26,7 +21,7 @@ export async function bootstrap(stopwatch: Stopwatch) {
     log.info(`Welcome to Spile version v${version} written by zorbyte`);
     log.info(`Please consider starring this project on Github at ${GITHUB_URL}`);
 
-    [rcon, proto, query] = [new RConServer(), new ProtoServer(), new QueryServer()];
+    proto = new ProtoServer();
 
     await initPacketCodec()
       .catch(err => {
@@ -36,7 +31,8 @@ export async function bootstrap(stopwatch: Stopwatch) {
         throw err;
       });
 
-    await Promise.all([initMarshal(), rcon.listen(), proto.listen(), query.listen()]);
+    await proto.listen();
+
     isBooting = false;
     stopwatch.stop();
     log.info(`Bootstrap finished in ${stopwatch.toString()}`);
@@ -55,8 +51,9 @@ export async function bootstrap(stopwatch: Stopwatch) {
 
 export async function stop(): Promise<never> {
   try {
-    log.warn("Stopping server");
-    await Promise.all([rcon.close(), proto.close(), query.close()]);
+    log.warn("Stopping Spile");
+    await proto.close();
+
     Logger.destroySync();
     log.debug("Ready to exit");
 

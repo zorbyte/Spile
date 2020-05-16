@@ -68,7 +68,7 @@ export async function initPacketCodec() {
       const [stateName] = directory.length > 1 ? directory : ["noState"];
 
       // Packet schemas prefixed with "_" are ignored.
-      if ((directory?.[1] ?? packetName).startsWith("_")) return log.debug(`Skipping packet ${packetName}`);
+      if ((directory?.[1] ?? packetName).startsWith("_")) return;
 
       const fileObj = await import(loc);
 

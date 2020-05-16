@@ -6,7 +6,6 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    // Enable this if we use reflect in future.
     "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "lib": ["esnext"],
@@ -16,7 +15,6 @@
     "noImplicitAny": true,
     "noImplicitReturns": false,
     "noImplicitThis": true,
-    // NOTE: This is enforced by eslint.
     "noUnusedLocals": false,
     "noUnusedParameters": true,
     "outDir": "./dist",
