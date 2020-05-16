@@ -1,13 +1,13 @@
 import { mainLog } from "@lib/mainLog";
 
-import fjs from "fast-json-stringify";
-import secJsonParse from "secure-json-parse";
+import fjs, { Schema } from "fast-json-stringify";
+import { parse } from "secure-json-parse";
 
 import Field from "../Field";
 
 import buildMCString from "./buildMCString";
 
-function buildMCJson<T>(schema?: fjs.Schema): Field<T> {
+function buildMCJson<T>(schema?: Schema): Field<T> {
   const stringify = schema ? fjs(schema) as unknown as (doc: T) => string : JSON.stringify;
   const MCString = buildMCString();
 
@@ -28,7 +28,7 @@ function buildMCJson<T>(schema?: fjs.Schema): Field<T> {
     async decode(consumer): Promise<T> {
       const rawJson = await MCString.decode(consumer);
 
-      return secJsonParse.parse(rawJson);
+      return parse(rawJson);
     },
   };
 }

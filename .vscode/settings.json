@@ -11,10 +11,13 @@
     "Skyra",
     "Spile's",
     "bruh",
+    "builtin",
+    "esnext",
     "flatstr",
     "nextra",
     "protoserver",
     "rcon",
+    "vars",
     "zorbyte"
   ],
   "eslint.enable": true,

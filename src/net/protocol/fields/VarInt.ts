@@ -4,7 +4,6 @@ import Field from "../Field";
 
 const VarInt: Field<number> = {
   encode(value) {
-    // TODO: Modularise this since it is the same as VarLong and enforce range restrictions.
     const byteArr = [];
 
     while (true) {

@@ -29,9 +29,6 @@ interface PacketStateMap {
   [state: number]: {
     [id: number]: Packet;
   };
-  noState: {
-    [id: number]: Packet;
-  };
 }
 
 // Maps folder names to state enum values.
@@ -40,7 +37,6 @@ const STATE_STRING_MAP: Record<string, State> | Record<string, any> = {
   stats: State.STATS,
   login: State.LOGIN,
   play: State.PLAY,
-  noState: "noState",
 };
 
 const packets: PacketStateMap = {
@@ -48,7 +44,6 @@ const packets: PacketStateMap = {
   [State.STATS]: {},
   [State.LOGIN]: {},
   [State.PLAY]: {},
-  noState: {},
 };
 
 export async function encode<P extends Packet>(packet: P, compressThresh: number) {
@@ -137,12 +132,10 @@ export async function decode<P extends Packet>(
   }
 
   // Get the packet from the packets object.
-  const packet = (packets?.[state]?.[id] ?? packets.noState[id]) as P;
+  const packet = packets?.[state]?.[id] as P;
 
   // No packet to be mapped.
   if (!packet) return;
-
-  const packetName = Packet.getName(packet);
 
   // Set the hidden properties of packet and data length.
   Packet.setPacketLength(packet, packetLength);
@@ -153,16 +146,14 @@ export async function decode<P extends Packet>(
     const desVal = await field.decode(consumer);
 
     if (fieldData.validator) ow(desVal, fieldData.validator);
-
     const required = !fieldData.skipFieldOn?.(packet);
-
     if (!required && hasDefault) continue;
 
     packet[key as keyof P] = required ? desVal : void 0;
   }
 
+  const packetName = Packet.getName(packet);
   stopwatch.stop();
-
   log.debug(`Finished decoding packet 0x${id.toString(16).toUpperCase()} ${packetName} in ${stopwatch.toString()}`);
 
   const remaining = consumer.drain();
@@ -192,9 +183,9 @@ export async function initPacketCodec() {
 
       const directory = packetName.split(sep);
 
-      const [stateName] = directory.length > 1 ? directory : ["noState"];
+      const [stateName] = directory;
 
-      // Packet schemas prefixed with "_" are ignored.
+      // Packets prefixed with "_" are ignored.
       if ((directory?.[1] ?? packetName).startsWith("_")) return;
 
       const fileObj = await import(loc);

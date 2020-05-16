@@ -28,9 +28,8 @@ class Client {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.socket.on("data", this.handleRequest.bind(this));
 
-    this.socket.on("error", err => {
-      // @ts-expect-error
-      if (err.code && err.code === "ECONNRESET") {
+    this.socket.on("error", (err: Error & { code?: string }) => {
+      if (err?.code === "ECONNRESET") {
         this.log.debug("Connection was terminated prematurely by the remote host");
       } else {
         this.log.quickError("An error occurred in a socket", err);
@@ -63,6 +62,7 @@ class Client {
       // Prevent malicious allocations that slow down the server.
       if (data.length > MAX_PACKET_LEN) return this.close();
 
+      // Legacy ping will start with 0xFE.
       const handlingLegacyPing = data[0] === 0xFE;
       if (handlingLegacyPing) {
         resBuf = await handleLegacyPing(this);
