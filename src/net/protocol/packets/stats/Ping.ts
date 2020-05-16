@@ -9,7 +9,7 @@ const PingPacket = new Packet(0x01, "ping", "I")
     const pongRes = PongPacket;
     pongRes.dataClone = packet.randomData;
 
-    client.scheduledClose = true;
+    client.closePostRequest();
 
     return pongRes;
   })

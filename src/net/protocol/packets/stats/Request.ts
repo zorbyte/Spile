@@ -10,7 +10,7 @@ import Packet from "@net/protocol/Packet";
 import ResponsePacket from "./Response";
 
 const RequestPacket = new Packet(0x00, "request", "I")
-  .onBuilt((packet, client) => {
+  .onBuilt(() => {
     const res = ResponsePacket;
     res.body = {
       version: {
@@ -26,8 +26,6 @@ const RequestPacket = new Packet(0x00, "request", "I")
         sample: [],
       },
     };
-
-    client.blacklistPacket(packet);
 
     return res;
   })

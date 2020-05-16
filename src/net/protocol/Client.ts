@@ -5,7 +5,7 @@ import { MAX_PACKET_LEN } from "@lib/constants";
 import Logger from "@utils/Logger";
 
 import handleLegacyPing from "./handleLegacyPing";
-import Packet, { BuiltPacket } from "./Packet";
+import Packet from "./Packet";
 import { decode, encode } from "./packetCodec";
 import State from "./State";
 
@@ -16,14 +16,10 @@ enum DirectionLabel {
 
 class Client {
   public state = State.SHAKE;
-  public scheduledClose: boolean | string = false;
   public player?: Player;
   public compressionThresh = -1;
 
-  // These are the names of the packets that the decoder should find an alternative for.
-  // This means for instance if Request occurs, it will ad itself to this list in order for ping (which shares the same ID)
-  // to be ran afterwards.
-  private blacklistedPackets: string[] = [];
+  private scheduledClose: boolean | string = false;
 
   public constructor(private socket: Socket, public log: Logger) {
     // Disable Naggle's algorithm so we have better latency.
@@ -33,7 +29,7 @@ class Client {
     this.socket.on("data", this.handleRequest.bind(this));
 
     this.socket.on("close", () => {
-      this.log.debug("Socket closed.");
+      this.log.debug("Socket closed");
     });
 
     this.socket.on("error", err => {
@@ -46,15 +42,20 @@ class Client {
     });
   }
 
+  public closePostRequest(reason?: string) {
+    this.scheduledClose = reason ?? true;
+  }
+
   public close(_reason?: string) {
     // TODO: Send a chat message packet.
-    this.log.debug("Terminated a socket");
+    this.log.debug("Closed a socket");
     this.socket.removeAllListeners("data");
     this.socket.destroy();
   }
 
-  public blacklistPacket(packet: BuiltPacket<Packet>) {
-    this.blacklistedPackets.push(Packet.getName(packet as Packet));
+  private closeIfNeeded() {
+    const clsAfterStr = typeof this.scheduledClose === "string";
+    if (this.scheduledClose || clsAfterStr) return this.close(clsAfterStr ? this.scheduledClose as string : void 0);
   }
 
   private async handleRequest(data: Buffer) {
@@ -72,7 +73,7 @@ class Client {
       if (handlingLegacyPing) {
         resBuf = await handleLegacyPing(this);
       } else {
-        const decodeRes = await decode(data, this.state, this.blacklistedPackets, this.compressionThresh);
+        const decodeRes = await decode(data, this.state, this.compressionThresh);
 
         // No packet found.
         if (!decodeRes) return this.close();
@@ -89,7 +90,10 @@ class Client {
         if (this.socket.destroyed) return this.close();
 
         if (!resPacket) {
+          // Let it handle the request first, since any scheduled closures
+          // would be unaware of proceeding packets.
           if (handleAfter) await this.handleRequest(handleAfter);
+          this.closeIfNeeded();
           return;
         }
 
@@ -111,8 +115,7 @@ class Client {
             this.log.logPacket(getHandleMessage(resPacket, DirectionLabel.O), resPacket);
           }
 
-          const clsAfterStr = typeof this.scheduledClose === "string";
-          if (this.scheduledClose || clsAfterStr) return this.close(clsAfterStr ? this.scheduledClose as string : void 0);
+          this.closeIfNeeded();
         } catch (err) {
           this.log.quickError("An error occurred while writing to a socket", err);
           this.close();

@@ -26,10 +26,10 @@ const PACKET_DIR = join(__dirname, "packets");
 // Maps a state enum to an object of ids and in turn Packet instances.
 interface PacketStateMap {
   [state: number]: {
-    [id: number]: Packet[];
+    [id: number]: Packet;
   };
   noState: {
-    [id: number]: Packet[];
+    [id: number]: Packet;
   };
 }
 
@@ -88,9 +88,7 @@ export async function initPacketCodec() {
 
       Packet.setState(packet, packetState);
 
-      const presentPackets = packets[packetState][packet.id];
-      if (presentPackets?.length) packets[packetState][packet.id].push(packet);
-      else packets[packetState][packet.id] = [packet];
+      packets[packetState][packet.id] = packet;
 
       log.debug(`Registered packet ${packetName}`);
     }));
@@ -106,7 +104,6 @@ export async function encode<P extends Packet>(packet: P, compressThresh: number
     producer.append(await VarInt.encode(packet.id));
 
     for (const [key, fieldData] of Packet.getFields(packet).entries()) {
-      // TODO: Probably worth making a function for this, since the code is similar to decode.
       const { field, hasDefault } = fieldData;
       const data = packet[key as keyof P];
 
@@ -148,7 +145,6 @@ export async function encode<P extends Packet>(packet: P, compressThresh: number
 export async function decode<P extends Packet>(
   buffer: Buffer,
   state: State,
-  blacklistedNames: string[],
   compressThresh: number,
 ): Promise<P | [P, Buffer] | void> {
   const consumer = new BufferConsumer(buffer);
@@ -177,10 +173,7 @@ export async function decode<P extends Packet>(
   }
 
   // Get the packet from the packets object.
-  const packetList = (packets?.[state]?.[id] ?? packets.noState[id] ?? []) as P[];
-
-  // TODO: Make this work with more than 2 packets. Also use packet length as a factor.
-  const packet = packetList.find(p => !blacklistedNames.includes(Packet.getName(p)));
+  const packet = (packets?.[state]?.[id] ?? packets.noState[id]) as P;
 
   // No packet to be mapped.
   if (!packet) return;

@@ -21,7 +21,8 @@ async function handleLegacyPing(client: Client) {
   const pingBuffer = iconv.encode(str, "utf16be");
   producer.append(pingBuffer);
 
-  client.scheduledClose = true;
+  client.closePostRequest();
+
   client.state = 1;
 
   return producer.compile();
