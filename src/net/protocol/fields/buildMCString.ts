@@ -1,17 +1,21 @@
+import { TextDecoder, TextEncoder } from "util";
+
 import { STypeError } from "@lib/errors";
 
 import flatstr from "flatstr";
-import iconv from "iconv-lite";
 
 import Field from "../Field";
 
 import VarInt from "./VarInt";
 
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
 const buildMCString = (n = 32767): Field<string> => ({
   async encode(str) {
     str = flatstr(str);
     if (str.length > n) throw new STypeError("INVALID_FIELD", `This MCString can have up tp ${n} characters`);
-    const encStr = iconv.encode(str, "utf8");
+    const encStr = encoder.encode(str);
     const encLenOfStr = await VarInt.encode(encStr.length);
     const totalLength = encLenOfStr.length + encStr.length;
 
@@ -28,9 +32,9 @@ const buildMCString = (n = 32767): Field<string> => ({
     const len = await VarInt.decode(consumer);
     if (len > n * 4) throw new STypeError("INVALID_FIELD", `This MCString has a maximum of ${n * 4} bytes`);
     const data = consumer.consume(len);
-    const str = iconv.decode(data, "utf8");
+    const str = decoder.decode(data);
 
-    return str;
+    return flatstr(str);
   },
 });
 

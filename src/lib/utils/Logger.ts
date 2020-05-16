@@ -56,6 +56,7 @@ class Logger {
 
   private name?: string;
   private levelMin: LoggerLevels;
+  private levelStats = new Map<keyof LoggerMethods, boolean>();
 
   // Although it is unlikely we will not supply a name, we should allow this to enable modularity.
   public constructor(name?: string, levelMin?: LoggerLevels, fd?: string | number, childName?: string);
@@ -76,15 +77,17 @@ class Logger {
 
     this.name = name as string | undefined;
     this.levelMin = levelMin as LoggerLevels;
-    this.fd = fd || (process.stdout as unknown as { fd: number }).fd;
+    this.fd = fd ?? (process.stdout as unknown as { fd: number }).fd ?? 3;
 
     if (!Logger.stdout) Logger.stdout = new SonicBoom({ fd: this.fd } as any);
 
     let i = 0;
-    for (const [lvl, colFn] of Object.entries(METHOD_COLOURS)) {
+    for (const [lvl, colFn] of Object.entries(METHOD_COLOURS) as [keyof LoggerMethods, chalk.Chalk][]) {
       const levelIndex = i;
-      this[lvl as keyof LoggerMethods] = (...args: any[]): void => {
-        if (levelIndex >= levelMin) {
+      this[lvl] = (...args: any[]): void => {
+        const shouldRun = levelIndex >= levelMin;
+        this.levelStats.set(lvl, shouldRun);
+        if (shouldRun) {
           // eslint-disable-next-line no-console
           if (Logger.destroyed) return console.log(`[DESTROYED LOGGER]: ${lvl}`, ...args);
 
@@ -117,7 +120,7 @@ class Logger {
   }
 
   public twoPieceLog(method: keyof LoggerMethods, msg: string, data: unknown) {
-    // TODO: Detect if the level is disabled and return, in order to optimise prod.
+    if (!this.levelStats.get(method)) return;
     this[method](`${msg}\n${formatWithOptions(
       { colors: Logger.stdoutColours },
       data as string,
