@@ -51,53 +51,6 @@ const packets: PacketStateMap = {
   noState: {},
 };
 
-// TODO: Make these kind of file loaders more modular, given one similar exists in Marshal.
-export async function initPacketCodec() {
-  log.debug("Querying packets directory...");
-  const files = await scan(PACKET_DIR, {
-    filter: (stats, path) => stats.isFile() && extname(path) === (isDebug ? ".ts" : ".js"),
-  });
-
-  log.debug("Registering packets...");
-  await Promise.all([...files.keys()]
-    .map(async loc => {
-      const packetName = relative(PACKET_DIR, loc).slice(0, -3);
-
-      const directory = packetName.split(sep);
-
-      const [stateName] = directory.length > 1 ? directory : ["noState"];
-
-      // Packet schemas prefixed with "_" are ignored.
-      if ((directory?.[1] ?? packetName).startsWith("_")) return;
-
-      const fileObj = await import(loc);
-
-      if (!fileObj.default) return log.warn(`The packet ${packetName} has no default export`);
-      const packet = fileObj.default as Packet;
-
-      if (!(packet instanceof Packet)) return log.error(new STypeError("INVALID_PACKET", packetName));
-
-      const dir = Packet.getDirection(packet);
-
-      if (dir !== "I") return;
-
-      if (!STATE_STRING_MAP.hasOwnProperty(stateName)) {
-        return log.warn(`The packet ${packetName} was placed in a folder which is not a valid state`);
-      }
-
-      const packetState = STATE_STRING_MAP[stateName];
-
-      Packet.setState(packet, packetState);
-
-      packets[packetState][packet.id] = packet;
-
-      log.debug(`Registered packet ${packetName}`);
-    }));
-
-  log.info("Registered all packets");
-}
-
-
 export async function encode<P extends Packet>(packet: P, compressThresh: number) {
   let packetName: string;
 
@@ -219,4 +172,50 @@ export async function decode<P extends Packet>(
   }
 
   return packet;
+}
+
+// TODO: Make these kind of file loaders more modular, given one similar exists in Marshal.
+export async function initPacketCodec() {
+  log.debug("Querying packets directory...");
+  const files = await scan(PACKET_DIR, {
+    filter: (stats, path) => stats.isFile() && extname(path) === (isDebug ? ".ts" : ".js"),
+  });
+
+  log.debug("Registering packets...");
+  await Promise.all([...files.keys()]
+    .map(async loc => {
+      const packetName = relative(PACKET_DIR, loc).slice(0, -3);
+
+      const directory = packetName.split(sep);
+
+      const [stateName] = directory.length > 1 ? directory : ["noState"];
+
+      // Packet schemas prefixed with "_" are ignored.
+      if ((directory?.[1] ?? packetName).startsWith("_")) return;
+
+      const fileObj = await import(loc);
+
+      if (!fileObj.default) return log.warn(`The packet ${packetName} has no default export`);
+      const packet = fileObj.default as Packet;
+
+      if (!(packet instanceof Packet)) return log.error(new STypeError("INVALID_PACKET", packetName));
+
+      const dir = Packet.getDirection(packet);
+
+      if (dir !== "I") return;
+
+      if (!STATE_STRING_MAP.hasOwnProperty(stateName)) {
+        return log.warn(`The packet ${packetName} was placed in a folder which is not a valid state`);
+      }
+
+      const packetState = STATE_STRING_MAP[stateName];
+
+      Packet.setState(packet, packetState);
+
+      packets[packetState][packet.id] = packet;
+
+      log.debug(`Registered packet ${packetName}`);
+    }));
+
+  log.info("Registered all packets");
 }
