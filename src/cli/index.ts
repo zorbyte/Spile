@@ -1,9 +1,8 @@
-import { Container } from "func";
+/* eslint-disable no-console */
+import { bootstrap } from "@lib/mediator";
+import Stopwatch from "@utils/Stopwatch";
 
-import Main from "./commands/main";
-import NotFound from "./commands/NotFound";
-import StartSpile from "./commands/Start";
-import VersionOption from "./options/Version";
+const stopwatch = new Stopwatch();
 
-// FIXME: Write my own lib, turns out this lib adds a full second to boot time!
-new Container([Main, StartSpile, VersionOption, NotFound]);
+bootstrap(stopwatch)
+  .catch(err => console.error("An error occurred pre-bootstrap", err));
