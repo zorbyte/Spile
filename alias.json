@@ -1,0 +1,11 @@
+{
+  "_moduleAliases": {
+    "@root": "./dist",
+    "@lib": "./dist/lib",
+    "@utils": "./dist/lib/utils",
+    "@net": "./dist/net",
+    "@game": "./dist/game",
+    "@marshal": "./dist/marshal",
+    "@type": "./dist/lib/types"
+  }
+}

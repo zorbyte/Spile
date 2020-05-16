@@ -18,8 +18,6 @@ class ProtoServer extends SimpleServer<TCPServer> {
 
   // Called when a socket connects.
   private handleConnection(socket: Socket): void {
-    this.log.debug("Connection established");
-
     const newClient = new Client(socket, this.log);
     this.clients.push(newClient);
   }

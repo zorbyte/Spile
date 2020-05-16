@@ -8,6 +8,7 @@ import {
 import { STypeError } from "@lib/errors";
 import { mainLog } from "@lib/mainLog";
 import { protocolDeflate, protocolInflate } from "@utils/compression";
+import Stopwatch from "@utils/Stopwatch";
 import { isDebug } from "@utils/utils";
 
 import { scan } from "fs-nextra";
@@ -98,7 +99,12 @@ export async function initPacketCodec() {
 
 
 export async function encode<P extends Packet>(packet: P, compressThresh: number) {
+  let packetName: string;
+
   try {
+    const stopwatch = new Stopwatch();
+    packetName = Packet.getName(packet);
+
     const producer = new BufferProducer();
 
     producer.append(await VarInt.encode(packet.id));
@@ -136,9 +142,15 @@ export async function encode<P extends Packet>(packet: P, compressThresh: number
     // Set the packet length.
     if (willCompress) producer.prepend(await VarInt.encode(producer.length));
 
-    return producer.compile();
+    const comp = producer.compile();
+
+    stopwatch.stop();
+    log.debug(`Finished encoding packet ${packetName} in ${stopwatch.toString()}`);
+
+    return comp;
   } catch (err) {
-    log.quickError("An error occurred while serialising a packet", err);
+    const packetNoun = packetName ? `the packet ${packetName}` : "a packet";
+    log.quickError(`An error occurred while serialising ${packetNoun}`, err);
   }
 }
 
@@ -147,9 +159,8 @@ export async function decode<P extends Packet>(
   state: State,
   compressThresh: number,
 ): Promise<P | [P, Buffer] | void> {
+  const stopwatch = new Stopwatch();
   const consumer = new BufferConsumer(buffer);
-
-  // Frame the buffer.
 
   // Negative values mean that compression is disabled.
   let compressMode = compressThresh >= 0;
@@ -178,11 +189,11 @@ export async function decode<P extends Packet>(
   // No packet to be mapped.
   if (!packet) return;
 
+  const packetName = Packet.getName(packet);
+
   // Set the hidden properties of packet and data length.
   Packet.setPacketLength(packet, packetLength);
   Packet.setDataLength(packet, dataLength);
-
-  log.debug(`Found packet id: ${id}`);
 
   for (const [key, fieldData] of Packet.getFields(packet).entries()) {
     const { field, hasDefault } = fieldData;
@@ -197,9 +208,13 @@ export async function decode<P extends Packet>(
     packet[key as keyof P] = required ? desVal : void 0;
   }
 
+  stopwatch.stop();
+
+  log.debug(`Finished decoding packet 0x${id.toString(16).toUpperCase()} ${packetName} in ${stopwatch.toString()}`);
+
   const remaining = consumer.drain();
   if (remaining.length) {
-    log.debug("Coalesced packet found!");
+    log.debug("Coalesced packet found");
     return [packet, remaining];
   }
 

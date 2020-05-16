@@ -117,11 +117,11 @@ class Logger {
   }
 
   public twoPieceLog(method: keyof LoggerMethods, msg: string, data: unknown) {
-    this[method](msg);
-    Logger.stdout.write(`${formatWithOptions(
+    // TODO: Detect if the level is disabled and return, in order to optimise prod.
+    this[method](`${msg}\n${formatWithOptions(
       { colors: Logger.stdoutColours },
       data as string,
-    )}\n`);
+    )}`);
   }
 
   private formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {

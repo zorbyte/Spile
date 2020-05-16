@@ -28,10 +28,6 @@ class Client {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.socket.on("data", this.handleRequest.bind(this));
 
-    this.socket.on("close", () => {
-      this.log.debug("Socket closed");
-    });
-
     this.socket.on("error", err => {
       // @ts-expect-error
       if (err.code && err.code === "ECONNRESET") {
@@ -48,7 +44,6 @@ class Client {
 
   public close(_reason?: string) {
     // TODO: Send a chat message packet.
-    this.log.debug("Closed a socket");
     this.socket.removeAllListeners("data");
     this.socket.destroy();
   }
@@ -65,7 +60,6 @@ class Client {
     let resPacket: Packet;
 
     try {
-      this.log.debug("Incoming packet");
       // Prevent malicious allocations that slow down the server.
       if (data.length > MAX_PACKET_LEN) return this.close();
 
@@ -115,15 +109,15 @@ class Client {
             this.log.logPacket(getHandleMessage(resPacket, DirectionLabel.O), resPacket);
           }
 
+          // Don't worry about catching this, if it has an error it should handle it itself.
+          // If it doesn't, we'd probably want it to fail spectacularly so we'd know about it.
+          if (handleAfter) await this.handleRequest(handleAfter);
+
           this.closeIfNeeded();
         } catch (err) {
           this.log.quickError("An error occurred while writing to a socket", err);
           this.close();
         }
-
-        // Don't worry about catching this, if it has an error it should handle it itself.
-        // If it doesn't, we'd probably want it to fail spectacularly so we'd know about it.
-        if (handleAfter) await this.handleRequest(handleAfter);
       });
     } catch (err) {
       this.log.quickError(`${curDir} An error occurred while handling a packet`, err);
