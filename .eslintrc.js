@@ -17,7 +17,7 @@ module.exports = {
   },
   parserOptions: {
     ecmaVersion: 2020,
-    project: "./tsconfig.eslint.json"
+    project: "./etc/tsconfig.eslint.json"
   },
   rules: {
     "object-curly-newline": ["error", {
