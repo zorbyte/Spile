@@ -1,6 +1,4 @@
 dist/
-dist-prev/
-build/
 temp/
 node_modules/
-gulpfile.js
+tools/

@@ -4,3 +4,7 @@ node_modules/
 yarn-err.log
 yarn-error.log
 tsconfig.tsbuildinfo
+.clinic
+isolate-*.log
+.vscode/
+__pycache__/
