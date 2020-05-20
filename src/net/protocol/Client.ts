@@ -86,7 +86,7 @@ class Client {
         if (!resPacket) {
           // Let it handle the request first, since any scheduled closures
           // would be unaware of proceeding packets.
-          if (handleAfter) await this.handleRequest(handleAfter);
+          if (handleAfter!) await this.handleRequest(handleAfter!);
           this.closeIfNeeded();
           return;
         }
@@ -94,7 +94,7 @@ class Client {
         curDir = DirectionLabel.O;
 
         // encode the response packet.
-        resBuf = await encode(resPacket, this.compressionThresh);
+        resBuf = await encode(resPacket, this.compressionThresh) as Buffer;
 
         if (!resBuf) return this.close();
       }

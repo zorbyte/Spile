@@ -97,7 +97,7 @@ export async function encode<P extends Packet>(packet: P, compressThresh: number
 
     return comp;
   } catch (err) {
-    const packetNoun = packetName ? `the packet ${packetName}` : "a packet";
+    const packetNoun = packetName! ? `the packet ${packetName!}` : "a packet";
     log.quickError(`An error occurred while serialising ${packetNoun}`, err);
   }
 }

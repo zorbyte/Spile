@@ -34,7 +34,7 @@ class BigIntMath {
   }
 
   public static abs(value: bigint) {
-    if (this.sign(value) === -1n) return -value;
+    return this.sign(value) * value;
   }
 
   public static sqrt(value: bigint) {

@@ -48,9 +48,9 @@ class Logger {
   public static destroySync(): void {
     try {
       Logger.destroyed = true;
-      Logger.stdout.flushSync();
+      Logger.stdout?.flushSync();
     } finally {
-      Logger.stdout.destroy();
+      Logger.stdout?.destroy();
     }
   }
 
@@ -70,7 +70,7 @@ class Logger {
     const nameType = typeof name;
 
     if (nameType === "undefined" && typeof levelMin === "undefined") levelMin = LoggerLevels.INFO;
-    if (name in LoggerLevels) levelMin = name;
+    if ((name as LoggerLevels) in LoggerLevels) levelMin = name as LoggerLevels;
     else if (nameType === "string") name = chalk.green((name as string).toLowerCase());
 
     if (name && childName) name += ` ${chalk.gray(">")} ${chalk.green(childName.toLowerCase())}`;
@@ -99,7 +99,7 @@ class Logger {
 
           logStr += "\n";
 
-          Logger.stdout.write(logStr);
+          Logger.stdout?.write(logStr);
         }
       };
 
@@ -129,7 +129,10 @@ class Logger {
 
   private formatString(levelName: keyof MethodColours, colourMethod: chalk.Chalk): string {
     const currentTime = new Date();
-    return `${chalk.bold.magenta(currentTime.toLocaleTimeString("en-GB"))}${this.name ? ` ${this.name}` : ""} ${colourMethod(levelName)}`;
+    return `${chalk
+      .bold
+      .magenta(currentTime.toLocaleTimeString("en-GB"))
+    }${this.name ? ` ${this.name}` : ""} ${colourMethod(levelName)}`;
   }
 }
 

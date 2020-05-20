@@ -24,7 +24,7 @@
     "sourceMap": true,
     "strict": true,
     "strictBindCallApply": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "target": "es2020",
     "skipLibCheck": true,
 		"rootDir": "src/",

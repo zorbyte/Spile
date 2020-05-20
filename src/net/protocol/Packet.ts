@@ -57,8 +57,8 @@ class Packet {
     return packet[kFields];
   }
 
-  public static getRunHook(packet: Packet) {
-    return packet[kRunHook];
+  public static getRunHook<P extends Packet>(packet: P) {
+    return packet[kRunHook] as PacketHook<P>;
   }
 
   public static setPacketLength(packet: Packet, newLen: number) {
@@ -119,7 +119,7 @@ class Packet {
 
     if (validator) fieldData.validator = validator;
     this[kFields].set(key, fieldData);
-    this[key as keyof this] = defaultVal;
+    this[key as keyof this] = defaultVal as any;
 
     return this as P;
   }

@@ -2,7 +2,7 @@
 
 ![Discord Shield](https://discordapp.com/api/guilds/702504330456072303/widget.png?style=shield)
 
-Spile is a Minecraft Java edition game server. The goal of it is to slowly errode my brain away.
+Spile is a Minecraft Java edition game server. The goal of it is to slowly errode my brain away. It makes use of Deno.
 
 Check out issue #1 for more info (yes I'm that lazy I'm not going to link to it, please have fun finding it, as at the time of writing it is the only issue.)
 
@@ -61,6 +61,7 @@ This project would be impossible without these amazing people, resources, commun
   - [Mojang](https://www.mojang.com) - Mojang for such a cool game.
   - [GlowstoneMC](https://github.com/GlowstoneMC/Glowstone) - For countless inspirations on how I should go about creating certain aspects on this project.
   - [PrismarineJS](https://github.com/PrismarineJS) - Existing JS code to help me gain insight on how things are done through JS in the MC protocol.
+  - [Veza](https://github.com/kyranet/veza) - The Veza project, for without this code, I would not have any examples on how to go about handling TCP packets.
 
 ## License
 
