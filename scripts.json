@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "dev": {
+      "desc": "Runs the server",
+      "cmd": "./src/main.ts",
+      "allow": ["net", "read", "write"]
+    },
+    "setupDev": {
+      "desc": "Sets up the development environment.",
+      "cmd": "./scripts/setupDev.ts",
+      "allow": ["read", "write"]
+    }
+  }
+}
