@@ -1,10 +1,10 @@
 // Inspired by deno/std/http.
 // Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.
-import { BufReader, BufWriter } from "https://deno.land/std@0.51.0/io/mod.ts";
+import { BufReader, BufWriter } from "https://deno.land/std@0.52.0/io/mod.ts";
 import {
   MuxAsyncIterator,
   deferred,
-} from "https://deno.land/std@0.51.0/async/mod.ts";
+} from "https://deno.land/std@0.52.0/async/mod.ts";
 
 import Conn = Deno.Conn;
 import Listener = Deno.Listener;
