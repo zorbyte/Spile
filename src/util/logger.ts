@@ -6,7 +6,7 @@ import {
   green,
   magenta,
   bold,
-} from "https://deno.land/std/fmt/colors.ts";
+} from "https://deno.land/std@0.51.0/fmt/colors.ts";
 
 const METHOD_COLOURS = {
   debug: gray,
@@ -19,15 +19,24 @@ type LevelNames = keyof typeof METHOD_COLOURS;
 type LoggerMethods = Record<LevelNames, typeof console.log>;
 
 interface Logger extends LoggerMethods {
-  child: Logger;
+  child(name: string): Logger;
 }
 
-export function createLogger(name: string): Logger;
-export function createLogger(name: string, childNames?: string[]) {
-  const debugEnabled = !!Deno.env.get("DEBUG");
-  const displayName = [name, ...(childNames ?? [])].map(green).join(gray(" >"));
+let defaultName = "master";
 
-  const loggerObj = Object.fromEntries(
+export function setDefaultName(newDefaultName: string) {
+  defaultName = newDefaultName;
+}
+
+// Add these overloads so that the child creation function isn't usually visible.
+export function createLogger(name?: string): Logger;
+export function createLogger(name: string, childNames: string[]): Logger;
+export function createLogger(name = defaultName, childNames?: string[]) {
+  const knownChildNames = childNames ?? [];
+  const debugEnabled = !!Deno.env.get("DEBUG");
+  const displayName = [name, ...knownChildNames].map(green).join(gray(" > "));
+
+  const loggerObj = (Object.fromEntries(
     Object.entries(METHOD_COLOURS).map(([key, coloriser]) => [
       key,
       (...args: unknown[]) => {
@@ -39,9 +48,16 @@ export function createLogger(name: string, childNames?: string[]) {
         );
       },
     ]),
-  );
+  ) as unknown) as Logger;
 
-  return (loggerObj as unknown) as Logger;
+  loggerObj.child = (childName: string) =>
+    createLogger(name, [childName, ...knownChildNames]);
+
+  return loggerObj;
+}
+
+export function createChild(childName: string) {
+  return createLogger(defaultName, [childName]);
 }
 
 function formatLog(

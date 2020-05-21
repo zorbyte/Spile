@@ -5,5 +5,5 @@ const tsconfigContent = {
 
 await Deno.writeTextFile(
   "./tsconfig.json",
-  JSON.stringify(tsconfigContent, void 0, 2)
+  JSON.stringify(tsconfigContent, void 0, 2),
 );

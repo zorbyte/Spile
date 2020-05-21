@@ -9,7 +9,6 @@
     "checkJs": false,
     "disableSizeLimit": false,
     "generateCpuProfile": "profile.cpuprofile",
-    "lib": [],
     "noFallthroughCasesInSwitch": false,
     "noImplicitAny": true,
     "noImplicitReturns": true,
