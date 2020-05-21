@@ -8,4 +8,4 @@ tsconfig.tsbuildinfo
 isolate-*.log
 .vscode/
 __pycache__/
-./tsconfig.json
+/tsconfig.json
