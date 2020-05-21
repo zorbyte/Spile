@@ -3,7 +3,7 @@
     "dev": {
       "desc": "Runs the server",
       "cmd": "deno run --unstable ./src/main.ts",
-      "allow": ["net", "read", "write"],
+      "allow": ["net", "read", "write", "env"],
       "env": {
         "DEBUG": "true"
       }
