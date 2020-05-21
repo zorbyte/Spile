@@ -8,7 +8,11 @@ Check out issue [#1](../../issues/1) for more info.
 
 ## Contributing
 
-To use the scripts, use the [Velociraptor](https://github.com/umbopepato/velociraptor) CLI.
+To use the scripts, install the [Velociraptor](https://github.com/umbopepato/velociraptor) CLI.
+
+To configure the development environment, run `vr setup_dev` (this requires the aforementioned CLI).
+
+To run Spile (in development mode), run `vr dev`.
 
 Ensure that you lint everything with prettier and then `deno fmt` prior to committing.
 
