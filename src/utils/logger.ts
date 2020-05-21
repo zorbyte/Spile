@@ -35,10 +35,10 @@ export function createLogger(name: string, childNames?: string[]) {
         if (callableKey === "debug" && !debugEnabled) return;
         console[callableKey as "log"](
           formatLog(displayName, { method: key, coloriser }),
-          ...args
+          ...args,
         );
       },
-    ])
+    ]),
   );
 
   return (loggerObj as unknown) as Logger;
@@ -46,11 +46,13 @@ export function createLogger(name: string, childNames?: string[]) {
 
 function formatLog(
   displayName: string,
-  opts: { method: string; coloriser: typeof gray }
+  opts: { method: string; coloriser: typeof gray },
 ) {
   const currentTime = new Date();
   const timeStr = currentTime.toLocaleTimeString();
-  return `${bold(
-    magenta(timeStr.slice(0, timeStr.indexOf(" ")))
-  )} ${displayName} ${opts.coloriser(opts.method)}`;
+  return `${
+    bold(
+      magenta(timeStr.slice(0, timeStr.indexOf(" "))),
+    )
+  } ${displayName} ${opts.coloriser(opts.method)}`;
 }
