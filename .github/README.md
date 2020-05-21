@@ -8,7 +8,7 @@ Check out issue [#1](../../issues/1) for more info.
 
 ## Contributing
 
-To use the scripts, use the [velociraptor](https://github.com/umbopepato/velociraptor) cli.
+To use the scripts, use the [Velociraptor](https://github.com/umbopepato/velociraptor) cli.
 Ensure that you lint everything with prettier and then `deno fmt` prior to committing.
 
 ## Credits
