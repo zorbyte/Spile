@@ -6,6 +6,11 @@ Spile is a Minecraft Java edition game server written in Typescript using Deno.
 
 Check out issue [#1](../../issues/1) for more info.
 
+## Contributing
+
+To use the scripts, use the [velociraptor](https://github.com/umbopepato/velociraptor) cli.
+Ensure that you lint everything with prettier and then `deno fmt` prior to committing.
+
 ## Credits
 
 This project would be impossible without these amazing people, resources, communities and projects:
