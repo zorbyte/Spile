@@ -3,9 +3,9 @@
     "lint": "deno fmt ./src ./bin",
     "dev": {
       "desc": "Runs the server",
-      "cmd": "deno run --unstable ./src/cli/main.ts",
+      "cmd": "deno run --unstable ./src/main.ts",
       "tsconfig": "./etc/tsconfig.json",
-      "lock": "./etc//ock.json",
+      "lock": "./etc/lock.json",
       "allow": ["net", "read", "write", "env"],
       "env": {
         "DEBUG": "true"

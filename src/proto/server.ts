@@ -1,8 +1,11 @@
+import { parseHeaders } from "./io_utils.ts";
+
 import Listener = Deno.Listener;
-import { parseHeaders } from "./io_util.ts";
+import Conn = Deno.Conn;
 
 const { listen } = Deno;
 
+const connections = new Set<Conn>();
 let listener: Listener;
 let open = false;
 
@@ -25,11 +28,29 @@ export async function serve(host: string) {
 export function close() {
   open = false;
   listener?.close();
+  for (const conn of connections) {
+    try {
+      conn.close();
+    } catch (err) {
+      // Connection might have been already closed
+      if (!(err instanceof Deno.errors.BadResource)) throw err;
+    }
+  }
 }
 
 async function acceptConns() {
   while (open) {
-    const conn = await listener.accept();
+    let _conn: Conn;
+    try {
+      _conn = await listener.accept();
+    } catch (err) {
+      // Connection might have been already closed
+      if (!(err instanceof Deno.errors.BadResource)) throw err;
+    }
+
+    // TODO: Use @ts-ignore-error in future.
+    // @ts-ignore
+    const conn = _conn;
 
     // TODO: Get legit data.
     const headerData = await parseHeaders(conn, {

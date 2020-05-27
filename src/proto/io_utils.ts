@@ -1,3 +1,4 @@
+import { varInt } from "./fields/var_int.ts";
 import Reader = Deno.Reader;
 
 export function concatArrays(arrays: Uint8Array[], length: number) {
@@ -16,7 +17,7 @@ export interface Collator {
   (data: Uint8Array, action: "prepend" | "append" | "replace"): void;
   (
     data?: Uint8Array,
-    action?: "prepend" | "append" | "replace",
+    action?: "prepend" | "append" | "replace"
   ): Uint8Array | void;
 }
 
@@ -27,11 +28,11 @@ export function collator(): Collator {
   function insert(): Uint8Array;
   function insert(
     data: Uint8Array,
-    action: "prepend" | "append" | "replace",
+    action: "prepend" | "append" | "replace"
   ): void;
   function insert(
     data?: Uint8Array,
-    action?: "prepend" | "append" | "replace",
+    action?: "prepend" | "append" | "replace"
   ): Uint8Array | void {
     if (!data) return concatArrays(buffered, length);
     if (action && action === "replace") {
@@ -52,10 +53,7 @@ export interface Consumer {
   (amount?: number, changeLen?: boolean): Uint8Array | number | void;
 }
 
-export function consumer(
-  buffer: Uint8Array,
-  maxLength = buffer.length,
-): Consumer {
+export function consumer(data: Uint8Array, maxLength = data.length): Consumer {
   let offset = 0;
 
   // Returns offset if no arguments supplied.
@@ -66,7 +64,7 @@ export function consumer(
   function consume(amount: number, changeLen: true): void;
   function consume(
     amount?: number,
-    changeLen?: boolean,
+    changeLen?: boolean
   ): Uint8Array | number | void {
     if (typeof amount === "undefined") {
       return offset;
@@ -79,18 +77,13 @@ export function consumer(
     if (endOffset > maxLength) {
       throw new Error("Can not read outside bounds of consumer!");
     }
-    const section = buffer.subarray(offset, endOffset);
+    const section = data.subarray(offset, endOffset);
     offset = endOffset;
 
     return section;
   }
 
   return consume;
-}
-
-export type VarType = "int" | "long";
-
-export function decodeVarType(data: Uint8Array, type: VarType) {
 }
 
 export interface ProtoHeaders {
@@ -105,33 +98,25 @@ export interface HeaderParserOpts {
   encrypted: boolean;
 }
 
+// A header either compressed or uncompressed will have two visible fields
+// both of which are VarInts. A VarInt has a max size of 5 bytes.
 const SIGNIFICANT_HEADER_LEN = 10;
-const VarIntStub = (_data: Uint8Array) => 0;
 
 export async function parseHeaders(
   reader: Reader,
-  _opts: HeaderParserOpts,
+  _opts: HeaderParserOpts
 ): Promise<ProtoHeaders | null> {
-  let i = 0;
-  const fields: Uint8Array[] = [];
   const collected = new Uint8Array(SIGNIFICANT_HEADER_LEN);
   const readAmnt = await reader.read(collected);
 
   if (readAmnt === null || readAmnt < SIGNIFICANT_HEADER_LEN) return null;
 
-  // A header either compressed or uncompressed will have two visible fields
-  // both of which are VarInts. A VarInt has a max size of 5 bytes.
-  for await (const chunk of Deno.iter(reader, { bufSize: 5 })) {
-    if (i > 1) break;
-    fields[i] = chunk;
-    i++;
-  }
+  const cons = consumer(collected, SIGNIFICANT_HEADER_LEN);
 
-  if (fields.length === 0) return null;
-
-  const headers: Partial<ProtoHeaders> = {};
-
-  [headers.packetLength, headers.dataLength] = fields.map(VarIntStub);
+  const headers: Partial<ProtoHeaders> = {
+    packetLength: await varInt.decode(cons),
+    dataLength: await varInt.decode(cons),
+  };
 
   headers.id = 0;
 

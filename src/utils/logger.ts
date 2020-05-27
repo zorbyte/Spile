@@ -38,13 +38,13 @@ export function createLogger(name = defaultName, childNames?: string[]) {
   const displayName = [name, ...knownChildNames].map(green).join(gray(" > "));
 
   const loggerObj = (Object.fromEntries(
-    Object.entries(METHOD_COLOURS).map(([key, coloriser]) => [
+    Object.entries(METHOD_COLOURS).map(([key, colouriser]) => [
       key,
       (...args: unknown[]) => {
         let callableKey = key === "warn" ? "info" : key;
         if (callableKey === "debug" && !debugEnabled) return;
         console[callableKey as "log"](
-          formatLog(displayName, { method: key, coloriser }),
+          formatLog(displayName, { method: key, colouriser }),
           ...args,
         );
       },
@@ -63,7 +63,7 @@ export function createChild(childName: string) {
 
 function formatLog(
   displayName: string,
-  opts: { method: string; coloriser: typeof gray },
+  opts: { method: string; colouriser: typeof gray },
 ) {
   if (displayName.length > 11) displayName += " ";
   const currentTime = new Date();
@@ -72,5 +72,5 @@ function formatLog(
     bold(
       magenta(timeStr.slice(0, timeStr.indexOf(" "))),
     )
-  } ${displayName}${opts.coloriser(opts.method)}`;
+  } ${displayName}${opts.colouriser(opts.method)}`;
 }
