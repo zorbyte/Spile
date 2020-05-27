@@ -1,6 +1,5 @@
 // Inspired by deno/std/http.
 // Copyright 2018-2020 the Deno authors. All rights reserved. MIT license.
-import { BufReader, BufWriter } from "https://deno.land/std@0.52.0/io/mod.ts";
 import {
   MuxAsyncIterator,
   deferred,
@@ -8,11 +7,13 @@ import {
 
 import Conn = Deno.Conn;
 import Listener = Deno.Listener;
+import { parseHeaders } from "./io_util.ts";
 
 const { listen } = Deno;
 
 class Request {
-  done = deferred<Error | void>();
+  public done = deferred<Error | void>();
+  public constructor(public conn: Conn) {}
 }
 
 const connections = new Set<Conn>();
@@ -61,10 +62,15 @@ async function* connectAndIter(mux: MuxAsyncIterator<Request>) {
 }
 
 async function* iterRequests(conn: Conn) {
-  const reader = new BufReader(conn);
-  const writer = new BufWriter(conn);
-
-  while (!closing) {}
-
-  yield new Request();
+  while (!closing) {
+    const headers = parseHeaders(
+      conn,
+      {
+        compressed: false,
+        compressionThreshold: -1,
+        encrypted: false,
+      },
+    );
+    yield new Request(conn);
+  }
 }

@@ -1,0 +1,7 @@
+{
+  "https://deno.land/std@0.53.0/async/mod.ts": "bf46766747775d0fc4070940d20d45fb311c814989485861cdc8a8ef0e3bbbab",
+  "https://deno.land/std@0.53.0/fmt/colors.ts": "ec9d653672a9a3c7b6eafe53c5bc797364a2db2dcf766ab649c1155fea7a80b2",
+  "https://deno.land/std@0.53.0/async/deferred.ts": "ac95025f46580cf5197928ba90995d87f26e202c19ad961bc4e3177310894cdc",
+  "https://deno.land/std@0.53.0/async/delay.ts": "35957d585a6e3dd87706858fb1d6b551cb278271b03f52c5a2cb70e65e00c26a",
+  "https://deno.land/std@0.53.0/async/mux_async_iterator.ts": "e2a4c2c53aee22374b493b88dfa08ad893bc352c8aeea34f1e543e938ec6ccc6"
+}

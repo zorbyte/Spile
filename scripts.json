@@ -5,7 +5,7 @@
       "desc": "Runs the server",
       "cmd": "deno run --unstable ./src/cli/main.ts",
       "tsconfig": "./etc/tsconfig.json",
-      "lock": "./etc/locks/lock.cli.json",
+      "lock": "./etc//ock.json",
       "allow": ["net", "read", "write", "env"],
       "env": {
         "DEBUG": "true"
@@ -17,15 +17,11 @@
         {
           "cmd": "./bin/setup_dev.ts",
           "tsconfig": "./etc/tsconfig.json",
-          "allow": ["write"]
+          "allow": ["write", "read"]
         },
         {
-          "cmd": "deno cache --lock-write ./src/cli/main.ts",
-          "lock": "./etc/locks/lock.cli.json"
-        },
-        {
-          "cmd": "deno cache --lock-write ./src/protocol/mod.ts",
-          "lock": "./etc/locks/lock.protocol.json"
+          "cmd": "deno cache --lock-write ./src/deps.ts",
+          "lock": "./etc/lock.json"
         }
       ]
     }

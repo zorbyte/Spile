@@ -6,7 +6,7 @@ import {
   green,
   magenta,
   bold,
-} from "https://deno.land/std@0.52.0/fmt/colors.ts";
+} from "../deps.ts";
 
 const METHOD_COLOURS = {
   debug: gray,
@@ -22,7 +22,7 @@ interface Logger extends LoggerMethods {
   child(name: string): Logger;
 }
 
-let defaultName = "master";
+let defaultName = "";
 
 export function setDefaultName(newDefaultName: string) {
   defaultName = newDefaultName;
@@ -33,6 +33,7 @@ export function createLogger(name?: string): Logger;
 export function createLogger(name: string, childNames: string[]): Logger;
 export function createLogger(name = defaultName, childNames?: string[]) {
   const knownChildNames = childNames ?? [];
+  if (name === "" && knownChildNames.length) name = knownChildNames.pop() ?? "";
   const debugEnabled = !!Deno.env.get("DEBUG");
   const displayName = [name, ...knownChildNames].map(green).join(gray(" > "));
 
@@ -64,11 +65,12 @@ function formatLog(
   displayName: string,
   opts: { method: string; coloriser: typeof gray },
 ) {
+  if (displayName.length > 11) displayName += " ";
   const currentTime = new Date();
   const timeStr = currentTime.toLocaleTimeString();
   return `${
     bold(
       magenta(timeStr.slice(0, timeStr.indexOf(" "))),
     )
-  } ${displayName} ${opts.coloriser(opts.method)}`;
+  } ${displayName}${opts.coloriser(opts.method)}`;
 }
