@@ -16,7 +16,7 @@ let open = false;
 export async function serve(host: string) {
   const opts: Partial<Deno.ListenOptions> = {};
   const optsSplit = host.split(":") as [string, number];
-  optsSplit[1] = parseInt(optsSplit[1] as unknown as string);
+  optsSplit[1] = parseInt((optsSplit[1] as unknown) as string);
   [opts.hostname, opts.port] = optsSplit;
 
   listener = listen(opts as Deno.ListenOptions);
@@ -40,20 +40,17 @@ export function close() {
 
 async function acceptConns() {
   while (open) {
-    let _conn: Conn;
+    let conn: Conn;
     try {
-      _conn = await listener.accept();
+      conn = await listener.accept();
     } catch (err) {
       // Connection might have been already closed
       if (!(err instanceof Deno.errors.BadResource)) throw err;
+      return;
     }
 
-    // TODO: Use @ts-ignore-error in future.
-    // @ts-ignore
-    const conn = _conn;
-
     // TODO: Get legit data.
-    const headerData = await parseHeaders(conn, {
+    const headerData = await parseHeaders(_conn, {
       encrypted: false,
       compressed: false,
       compressionThreshold: -1,
