@@ -39,9 +39,9 @@ export function close() {
   for (const conn of connections) {
     try {
       conn.close();
-    } catch (e) {
+    } catch (err) {
       // Connection might have been already closed
-      if (!(e instanceof Deno.errors.BadResource)) throw e;
+      if (!(err instanceof Deno.errors.BadResource)) throw e;
     }
   }
 }
@@ -51,9 +51,8 @@ async function* connectAndIter(mux: MuxAsyncIterator<Request>) {
   let conn: Conn;
   try {
     conn = await listener.accept();
-  } catch (error) {
-    if (error instanceof Deno.errors.BadResource) return;
-    throw error;
+  } catch (err) {
+    if (!(err instanceof Deno.errors.BadResource)) throw e;
   }
 
   connections.add(conn);
@@ -63,14 +62,11 @@ async function* connectAndIter(mux: MuxAsyncIterator<Request>) {
 
 async function* iterRequests(conn: Conn) {
   while (!closing) {
-    const headers = parseHeaders(
-      conn,
-      {
-        compressed: false,
-        compressionThreshold: -1,
-        encrypted: false,
-      },
-    );
+    const headers = parseHeaders(conn, {
+      compressed: false,
+      compressionThreshold: -1,
+      encrypted: false,
+    });
     yield new Request(conn);
   }
 }
