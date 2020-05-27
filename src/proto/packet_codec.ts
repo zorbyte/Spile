@@ -1,4 +1,4 @@
-import { STypeError } from "@lib/errors";
+import { STypeError } from "../errors/mod.ts";
 import { Consumer } from "./io_utils.ts";
 import { FieldCodec } from "./field_codec.d.ts";
 import { Predicate } from "../utils/type_utils.d.ts";

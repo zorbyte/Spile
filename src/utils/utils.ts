@@ -15,3 +15,9 @@ export function Enumerable(value: boolean) {
     });
   };
 }
+
+// Improves speed when working with heavily concatenated strings.
+export function flatStr(str: string): string {
+  // @ts-ignore
+  return str | 0;
+}

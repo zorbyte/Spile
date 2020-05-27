@@ -1,12 +1,12 @@
 import { STypeError } from "../../errors/mod.ts";
 import { FieldCodec } from "../field_codec.d.ts";
 
-export const VarLong: FieldCodec<bigint> = {
+export const varLong: FieldCodec<bigint> = {
   encode(value) {
     const byteArr = [];
 
     while (value !== 0n) {
-      let temp = value & 0x7Fn;
+      let temp = value & 0x7fn;
 
       value >>= 7n;
       if (value !== 0n) temp |= 0x80n;
@@ -14,7 +14,7 @@ export const VarLong: FieldCodec<bigint> = {
       byteArr.push(temp);
     }
 
-    return Uint8Array.from(byteArr as unknown as number[]);
+    return Uint8Array.from((byteArr as unknown) as number[]);
   },
 
   decode(consume) {
@@ -23,7 +23,7 @@ export const VarLong: FieldCodec<bigint> = {
 
     while (true) {
       const [read] = consume(1);
-      result |= (BigInt(read) & 0x7Fn) << (7n * numRead);
+      result |= (BigInt(read) & 0x7fn) << (7n * numRead);
 
       numRead++;
       if (numRead > 10) {

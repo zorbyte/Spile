@@ -50,7 +50,7 @@ async function acceptConns() {
     }
 
     // TODO: Get legit data.
-    const headerData = await parseHeaders(_conn, {
+    const headerData = await parseHeaders(conn, {
       encrypted: false,
       compressed: false,
       compressionThreshold: -1,
