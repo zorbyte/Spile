@@ -9,4 +9,4 @@ const log = createLogger();
 log.error("bruh");
 
 await serve(":8080");
-log.info("Bruy")
+log.info("Bruy");

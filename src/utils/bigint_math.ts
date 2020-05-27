@@ -35,7 +35,9 @@ export class BigIntMath {
   }
 
   public static sqrt(value: bigint) {
-    if (value < 0n) throw new EvalError("Non-positive numbers can not be square rooted");
+    if (value < 0n) {
+      throw new EvalError("Non-positive numbers can not be square rooted");
+    }
 
     if (value < 2n) return value;
 

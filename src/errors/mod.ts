@@ -62,7 +62,9 @@ export function isError(
 }
 
 function message(key: ErrorMessageKeys, args: any[]) {
-  if (typeof key !== "string") throw new TypeError("Error message key is not a string");
+  if (typeof key !== "string") {
+    throw new TypeError("Error message key is not a string");
+  }
   if (!(key in ERROR_MESSAGES)) throw new SError("INVALID_ERROR_KEY", key);
   const msg = ERROR_MESSAGES[key];
 

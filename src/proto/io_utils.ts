@@ -17,7 +17,7 @@ export interface Collator {
   (data: Uint8Array, action: "prepend" | "append" | "replace"): void;
   (
     data?: Uint8Array,
-    action?: "prepend" | "append" | "replace"
+    action?: "prepend" | "append" | "replace",
   ): Uint8Array | void;
 }
 
@@ -28,11 +28,11 @@ export function collator(): Collator {
   function insert(): Uint8Array;
   function insert(
     data: Uint8Array,
-    action: "prepend" | "append" | "replace"
+    action: "prepend" | "append" | "replace",
   ): void;
   function insert(
     data?: Uint8Array,
-    action?: "prepend" | "append" | "replace"
+    action?: "prepend" | "append" | "replace",
   ): Uint8Array | void {
     if (!data) return concatArrays(buffered, length);
     if (action && action === "replace") {
@@ -64,7 +64,7 @@ export function consumer(data: Uint8Array, maxLength = data.length): Consumer {
   function consume(amount: number, changeLen: true): void;
   function consume(
     amount?: number,
-    changeLen?: boolean
+    changeLen?: boolean,
   ): Uint8Array | number | void {
     if (typeof amount === "undefined") {
       return offset;
@@ -104,7 +104,7 @@ const SIGNIFICANT_HEADER_LEN = 10;
 
 export async function parseHeaders(
   reader: Reader,
-  _opts: HeaderParserOpts
+  _opts: HeaderParserOpts,
 ): Promise<ProtoHeaders | null> {
   const collected = new Uint8Array(SIGNIFICANT_HEADER_LEN);
   const readAmnt = await reader.read(collected);
