@@ -2,10 +2,11 @@ import {
   ERROR_MESSAGES,
   ErrorMessages,
 } from "./messages.ts";
+import { AnyFunction } from "../utils/type_utils.d.ts";
 
 type ErrorArgs<K extends keyof ErrorMessages> = Parameters<
-  ErrorMessages[K] extends (...args: any[]) => string ? ErrorMessages[K]
-    : (...args: any[]) => string
+  ErrorMessages[K] extends AnyFunction<string> ? ErrorMessages[K]
+    : AnyFunction<string>
 >;
 type Constructor<T extends object> = new (
   ...args: ErrorArgs<keyof ErrorMessages>
@@ -85,8 +86,9 @@ function message<K extends keyof ErrorMessages>(
   const msg = ERROR_MESSAGES[key];
 
   if (typeof msg === "function") {
-    return (msg as (...args: any[]) => string)(...args);
+    return (msg as AnyFunction<string>)(...args);
   }
+  
   if (args === undefined || args.length === 0) return msg;
   args.unshift(msg as string);
 
