@@ -88,7 +88,7 @@ function message<K extends keyof ErrorMessages>(
   if (typeof msg === "function") {
     return (msg as AnyFunction<string>)(...args);
   }
-  
+
   if (args === undefined || args.length === 0) return msg;
   args.unshift(msg as string);
 
