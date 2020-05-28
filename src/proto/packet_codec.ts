@@ -68,8 +68,9 @@ class PacketCodec<P extends KnownPacketFields> {
     for (const [key, fieldInfo] of this.packetFields.entries()) {
       const val = await fieldInfo.fieldCodec.decode(consumer);
       if (fieldInfo.validator?.(val) ?? false) {
-        throw new STypeError("INVALID_PACKET");
+        throw new STypeError("INVALID_FIELD_DATA", key as string, val);
       }
+
       fields[key] = val;
       fieldInfo.skipOn?.(fields, val);
     }

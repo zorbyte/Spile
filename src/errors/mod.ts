@@ -1,7 +1,19 @@
-import { ERROR_MESSAGES, ErrorMessageKeys } from "./messages.ts";
+import {
+  ERROR_MESSAGES,
+  ErrorMessages,
+} from "./messages.ts";
 
-type Constructor<T extends object> = new (...args: any[]) => T;
-type SpileErrorCtor = new (key: ErrorMessageKeys, ...args: string[]) => Error;
+type ErrorArgs<K extends keyof ErrorMessages> = Parameters<
+  ErrorMessages[K] extends (...args: any[]) => string ? ErrorMessages[K]
+    : (...args: any[]) => string
+>;
+type Constructor<T extends object> = new (
+  ...args: ErrorArgs<keyof ErrorMessages>
+) => T;
+type SpileErrorCtor = new (
+  key: keyof ErrorMessages,
+  ...args: ErrorArgs<typeof key>
+) => Error;
 
 export const kSpileError = Symbol.for("kSpileError");
 const ERROR_PROPS = Object.keys(Error.prototype);
@@ -15,12 +27,12 @@ function createCustomError<E extends SpileErrorCtor>(DummyBaseCtor: E) {
   // For now it solves the "Type 'E' is not a constructor function type" error.
   const BaseCtor: Constructor<Error> = DummyBaseCtor;
 
-  return class SpileError extends BaseCtor {
+  return class SpileError<K extends keyof ErrorMessages> extends BaseCtor {
     public readonly [kSpileError]: boolean;
 
     public constructor(
-      public readonly key: ErrorMessageKeys,
-      ...args: string[]
+      public readonly key: K,
+      ...args: ErrorArgs<K>
     ) {
       // Error thrown further down the stack if need be.
       super(message(key, args));
@@ -61,16 +73,22 @@ export function isError(
     error instanceof Error;
 }
 
-function message(key: ErrorMessageKeys, args: any[]) {
+function message<K extends keyof ErrorMessages>(
+  key: K,
+  args: ErrorArgs<K>,
+) {
   if (typeof key !== "string") {
     throw new TypeError("Error message key is not a string");
   }
+
   if (!(key in ERROR_MESSAGES)) throw new SError("INVALID_ERROR_KEY", key);
   const msg = ERROR_MESSAGES[key];
 
-  if (typeof msg === "function") return msg(...args);
+  if (typeof msg === "function") {
+    return (msg as (...args: any[]) => string)(...args);
+  }
   if (args === undefined || args.length === 0) return msg;
-  args.unshift(msg);
+  args.unshift(msg as string);
 
   return String(...args);
 }
