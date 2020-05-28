@@ -21,3 +21,12 @@ export function flatStr(str: string): string {
   // @ts-ignore
   return str | 0;
 }
+
+// TODO: Find out if we need this.
+export function bigIntToBytes(num: bigint) {
+  return num
+    .toString(16)
+    .replace("0x", "")
+    .match(/[\da-f]{2}/gi)!
+    .map((h) => parseInt(h, 16));
+}

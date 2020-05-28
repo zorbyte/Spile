@@ -26,9 +26,8 @@ export const long: FieldCodec<bigint> = {
   },
 
   decode(consume) {
-    const bytes = consume(8);
-    const view = new DataView(bytes);
+    const [offset, view] = consume("view", 8);
 
-    return view.getBigInt64(0);
+    return view.getBigInt64(offset);
   },
 };

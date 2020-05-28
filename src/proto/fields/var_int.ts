@@ -23,7 +23,7 @@ export const varInt: FieldCodec<number> = {
     let result = 0;
 
     while (true) {
-      const [read] = consume(1);
+      const [read] = consume("read", 1);
       result |= (read & 0x7F) << (7 * numRead);
 
       numRead++;

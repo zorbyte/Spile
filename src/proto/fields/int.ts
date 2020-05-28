@@ -18,9 +18,7 @@ export const int: FieldCodec<number> = {
   },
 
   decode(consume) {
-    const bytes = consume(4);
-    const view = new DataView(bytes);
-
-    return view.getInt32(0);
+    const [offset, view] = consume("view", 4);
+    return view.getInt32(offset);
   },
 };

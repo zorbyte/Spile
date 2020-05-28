@@ -10,9 +10,7 @@ export const double: FieldCodec<number> = {
   },
 
   decode(consume) {
-    const bytes = consume(8);
-    const view = new DataView(bytes);
-
-    return view.getFloat64(0);
+    const [offset, view] = consume("view", 8);
+    return view.getFloat64(offset);
   },
 };

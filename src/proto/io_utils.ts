@@ -12,9 +12,11 @@ export function concatArrays(arrays: Uint8Array[], length: number) {
   return output;
 }
 
+type CollatorAction = "prepend" | "append" | "replace";
+
 export interface Collator {
   (): Uint8Array;
-  (data: Uint8Array, action: "prepend" | "append" | "replace"): void;
+  (data: Uint8Array, action: CollatorAction): void;
   (
     data?: Uint8Array,
     action?: "prepend" | "append" | "replace",
@@ -46,44 +48,58 @@ export function collator(): Collator {
   return insert;
 }
 
+export type ConsumerAction = "view" | "read" | "offset" | "changeMaxOffset";
+
 export interface Consumer {
-  (): number;
-  (amount: number): Uint8Array;
-  (amount: number, changeLen: true): void;
-  (amount?: number, changeLen?: boolean): Uint8Array | number | void;
+  (
+    action: ConsumerAction,
+    amount: number,
+  ): void | number | DataView | Uint8Array;
+  (action: "offset"): number;
+  (action: "read", amount: number): Uint8Array;
+  (action: "view", amount: number): [number, DataView];
+  (action: "changeMaxOffset", amount: number): void;
 }
 
-export function consumer(data: Uint8Array, maxLength = data.length): Consumer {
+export function consumer(data: Uint8Array, maxOffset = data.length) {
   let offset = 0;
+  let view!: DataView;
 
-  // Returns offset if no arguments supplied.
-  // Returns a slice of the buffer if amount is supplied.
-  // Extends the maximum length if the extend argument is supplied with true.
-  function consume(): number;
-  function consume(amount: number): Uint8Array;
-  function consume(amount: number, changeLen: true): void;
-  function consume(
-    amount?: number,
-    changeLen?: boolean,
-  ): Uint8Array | number | void {
-    if (typeof amount === "undefined") {
-      return offset;
-    } else if (changeLen) {
-      maxLength += amount;
-      return;
+  function consume(action: ConsumerAction, amount?: number) {
+    switch (action) {
+      case "view":
+        // Rule of thumb: Don't read more than the offset you provided!
+        if (!view) view = new DataView(data);
+        const prevOffset = changeOffset(amount!);
+        return [prevOffset, view];
+      case "offset":
+        return offset;
+      case "read":
+        const oldOffset = changeOffset(amount!);
+        const section = data.subarray(oldOffset, offset);
+
+        return section;
+      case "changeMaxOffset":
+        maxOffset += amount!;
+        break;
     }
-
-    const endOffset = offset + amount;
-    if (endOffset > maxLength) {
-      throw new Error("Can not read outside bounds of consumer!");
-    }
-    const section = data.subarray(offset, endOffset);
-    offset = endOffset;
-
-    return section;
   }
 
-  return consume;
+  // Returns the old offset.
+  function changeOffset(amount: number) {
+    const newOffset = offset + amount;
+    if (newOffset > maxOffset) {
+      throw new Error("Can not read outside bounds of consumer!");
+    }
+
+    // The new offset is assigned to offset.
+    const oldOffset = offset;
+    offset = newOffset;
+
+    return oldOffset;
+  }
+
+  return consume as Consumer;
 }
 
 export interface ProtoHeaders {
@@ -105,7 +121,7 @@ const SIGNIFICANT_HEADER_LEN = 10;
 export async function parseHeaders(
   reader: Reader,
   _opts: HeaderParserOpts,
-): Promise<ProtoHeaders | null> {
+) {
   const collected = new Uint8Array(SIGNIFICANT_HEADER_LEN);
   const readAmnt = await reader.read(collected);
 

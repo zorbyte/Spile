@@ -8,7 +8,7 @@ export const MCBool: FieldCodec<boolean> = {
   },
 
   decode(consume) {
-    const [byte] = consume(1);
+    const [byte] = consume("read", 1);
 
     if (byte === 0x01) return true;
     if (byte === 0x00) return false;

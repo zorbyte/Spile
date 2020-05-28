@@ -15,7 +15,6 @@ export function buildMCJson<T>(): FieldCodec<T> {
 
     async decode(consume): Promise<T> {
       const rawJson = await strCodec.decode(consume);
-
       return parse(rawJson);
     },
   };

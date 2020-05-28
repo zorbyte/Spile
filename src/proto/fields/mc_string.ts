@@ -41,7 +41,8 @@ export const buildMCString = (n = 32767): FieldCodec<string> => ({
         `This MCString has a maximum of ${n * 4} bytes`,
       );
     }
-    const data = consume(len);
+
+    const data = consume("read", len);
     const str = decoder.decode(data);
 
     return flatStr(str);
