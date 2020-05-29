@@ -7,7 +7,7 @@ const {
 
 const tsconfigProject = {
   extends: "./etc/tsconfig.json",
-  include: ["./src/**/*", "./bin/setup_dev.ts", "./etc/version.ts"],
+  include: ["./src/**/*", "./bin/setup_dev.ts", "./etc/package.ts"],
 };
 
 const vscodeSettings = {

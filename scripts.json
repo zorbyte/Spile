@@ -11,6 +11,11 @@
         "DEBUG": "true"
       }
     },
+    "cache": {
+      "desc": "Cache the modules and write the lock.",
+      "cmd": "deno cache --lock-write ./src/deps.ts",
+      "lock": "./etc/lock.json"
+    },
     "setup_dev": {
       "desc": "Sets up the development environment.",
       "pll": [
