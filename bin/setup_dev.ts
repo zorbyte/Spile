@@ -2,6 +2,7 @@ const {
   mkdir,
   stat,
   writeTextFile,
+  readTextFile,
   errors: { NotFound },
 } = Deno;
 
@@ -14,14 +15,31 @@ const vscodeSettings = {
   "deno.enable": true,
   "deno.unstable": true,
   "deno.tsconfig": "./tsconfig.json",
-  "deno.importmap": "./etc/import_map.json",
+  "deno.importmap": "./import_map_dev.json",
   "prettier.configPath": "./etc/.prettierrc",
   "cSpell.words": ["prettierrc"],
+};
+
+const importMap = JSON.parse(await readTextFile("./etc/import_map.json")) as {
+  imports: Record<string, string>;
+};
+
+const importMapDev = {
+  imports: Object.fromEntries(
+    Object.entries(importMap.imports).map(([alias, loc]) => {
+      if (alias.startsWith("@")) {
+        loc = loc.slice(1);
+      }
+
+      return [alias, loc];
+    }),
+  ),
 };
 
 await Promise.all([
   writeJson("./tsconfig.json", tsconfigProject),
   writeJson("./.vscode/settings.json", vscodeSettings),
+  writeJson("./import_map_dev.json", importMapDev),
 ]);
 
 async function writeJson(location: string, data: Record<string, any>) {

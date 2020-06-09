@@ -1,14 +1,14 @@
-import { parseHeaders } from "./io_utils.ts";
+import { createLogger } from "@utils/logger.ts";
 
+import { parseHeaders } from "./io_utils.ts";
 import { Context } from "./context.ts";
-import { createLogger } from "../utils/logger.ts";
 
 import Listener = Deno.Listener;
 import Conn = Deno.Conn;
 
 const { listen: listenTcp } = Deno;
 
-const log = createLogger("server");
+const log = createLogger("protocol");
 const connections = new Set<Conn>();
 let listener: Listener;
 let open = false;
@@ -41,11 +41,12 @@ async function handleConnection(conn: Conn) {
   }
 }
 
-export async function listen(opts: ServeOptions) {
+export function listen(opts: ServeOptions) {
   listener = listenTcp(opts);
   open = true;
 
   acceptConnections();
+  log.info(`Started listening on ${opts.hostname}:${opts.port}`);
 }
 
 export function close() {

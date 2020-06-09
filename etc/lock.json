@@ -1,8 +1,8 @@
 {
-  "https://deno.land/x/nanoid/customRandom.ts": "3f16ac459c23b31e615743086c263af3fee6960dad636fa0106d7c69b3e19072",
   "https://deno.land/x/nanoid/mod.ts": "6a0e44a4d3919e4012e62de04648da9097c77cb50ac0ff5e44891bc5f6c6efab",
   "https://deno.land/x/nanoid/url.ts": "fcdb9ce50950f141cd274cd00e10b22e60c65b1aef059bc33d3dacdf2b3b41bc",
-  "https://deno.land/x/nanoid/random.ts": "730354233442779c361966a3c4ca6c901ed0c78432c093ba67f040e7c46c9afd",
   "https://deno.land/std@0.55.0/fmt/colors.ts": "06444b6ebc3842a4b2340d804bfa81fc5452a03513cbb81bd7f6bf8f4b8f3ac4",
+  "https://deno.land/x/nanoid/customRandom.ts": "3f16ac459c23b31e615743086c263af3fee6960dad636fa0106d7c69b3e19072",
+  "https://deno.land/x/nanoid/random.ts": "730354233442779c361966a3c4ca6c901ed0c78432c093ba67f040e7c46c9afd",
   "https://deno.land/x/nanoid/customAlphabet.ts": "ac97fdc7452e784deaa124b6e59b247608ef7e999cce8d8f4e5077070891973b"
 }

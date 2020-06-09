@@ -1,5 +1,5 @@
-import { STypeError } from "../errors/mod.ts";
-import { Predicate } from "../utils/type_utils.d.ts";
+import { STypeError } from "@utils/errors/mod.ts";
+import { Predicate } from "@utils/type_utils.d.ts";
 
 import { Consumer } from "./consumer.ts";
 import { FieldCodec } from "./field_codec.ts";
@@ -40,7 +40,7 @@ class PacketCodec<P extends KnownPacketFields> {
   public addField<
     T extends string,
     F extends FieldCodec<any>,
-    FT extends FieldCodecType<F>
+    FT extends FieldCodecType<F>,
   >(key: T & (T extends RestrictedKeys ? never : {}), fieldCodec: F) {
     const fieldInfo: FieldInfo<P, FT> = { fieldCodec };
 

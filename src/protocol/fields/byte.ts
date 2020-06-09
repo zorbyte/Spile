@@ -1,5 +1,5 @@
-import { FieldCodecBuilder } from "../field_codec.ts";
 import { getBytesOfNumber } from "../io_utils.ts";
+import { FieldCodecBuilder } from "../field_codec.ts";
 
 export const byte = new FieldCodecBuilder<number>("byte")
   .validate((value) => value < 127 && value > -128)

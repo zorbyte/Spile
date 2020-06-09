@@ -1,6 +1,6 @@
 import nanoid from "nanoid/mod.ts";
 
-import { Logger } from "../utils/logger.ts";
+import { Logger } from "@utils/logger.ts";
 
 import { Consumer } from "./consumer.ts";
 

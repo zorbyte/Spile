@@ -2,7 +2,7 @@ import {
   ERROR_MESSAGES,
   ErrorMessages,
 } from "./messages.ts";
-import { AnyFunction } from "../utils/type_utils.d.ts";
+import { AnyFunction } from "../type_utils.d.ts";
 
 type ErrorArgs<K extends keyof ErrorMessages> = Parameters<
   ErrorMessages[K] extends AnyFunction<string> ? ErrorMessages[K]

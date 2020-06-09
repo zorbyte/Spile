@@ -16,7 +16,7 @@ export interface SpileConfig {
 }
 
 export async function getConfig() {
-  const data = await Deno.readTextFile("./config.json")
+  const data = await Deno.readTextFile("./config.json");
   const parsedConfig = JSON.parse(data);
   return parsedConfig;
 }

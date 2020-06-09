@@ -1,7 +1,8 @@
-import { flatStr } from "../../utils/utils.ts";
+import { flatStr } from "@utils/common.ts";
 
-import { FieldCodec } from "../field_codec.ts";
 import { concatArrays } from "../io_utils.ts";
+import { FieldCodec } from "../field_codec.ts";
+
 import { varInt } from "./var_int.ts";
 
 const encoder = new TextEncoder();

@@ -6,7 +6,10 @@ export class Consumer {
   #offset = 0;
   #readSoFar = 0;
 
-  public constructor(private reader: Reader, public maxOffset = MAX_PACKET_SIZE) {}
+  public constructor(
+    private reader: Reader,
+    public maxOffset = MAX_PACKET_SIZE,
+  ) {}
 
   public get offset() {
     return this.#offset;
@@ -37,7 +40,9 @@ export class Consumer {
     return oldOffset;
   }
 
-  private async readIntoArray(amount: number): Promise<[Uint8Array | void, number]> {
+  private async readIntoArray(
+    amount: number,
+  ): Promise<[Uint8Array | void, number]> {
     const data = new Uint8Array(amount);
     const amountRead = await this.reader.read(data);
     if (amountRead !== null && amountRead > 0) {
@@ -50,7 +55,9 @@ export class Consumer {
         const extValidData = new Uint8Array(offsetDiff);
         const extAmountRead = await this.reader.read(extValidData);
         if (extAmountRead === null || amountRead === 0) {
-          throw new Error("Can not read data in area of a pre-maturely extended offset.");
+          throw new Error(
+            "Can not read data in area of a pre-maturely extended offset.",
+          );
         }
 
         finalData = concatArrays(

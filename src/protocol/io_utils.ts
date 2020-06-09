@@ -1,6 +1,6 @@
-import { varInt } from "./fields/var_int.ts";
-import { PickByValue } from "../utils/type_utils.d.ts";
+import { PickByValue } from "@utils/type_utils.d.ts";
 
+import { varInt } from "./fields/var_int.ts";
 import { Consumer } from "./consumer.ts";
 
 export const MAX_PACKET_SIZE = 1_000_000;

@@ -1,5 +1,5 @@
-import { STypeError } from "../errors/mod.ts";
-import { Asyncable, Predicate } from "../utils/type_utils.d.ts";
+import { STypeError } from "@utils/errors/mod.ts";
+import { Asyncable, Predicate } from "@utils/type_utils.d.ts";
 
 import { Consumer } from "./consumer.ts";
 

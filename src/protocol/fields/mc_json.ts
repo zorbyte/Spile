@@ -1,7 +1,7 @@
 import { parse } from "secure-json-parse-deno/mod.js";
 
-import { buildMCString } from "./mc_string.ts";
 import { FieldCodec } from "../field_codec.ts";
+import { buildMCString } from "./mc_string.ts";
 
 export function buildMCJson<T>(): FieldCodec<T> {
   const strCodec = buildMCString();

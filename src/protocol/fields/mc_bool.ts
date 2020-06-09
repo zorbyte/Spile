@@ -1,4 +1,4 @@
-import { STypeError } from "../../errors/mod.ts";
+import { STypeError } from "@utils/errors/mod.ts";
 
 import { FieldCodec } from "../field_codec.ts";
 
