@@ -12,6 +12,9 @@ Spile was originally written in Node.js, however it is being ported to Deno for 
 
 ## Contributing
 
+Follow the [Deno Style Guide](https://github.com/denoland/deno/blob/4ebd24342368adbb99582b87dc6c4b8cb6f44c87/docs/contributing/style_guide.md) where appropriate.
+It can be inferred which rules do not apply from a cursory glance at the Spile code.
+
 To use the scripts, install the [Velociraptor](https://github.com/umbopepato/velociraptor) CLI.
 
 To configure the development environment, run `vr setup_dev` (this requires the aforementioned CLI).
@@ -19,6 +22,8 @@ To configure the development environment, run `vr setup_dev` (this requires the 
 To run Spile (in development mode), run `vr dev`.
 
 Ensure that you lint everything with prettier and then `deno fmt` prior to committing.
+
+Do not use a `deps.ts` file. Instead use the import map, take a look at how previous imports are done and replicate the format.
 
 ## Credits
 

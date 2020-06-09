@@ -34,7 +34,7 @@ export function createLogger(name: string, childNames: string[]): Logger;
 export function createLogger(name = defaultName, childNames?: string[]) {
   const knownChildNames = childNames ?? [];
   if (name === "" && knownChildNames.length) name = knownChildNames.pop() ?? "";
-  const debugEnabled = !!Deno.env.get("DEBUG");
+  const debugEnabled = !!Deno.env.get("DEBUG_LOG");
   const displayName = [name, ...knownChildNames].map(green).join(gray(" > "));
 
   const loggerObj = (Object.fromEntries(

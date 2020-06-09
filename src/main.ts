@@ -1,4 +1,4 @@
-import { SPILE_VERSION, SPILE_GITHUB_URL } from "@etc/package.ts";
+import { SPILE_VERSION } from "@etc/package.ts";
 
 import { createLogger, setDefaultName } from "@utils/logger.ts";
 
@@ -8,9 +8,6 @@ setDefaultName("master");
 
 const log = createLogger();
 
-log.info(`Welcome to Spile version v${SPILE_VERSION} written by zorbyte`);
-log.info(
-  `Please consider starring this project on Github at ${SPILE_GITHUB_URL}`,
-);
+log.info(`Starting Spile v${SPILE_VERSION}`);
 
 listen({ hostname: "127.0.0.1", port: 25565 });
