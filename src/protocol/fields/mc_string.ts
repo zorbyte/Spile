@@ -29,13 +29,13 @@ export const buildMCString = (n = 32767): FieldCodec<string> => ({
     return into;
   },
 
-  async decode(consume) {
-    const len = await varInt.decode(consume);
+  async decode(consumer) {
+    const len = await varInt.decode(consumer);
     if (len > n * 4) {
       throw new TypeError(`This MCString has a maximum of ${n * 4} bytes`);
     }
 
-    const data = consume("read", len);
+    const data = await consumer.read(len);
     const str = decoder.decode(data);
 
     return flatStr(str);

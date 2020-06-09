@@ -1,9 +1,10 @@
-import { Asyncable, Predicate } from "../utils/type_utils.d.ts";
-import { Consumer } from "./io_utils.ts";
 import { STypeError } from "../errors/mod.ts";
+import { Asyncable, Predicate } from "../utils/type_utils.d.ts";
+
+import { Consumer } from "./consumer.ts";
 
 type Encoder<T> = (data: T) => Asyncable<Uint8Array>;
-type Decoder<T> = (consumer: Consumer) => Asyncable<T>;
+type Decoder<T> = (consumer: Consumer) => Promise<T>;
 
 export interface FieldCodec<T extends unknown> {
   encode: Encoder<T>;

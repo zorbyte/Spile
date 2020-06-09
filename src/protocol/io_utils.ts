@@ -1,6 +1,9 @@
 import { varInt } from "./fields/var_int.ts";
 import { PickByValue } from "../utils/type_utils.d.ts";
-import Reader = Deno.Reader;
+
+import { Consumer } from "./consumer.ts";
+
+export const MAX_PACKET_SIZE = 1_000_000;
 
 export function concatArrays(arrays: Uint8Array[], length: number) {
   const output = new Uint8Array(length);
@@ -13,7 +16,7 @@ export function concatArrays(arrays: Uint8Array[], length: number) {
   return output;
 }
 
-export function getNumberBytes(
+export function getBytesOfNumber(
   length: number,
   value: number,
   method: keyof PickByValue<DataView, Function>,
@@ -61,69 +64,6 @@ export function collator(): Collator {
   return insert;
 }
 
-export type ConsumerAction = "view" | "read" | "offset" | "changeMaxOffset";
-type ConsumerReturnTypes =
-  | void
-  | number
-  | [number, DataView]
-  | DataView
-  | Uint8Array;
-
-export interface Consumer {
-  (
-    action: ConsumerAction,
-    amount: number,
-  ): ConsumerReturnTypes;
-  (action: "offset"): number;
-  (action: "read", amount: number): Uint8Array;
-  (action: "view", amount: number): [number, DataView];
-  (action: "changeMaxOffset", amount: number): void;
-}
-
-export function consumer(data: Uint8Array, maxOffset = data.length) {
-  let offset = 0;
-  let view!: DataView;
-
-  function consume(
-    action: ConsumerAction,
-    amount?: number,
-  ): ConsumerReturnTypes {
-    switch (action) {
-      case "view":
-        // Rule of thumb: Don't read more than the offset you provided!
-        if (!view) view = new DataView(data);
-        const prevOffset = changeOffset(amount!);
-        return [prevOffset, view];
-      case "offset":
-        return offset;
-      case "read":
-        const oldOffset = changeOffset(amount!);
-        const section = data.subarray(oldOffset, offset);
-
-        return section;
-      case "changeMaxOffset":
-        maxOffset += amount!;
-        break;
-    }
-  }
-
-  // Returns the old offset.
-  function changeOffset(amount: number) {
-    const newOffset = offset + amount;
-    if (newOffset > maxOffset) {
-      throw new Error("Can not read outside bounds of consumer!");
-    }
-
-    // The new offset is assigned to offset.
-    const oldOffset = offset;
-    offset = newOffset;
-
-    return oldOffset;
-  }
-
-  return consume as Consumer;
-}
-
 export interface ProtoHeaders {
   packetLength: number;
   dataLength: number;
@@ -136,21 +76,7 @@ export interface HeaderParserOpts {
   encrypted: boolean;
 }
 
-// A header either compressed or uncompressed will have two visible fields
-// both of which are VarInts. A VarInt has a max size of 5 bytes.
-const SIGNIFICANT_HEADER_LEN = 10;
-
-export async function parseHeaders(
-  reader: Reader,
-  _opts: HeaderParserOpts,
-) {
-  const collected = new Uint8Array(SIGNIFICANT_HEADER_LEN);
-  const readAmnt = await reader.read(collected);
-
-  if (readAmnt === null || readAmnt < SIGNIFICANT_HEADER_LEN) return null;
-
-  const cons = consumer(collected, SIGNIFICANT_HEADER_LEN);
-
+export async function parseHeaders(cons: Consumer, _opts: HeaderParserOpts) {
   const headers: Partial<ProtoHeaders> = {
     packetLength: await varInt.decode(cons),
     dataLength: await varInt.decode(cons),

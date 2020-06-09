@@ -1,4 +1,4 @@
-import { deferred } from "../deps.ts";
+import { deferred } from "std/async/mod.ts";
 
 export class Queue<T> {
   private current = deferred<T | void>();

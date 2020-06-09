@@ -1,11 +1,14 @@
 import { parseHeaders } from "./io_utils.ts";
 
+import { Context } from "./context.ts";
+import { createLogger } from "../utils/logger.ts";
+
 import Listener = Deno.Listener;
 import Conn = Deno.Conn;
-import { Context } from "./context.ts";
 
 const { listen: listenTcp } = Deno;
 
+const log = createLogger("server");
 const connections = new Set<Conn>();
 let listener: Listener;
 let open = false;
@@ -20,11 +23,11 @@ async function acceptConnections() {
 }
 
 async function handleConnection(conn: Conn) {
-  const ctx = new Context(conn);
+  const ctx = new Context(conn, log);
 
   while (open && !ctx.closed) {
     // TODO: Get legit data.
-    const headerData = await parseHeaders(conn, {
+    const headerData = await parseHeaders(ctx.consumer, {
       encrypted: false,
       compressed: false,
       compressionThreshold: -1,

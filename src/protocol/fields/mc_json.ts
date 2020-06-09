@@ -1,4 +1,5 @@
-import { parse } from "../../deps.ts";
+import { parse } from "secure-json-parse-deno/mod.js";
+
 import { buildMCString } from "./mc_string.ts";
 import { FieldCodec } from "../field_codec.ts";
 
@@ -12,8 +13,8 @@ export function buildMCJson<T>(): FieldCodec<T> {
       return jsonBuff;
     },
 
-    async decode(consume): Promise<T> {
-      const rawJson = await strCodec.decode(consume);
+    async decode(consumer): Promise<T> {
+      const rawJson = await strCodec.decode(consumer);
       return parse(rawJson);
     },
   };

@@ -1,7 +1,8 @@
 import { STypeError } from "../errors/mod.ts";
-import { Consumer } from "./io_utils.ts";
-import { FieldCodec } from "./field_codec.ts";
 import { Predicate } from "../utils/type_utils.d.ts";
+
+import { Consumer } from "./consumer.ts";
+import { FieldCodec } from "./field_codec.ts";
 
 // Inbound, Outbound, Bidirectional.
 type Direction = "I" | "O" | "B";
@@ -39,16 +40,13 @@ class PacketCodec<P extends KnownPacketFields> {
   public addField<
     T extends string,
     F extends FieldCodec<any>,
-    FT extends FieldCodecType<F>,
-  >(
-    key: T & (T extends RestrictedKeys ? never : {}),
-    fieldCodec: F,
-  ) {
+    FT extends FieldCodecType<F>
+  >(key: T & (T extends RestrictedKeys ? never : {}), fieldCodec: F) {
     const fieldInfo: FieldInfo<P, FT> = { fieldCodec };
 
     this.packetFields.set(key as keyof P, fieldInfo);
 
-    return this as unknown as PacketCodec<P & Record<T, FT>>;
+    return (this as unknown) as PacketCodec<P & Record<T, FT>>;
   }
 
   public skipOn<K extends keyof P>(

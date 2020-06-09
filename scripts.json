@@ -5,6 +5,7 @@
       "desc": "Runs the server",
       "cmd": "deno run --unstable ./src/main.ts",
       "tsconfig": "./etc/tsconfig.json",
+      "imap": "./etc/import_map.json",
       "lock": "./etc/lock.json",
       "allow": ["net", "read", "write", "env"],
       "env": {
@@ -13,7 +14,8 @@
     },
     "cache": {
       "desc": "Cache the modules and write the lock.",
-      "cmd": "deno cache --lock-write ./src/deps.ts",
+      "cmd": "deno cache --unstable --lock-write ./src/main.ts",
+      "imap": "./etc/import_map.json",
       "lock": "./etc/lock.json"
     },
     "setup_dev": {
@@ -25,7 +27,8 @@
           "allow": ["write", "read"]
         },
         {
-          "cmd": "deno cache --lock-write ./src/deps.ts",
+          "cmd": "deno cache --unstable --lock-write ./src/main.ts",
+          "imap": "./etc/import_map.json",
           "lock": "./etc/lock.json"
         }
       ]

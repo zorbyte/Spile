@@ -14,6 +14,7 @@ const vscodeSettings = {
   "deno.enable": true,
   "deno.unstable": true,
   "deno.tsconfig": "./tsconfig.json",
+  "deno.importmap": "./etc/import_map.json",
   "prettier.configPath": "./etc/.prettierrc",
   "cSpell.words": ["prettierrc"],
 };

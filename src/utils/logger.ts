@@ -6,7 +6,7 @@ import {
   green,
   magenta,
   bold,
-} from "../deps.ts";
+} from "std/fmt/colors.ts";
 
 const METHOD_COLOURS = {
   debug: gray,
@@ -18,7 +18,7 @@ const METHOD_COLOURS = {
 type LevelNames = keyof typeof METHOD_COLOURS;
 type LoggerMethods = Record<LevelNames, typeof console.log>;
 
-interface Logger extends LoggerMethods {
+export interface Logger extends LoggerMethods {
   child(name: string): Logger;
 }
 

@@ -7,8 +7,8 @@ export const MCBool: FieldCodec<boolean> = {
     return Uint8Array.of(value ? 0x01 : 0x00);
   },
 
-  decode(consume) {
-    const [byte] = consume("read", 1);
+  async decode(consumer) {
+    const [byte] = await consumer.read(1);
 
     if (byte === 0x01) return true;
     if (byte === 0x00) return false;
