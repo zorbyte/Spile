@@ -1,6 +1,6 @@
 import { STypeError } from "../errors/mod.ts";
 import { Consumer } from "./io_utils.ts";
-import { FieldCodec } from "./field_codec.d.ts";
+import { FieldCodec } from "./field_codec.ts";
 import { Predicate } from "../utils/type_utils.d.ts";
 
 // Inbound, Outbound, Bidirectional.
@@ -68,7 +68,7 @@ class PacketCodec<P extends KnownPacketFields> {
     for (const [key, fieldInfo] of this.packetFields.entries()) {
       const val = await fieldInfo.fieldCodec.decode(consumer);
       if (fieldInfo.validator?.(val) ?? false) {
-        throw new STypeError("INVALID_FIELD_DATA", key as string, val);
+        throw new STypeError("MALFORMED_PACKET", key as string, val);
       }
 
       fields[key] = val;

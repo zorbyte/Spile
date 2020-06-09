@@ -1,7 +1,6 @@
 import { parse } from "../../deps.ts";
-
-import { FieldCodec } from "../field_codec.d.ts";
 import { buildMCString } from "./mc_string.ts";
+import { FieldCodec } from "../field_codec.ts";
 
 export function buildMCJson<T>(): FieldCodec<T> {
   const strCodec = buildMCString();

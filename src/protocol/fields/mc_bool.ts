@@ -1,6 +1,6 @@
 import { STypeError } from "../../errors/mod.ts";
 
-import { FieldCodec } from "../field_codec.d.ts";
+import { FieldCodec } from "../field_codec.ts";
 
 export const MCBool: FieldCodec<boolean> = {
   encode(value) {
@@ -13,6 +13,6 @@ export const MCBool: FieldCodec<boolean> = {
     if (byte === 0x01) return true;
     if (byte === 0x00) return false;
 
-    throw new STypeError("INVALID_FIELD", "MCBoolean was not 0x01 or 0x00");
+    throw new STypeError("FIELD_DATA_INVALID", "MCBool", "decoding", byte);
   },
 };

@@ -1,4 +1,5 @@
 import { varInt } from "./fields/var_int.ts";
+import { PickByValue } from "../utils/type_utils.d.ts";
 import Reader = Deno.Reader;
 
 export function concatArrays(arrays: Uint8Array[], length: number) {
@@ -10,6 +11,18 @@ export function concatArrays(arrays: Uint8Array[], length: number) {
   }
 
   return output;
+}
+
+export function getNumberBytes(
+  length: number,
+  value: number,
+  method: keyof PickByValue<DataView, Function>,
+): Uint8Array {
+  const bytes = new Uint8Array(length);
+  const view = new DataView(bytes);
+  (view[method] as (offset: number, value: number) => number)(0, value);
+
+  return bytes;
 }
 
 type CollatorAction = "prepend" | "append" | "replace";
@@ -49,12 +62,18 @@ export function collator(): Collator {
 }
 
 export type ConsumerAction = "view" | "read" | "offset" | "changeMaxOffset";
+type ConsumerReturnTypes =
+  | void
+  | number
+  | [number, DataView]
+  | DataView
+  | Uint8Array;
 
 export interface Consumer {
   (
     action: ConsumerAction,
     amount: number,
-  ): void | number | DataView | Uint8Array;
+  ): ConsumerReturnTypes;
   (action: "offset"): number;
   (action: "read", amount: number): Uint8Array;
   (action: "view", amount: number): [number, DataView];
@@ -65,7 +84,10 @@ export function consumer(data: Uint8Array, maxOffset = data.length) {
   let offset = 0;
   let view!: DataView;
 
-  function consume(action: ConsumerAction, amount?: number) {
+  function consume(
+    action: ConsumerAction,
+    amount?: number,
+  ): ConsumerReturnTypes {
     switch (action) {
       case "view":
         // Rule of thumb: Don't read more than the offset you provided!

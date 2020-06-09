@@ -1,5 +1,5 @@
 import { STypeError } from "../../errors/mod.ts";
-import { FieldCodec } from "../field_codec.d.ts";
+import { FieldCodec } from "../field_codec.ts";
 
 export const varInt: FieldCodec<number> = {
   encode(value) {
@@ -29,8 +29,10 @@ export const varInt: FieldCodec<number> = {
       numRead++;
       if (numRead > 5) {
         throw new STypeError(
-          "INVALID_FIELD",
-          "A VarInt can not have more than 5 bytes",
+          "FIELD_DATA_INVALID",
+          "varInt",
+          "decoding",
+          "varInt",
         );
       }
 

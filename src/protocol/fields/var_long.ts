@@ -1,6 +1,4 @@
-import { STypeError } from "../../errors/mod.ts";
-import { FieldCodec } from "../field_codec.d.ts";
-import { bigIntToBytes } from "../../utils/utils.ts";
+import { FieldCodec } from "../field_codec.ts";
 
 export const varLong: FieldCodec<bigint> = {
   encode(value) {
@@ -12,7 +10,7 @@ export const varLong: FieldCodec<bigint> = {
       value >>= 7n;
       if (value !== 0n) temp |= 0x80n;
 
-      byteArr.push(Number(value));
+      byteArr.push(Number(temp));
     }
 
     return Uint8Array.from(byteArr);
@@ -28,10 +26,7 @@ export const varLong: FieldCodec<bigint> = {
 
       numRead++;
       if (numRead > 10) {
-        throw new STypeError(
-          "INVALID_FIELD",
-          "A VarLong can not have more than 10 bytes",
-        );
+        throw new TypeError("A varLong can not have more than 9 bytes");
       }
 
       if ((read & 0x80) !== 0x80) break;

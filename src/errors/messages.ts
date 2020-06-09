@@ -1,27 +1,34 @@
 export type SpileErrorMessage = ((...args: any[]) => string) | string;
 
-// Can't annotate this because I want types to work everywhere else... Oh well.
 const _ERROR_MESSAGES = {
-  // Misc.
-  FEATURE_TODO:
-    "This feature is currently not implemented. It will be implemented eventually",
+  /* Misc. */
+
+  NOT_IMPLEMENTED: "This feature is currently not implemented",
+
   INVALID_ERROR_KEY: (key: string) =>
     `An invalid error message key was used: ${key}`,
 
-  // Marshal.
-  INVALID_COMMAND_BUILDER: (cmdFileName: string) =>
-    `The file ${cmdFileName} is not a valid Command Builder`,
+  /* Packet Codec. */
 
-  // Protocol.
   INVALID_PACKET: (packetName: string) =>
-    `The ${packetName} is not a valid Packet Schema`,
-  INBOUND_PACKET_HOOK_ABSENT: (name: string) =>
+    `The ${packetName} is not a valid Packet Codec`,
+
+  NO_INBOUND_PACKET_HOOK: (name: string) =>
     `The inbound packet ${name} must have a hook attached to it`,
+
   INVALID_FIELD_KEY: (key: string) => `An invalid field key was used: ${key}`,
 
-  INVALID_FIELD: (errStr: string) => errStr,
-  INVALID_FIELD_DATA: (field: string, data: any) =>
-    `The data for field ${field} is invalid. Got: ${data}`,
+  /* Packet Codec in flight */
+
+  FIELD_DATA_INVALID: (
+    key: string,
+    stage: "encoding" | "decoding",
+    data: any,
+  ) =>
+    `The field ${key} failed its predicate with data ${data} during ${stage}`,
+
+  MALFORMED_PACKET: (field: string, data: string) =>
+    `Packet malformed at field ${field}. Data: ${data}`,
 };
 
 export type ErrorMessages = typeof _ERROR_MESSAGES;

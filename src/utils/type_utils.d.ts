@@ -6,3 +6,11 @@ export type Asyncable<T> = Promise<T> | T;
 export type $TSFix = any;
 
 export type AnyFunction<R = any> = (...args: any[]) => R;
+
+// https://stackoverflow.com/questions/56431150/exclude-object-keys-by-their-value-type-in-typescript
+type PickByValue<Base, Condition> = Pick<
+  Base,
+  {
+    [Key in keyof Base]: Base[Key] extends Condition ? Key : never;
+  }[keyof Base]
+>;

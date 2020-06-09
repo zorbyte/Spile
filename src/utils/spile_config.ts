@@ -4,17 +4,19 @@ interface ServerConfig {
   port: number;
 }
 
-interface ProtocolServerConfig {
+// TODO: Use these correctly, they are exported to suppress errors.
+export interface ProtocolServerConfig {
   enableCompression?: boolean;
   encryption: boolean;
   online: boolean;
 }
 
-interface SpileConfig {
+export interface SpileConfig {
   proto: ServerConfig;
 }
 
 export async function getConfig() {
   const data = await Deno.readTextFile("./config.json")
   const parsedConfig = JSON.parse(data);
+  return parsedConfig;
 }
