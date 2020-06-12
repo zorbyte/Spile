@@ -9,7 +9,7 @@
       "lock": "./etc/lock.json",
       "allow": ["net", "read", "write", "env"],
       "env": {
-        "DEBUG_LOG": "As long as a string is present here, debug logging will be enabled"
+        "DEBUG_LOG": "true"
       }
     },
     "prod": {
