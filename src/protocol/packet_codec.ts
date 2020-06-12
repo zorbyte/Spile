@@ -88,8 +88,8 @@ export class PacketCodecBuilder<
   // A public form to use the packet codec.
   public compile(hook?: PacketHook<P>) {
     const compiled = {
-      decode: this.decode,
-      encode: this.encode,
+      decode: this.decode.bind(this),
+      encode: this.encode.bind(this),
 
       // If the packet were to be created for outbound,
       // use this as starting point and modify the object.
@@ -122,7 +122,7 @@ export class PacketCodecBuilder<
   }
 
   private async decode(consumer: Consumer, headers: ProtocolHeaders) {
-    const data = headers as P;
+    const data = { ...headers } as P;
     for (const [key, fieldInfo] of this.packetFields.entries()) {
       const fieldVal = await fieldInfo.codec.decode(
         consumer,

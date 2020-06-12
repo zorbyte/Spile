@@ -1,10 +1,12 @@
 import { concatArrays, MAX_PACKET_SIZE } from "./io_utils.ts";
 
 import Reader = Deno.Reader;
+import { SError } from "../utils/errors/mod.ts";
 
 export class Consumer {
   #offset = 0;
-  #readSoFar = 0;
+  #peaked: Uint8Array | undefined = void 0;
+  #peakedOffset = 0;
 
   public constructor(
     private reader: Reader,
@@ -15,19 +17,74 @@ export class Consumer {
     return this.#offset;
   }
 
-  public async read(amount: number) {
+  public async peak(amount: number) {
     const [data] = await this.readIntoArray(amount);
-    if (!data) throw new Error("No data to read.");
+
+    const newPeakOffset = this.#peakedOffset + amount;
+    if (this.#peaked) {
+      this.#peaked = concatArrays([this.#peaked, data], newPeakOffset);
+    } else {
+      this.#peaked = data;
+    }
+
+    this.#peakedOffset = newPeakOffset;
+
     return data;
   }
 
-  public async readWithView(amount: number): Promise<[number, DataView]> {
-    const [data, prevOffset] = await this.readIntoArray(amount);
-    if (!data) throw new Error("No data to read.");
-    return [prevOffset, new DataView(data)];
+  public async read(amount: number) {
+    let priorPortion: Uint8Array | undefined = void 0;
+    let readMore = false;
+
+    if (this.#peaked && this.#peakedOffset > 0) {
+      let empty = false;
+      let allowedReadAmount = this.#peakedOffset - amount;
+      if (allowedReadAmount <= 0) {
+        amount = allowedReadAmount * -1;
+        allowedReadAmount = this.#peakedOffset;
+        this.#peakedOffset = 0;
+        empty = true;
+      } else {
+        this.#peakedOffset -= allowedReadAmount;
+        readMore = true;
+      }
+
+      priorPortion = this.#peaked.slice(0, allowedReadAmount);
+
+      if (empty) this.#peaked = void 0;
+    }
+
+    let finalData!: Uint8Array;
+
+    if (priorPortion) {
+      if (readMore) {
+        const [data] = await this.readIntoArray(amount);
+        finalData = concatArrays(
+          [priorPortion, data],
+          priorPortion.length + data.length,
+        );
+      } else {
+        finalData = priorPortion;
+      }
+    } else {
+      [finalData] = await this.readIntoArray(amount);
+    }
+
+    return finalData;
   }
 
-  public changeOffset(amount: number) {
+  public async readWithView(amount: number): Promise<DataView> {
+    const data = await this.read(amount);
+    return new DataView(data.buffer);
+  }
+
+  public end() {
+    this.#offset = 0;
+    this.#peakedOffset = 0;
+    this.#peaked = void 0;
+  }
+
+  private changeOffset(amount: number) {
     const newOffset = this.#offset + amount;
     if (newOffset > this.maxOffset) {
       throw new Error("Can not read outside bounds of consumer!");
@@ -42,33 +99,14 @@ export class Consumer {
 
   private async readIntoArray(
     amount: number,
-  ): Promise<[Uint8Array | void, number]> {
+  ): Promise<[Uint8Array, number]> {
     const data = new Uint8Array(amount);
     const amountRead = await this.reader.read(data);
     if (amountRead !== null && amountRead > 0) {
-      this.#readSoFar += amountRead;
       const oldOffset = this.changeOffset(amount);
-      const offsetDiff = this.#offset - this.#readSoFar;
-      let finalData = data;
-      if (offsetDiff > 0) {
-        const validData = data.slice(offsetDiff);
-        const extValidData = new Uint8Array(offsetDiff);
-        const extAmountRead = await this.reader.read(extValidData);
-        if (extAmountRead === null || amountRead === 0) {
-          throw new Error(
-            "Can not read data in area of a pre-maturely extended offset.",
-          );
-        }
-
-        finalData = concatArrays(
-          [validData, extValidData],
-          validData.length + extValidData.length,
-        );
-      }
-
-      return [finalData, oldOffset];
+      return [data, oldOffset];
     }
 
-    return [void 0, 0];
+    throw new SError("CONNECTION_CLOSED");
   }
 }

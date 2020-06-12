@@ -29,6 +29,9 @@ const _ERROR_MESSAGES = {
     field: string,
     data: string,
   ) => `Field ${field} of ${packetName} failed validation with data ${data}`,
+
+  // Not really an error, but since errors rise up the stack this is extremely useful.
+  CONNECTION_CLOSED: "The request was cancelled.",
 };
 
 export type ErrorMessages = typeof _ERROR_MESSAGES;

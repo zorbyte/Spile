@@ -7,6 +7,7 @@ import { Client } from "./client.ts";
 
 import Listener = Deno.Listener;
 import Conn = Deno.Conn;
+import { kSpileError, SError } from "../utils/errors/mod.ts";
 
 const { listen: listenTcp } = Deno;
 
@@ -28,36 +29,61 @@ async function handleConnection(conn: Conn) {
   const client = new Client(conn, log);
 
   while (open && !client.closed) {
-    // TODO: Get legit data.
-    const headerData = await parseHeaders(client.consumer, {
-      encrypted: false,
-      compressed: false,
-      compressionThreshold: -1,
-    });
+    try {
+      const [nextByte] = await client.consumer.peak(1);
+      if (nextByte === 0xFE) {
+        // TODO: Implement legacy ping.
+        client.log.debug("Ignoring legacy ping");
+        client.consumer.end();
+        continue;
+      }
 
-    if (!headerData) continue;
+      const headerData = await parseHeaders(client.consumer, {
+        encrypted: false,
+        compressed: false,
+        compressionThreshold: -1,
+      });
 
-    const { id } = headerData;
+      if (!headerData) continue;
 
-    const packetCodec = getPacketCodec(id, client.state);
-    if (!packetCodec) continue;
+      const { id } = headerData;
 
-    const packet = await packetCodec.decode(client.consumer, headerData);
-    const ctx = new Context(client, packet);
+      const packetCodec = getPacketCodec(id, client.state);
+      if (!packetCodec) continue;
 
-    const resPacket = await packetCodec?.runHook?.(ctx);
-    if (!resPacket) continue;
+      const packet = await packetCodec.decode(client.consumer, headerData);
+      const ctx = new Context(client, packet);
 
-    const resPacketCodec = getPacketCodec(resPacket.id, client.state);
-    if (!resPacketCodec) {
-      throw new Error("Tried to send back a packet that doesn't have a codec!");
+      client.log.debug("Incoming request with headers:", headerData);
+
+      const resPacket = await packetCodec?.runHook?.(ctx);
+      if (!resPacket) continue;
+
+      const resPacketCodec = getPacketCodec(resPacket.id, client.state);
+      if (!resPacketCodec) {
+        throw new Error(
+          "Tried to send back a packet that doesn't have a codec",
+        );
+      }
+
+      const insert = collator();
+      await resPacketCodec.encode(insert, resPacket);
+
+      const resBytes = insert();
+      await conn.write(resBytes);
+    } catch (err) {
+      if (
+        !!err?.[kSpileError] &&
+        (err as InstanceType<typeof SError>).code === "CONNECTION_CLOSED"
+      ) {
+        continue;
+      }
+
+      client.log.error("Request failed:");
+      client.log.error(err);
+    } finally {
+      client.consumer.end();
     }
-
-    const insert = collator();
-    await resPacketCodec.encode(insert, resPacket);
-
-    const resBytes = insert();
-    await conn.write(resBytes);
   }
 }
 

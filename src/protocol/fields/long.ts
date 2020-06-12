@@ -13,7 +13,7 @@ export const long = new FieldCodecBuilder<bigint>("long")
     return bytes;
   })
   .decode(async (consumer) => {
-    const [offset, view] = await consumer.readWithView(8);
-    return view.getBigInt64(offset);
+    const view = await consumer.readWithView(8);
+    return view.getBigInt64(0);
   })
   .compile();

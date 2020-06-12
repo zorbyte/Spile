@@ -6,7 +6,7 @@ export class Context<P extends ProtocolHeaders> extends BaseContextHolder {
   public ended = false;
 
   public constructor(private client: Client, public packet: P) {
-    super("context", client.log);
+    super("ctx", client.log);
   }
 
   public get state() {

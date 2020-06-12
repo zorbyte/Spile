@@ -10,6 +10,7 @@ export const handshake = new PacketCodecBuilder(0x00, "handshake")
   .addField("port", ushort)
   .addField("nextState", varInt)
   .compile((ctx) => {
-    ctx.log.debug("Received handshake!");
+    ctx.log.debug("Received handshake");
+    ctx.log.debug(ctx.packet)
     // Do something.
   });

@@ -52,7 +52,7 @@ export function createLogger(name = defaultName, childNames?: string[]) {
   ) as unknown) as Logger;
 
   loggerObj.child = (...childNames: string[]) =>
-    createLogger(name, [...childNames, ...knownChildNames]);
+    createLogger(name, [...knownChildNames, ...childNames]);
 
   return loggerObj;
 }
