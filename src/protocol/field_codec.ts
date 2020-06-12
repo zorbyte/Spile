@@ -6,6 +6,9 @@ import { Consumer } from "./consumer.ts";
 type Encoder<T> = (data: T) => Asyncable<Uint8Array>;
 type Decoder<T> = (consumer: Consumer) => Promise<T>;
 
+type ProcessTypeName = "encode" | "decode" | "none";
+type ProcessVerb = "encoding" | "decoding";
+
 export interface FieldCodec<T extends unknown> {
   encode: Encoder<T>;
   decode: Decoder<T>;
@@ -18,7 +21,7 @@ export class FieldCodecBuilder<T extends unknown> {
   private decoder!: Decoder<T>;
   private decoderValidator?: Predicate<T>;
 
-  private lastRegistered: "encode" | "decode" | "none" = "none";
+  private lastRegistered: ProcessTypeName = "none";
 
   public constructor(private fieldTypeName: string) {}
 
@@ -59,33 +62,35 @@ export class FieldCodecBuilder<T extends unknown> {
 
     return {
       encode: async (value: T) => {
-        const passed = this.encoderValidator?.(value) ?? true;
-        if (!passed) {
-          throw new STypeError(
-            "INVALID_FIELD_DATA",
-            this.fieldTypeName,
-            "encoding",
-            value,
-          );
-        }
-
+        this.isValid(value, "encoding");
         const data = await this.encoder(value);
+
         return data;
       },
       decode: async (consumer: Consumer) => {
         const data = await this.decoder(consumer);
-        const passed = this.decoderValidator?.(data) ?? true;
-        if (!passed) {
-          throw new STypeError(
-            "INVALID_FIELD_DATA",
-            this.fieldTypeName,
-            "decoding",
-            data,
-          );
-        }
+        this.isValid(data, "decoding");
 
         return data;
       },
     };
+  }
+
+  private isValid(data: T, process: ProcessVerb) {
+    const passed =
+      this?.[
+        process === "encoding"
+          ? "encoderValidator"
+          : "decoderValidator"
+      ]?.(data) ?? true;
+
+    if (!passed) {
+      throw new STypeError(
+        "INVALID_FIELD_DATA",
+        this.fieldTypeName,
+        process,
+        data,
+      );
+    }
   }
 }

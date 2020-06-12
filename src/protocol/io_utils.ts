@@ -2,6 +2,7 @@ import { PickByValue } from "@utils/type_utils.d.ts";
 
 import { varInt } from "./fields/var_int.ts";
 import { Consumer } from "./consumer.ts";
+import { SError } from "../utils/errors/mod.ts";
 
 export const MAX_PACKET_SIZE = 1_000_000;
 
@@ -20,7 +21,7 @@ export function getBytesOfNumber(
   length: number,
   value: number,
   method: keyof PickByValue<DataView, Function>,
-): Uint8Array {
+) {
   const bytes = new Uint8Array(length);
   const view = new DataView(bytes);
   (view[method] as (offset: number, value: number) => number)(0, value);
@@ -34,12 +35,12 @@ export interface Collator {
   (): Uint8Array;
   (data: Uint8Array, action: CollatorAction): void;
   (
-    data?: Uint8Array,
-    action?: "prepend" | "append" | "replace",
+    data: Uint8Array,
+    action: "prepend" | "append" | "replace",
   ): Uint8Array | void;
 }
 
-export function collator(): Collator {
+export function collator() {
   let length = 0;
   let buffered: Uint8Array[] = [];
 
@@ -61,7 +62,7 @@ export function collator(): Collator {
     buffered[action === "prepend" ? "unshift" : "push"](data);
   }
 
-  return insert;
+  return insert as Collator;
 }
 
 export interface ProtocolHeaders {
@@ -77,24 +78,25 @@ export interface HeaderParserOpts {
 }
 
 export async function parseHeaders(cons: Consumer, opts: HeaderParserOpts) {
+  if (opts.compressed) throw new SError("NOT_IMPLEMENTED");
+
   const packetLength = await varInt.decode(cons);
   const dataLengthOrId = await varInt.decode(cons);
-  let dataLegnth: number;
-  let id: number;
+  let dataLength!: number;
+  let id!: number;
 
   if (!opts.compressed) {
     id = dataLengthOrId;
+    dataLength = packetLength;
   } else {
-    dataLegnth = await varInt.decode(cons);
+    dataLength = await varInt.decode(cons);
   }
 
   const headers: ProtocolHeaders = {
     packetLength,
-    dataLength: dataLegnth!,
-    id: id!,
+    dataLength,
+    id,
   };
 
   return headers;
-}
-export function createArrayReader() {
 }

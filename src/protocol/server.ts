@@ -1,11 +1,12 @@
 import { createLogger } from "@utils/logger.ts";
 
-import { parseHeaders } from "./io_utils.ts";
+import { Context } from "./context.ts";
+import { getPacketCodec } from "./get_packet_codec.ts";
+import { parseHeaders, collator } from "./io_utils.ts";
 import { Client } from "./client.ts";
 
 import Listener = Deno.Listener;
 import Conn = Deno.Conn;
-import { Context } from "./context.ts";
 
 const { listen: listenTcp } = Deno;
 
@@ -36,13 +37,27 @@ async function handleConnection(conn: Conn) {
 
     if (!headerData) continue;
 
-    // TODO: Check data lengths and Ids.
-    // @ts-expect-error
-    const { packetLength, dataLength, id } = headerData;
+    const { id } = headerData;
 
-    // TODO: Use the context, get the packet, send it to its hook.
-    // @ts-expect-error
-    const ctx = new Context(client, headerData);
+    const packetCodec = getPacketCodec(id, client.state);
+    if (!packetCodec) continue;
+
+    const packet = await packetCodec.decode(client.consumer, headerData);
+    const ctx = new Context(client, packet);
+
+    const resPacket = await packetCodec?.runHook?.(ctx);
+    if (!resPacket) continue;
+
+    const resPacketCodec = getPacketCodec(resPacket.id, client.state);
+    if (!resPacketCodec) {
+      throw new Error("Tried to send back a packet that doesn't have a codec!");
+    }
+
+    const insert = collator();
+    await resPacketCodec.encode(insert, resPacket);
+
+    const resBytes = insert();
+    await conn.write(resBytes);
   }
 }
 

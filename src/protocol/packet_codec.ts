@@ -4,7 +4,7 @@ import { Asyncable } from "@utils/type_utils.d.ts";
 import { Consumer } from "./consumer.ts";
 import { FieldCodec } from "./field_codec.ts";
 import { Context } from "./context.ts";
-import { ProtocolHeaders, collator } from "./io_utils.ts";
+import { ProtocolHeaders, Collator } from "./io_utils.ts";
 
 type RestrictedKeys = keyof ProtocolHeaders;
 type RestrictedKeysCheck<K> = K & (K extends RestrictedKeys ? never : {});
@@ -19,11 +19,11 @@ type FieldPredicate<
 type PacketDirection = "I" | "O";
 type PacketHook<P extends ProtocolHeaders> = (
   ctx: Context<P>,
-) => Asyncable<void>;
+) => Asyncable<ProtocolHeaders & unknown | void>;
 
 export interface PacketCodec<P extends ProtocolHeaders> {
-  decode(ctx: Consumer, headers: ProtocolHeaders): Promise<P>;
-  encode(data: P): Promise<Uint8Array>;
+  decode(consumer: Consumer, headers: ProtocolHeaders): Promise<P>;
+  encode(insert: Collator, data: P): Promise<void>;
   getScaffold(): P;
   runHook?: PacketHook<P>;
 }
@@ -42,18 +42,16 @@ export class PacketCodecBuilder<
   P extends ProtocolHeaders,
   NK extends keyof P,
 > {
-  public name: string;
-  public direction: PacketDirection = "I";
+  public direction = "I" as PacketDirection;
 
-  private lastField!: NK;
+  // Used to add validators to.
+  private lastField?: NK;
   private packetFields = new Map<keyof P, FieldInfo<P, any>>();
 
   public constructor(
     public id: number,
-    name: string,
-  ) {
-    this.name = name.toLowerCase();
-  }
+    public name: string,
+  ) {}
 
   public addField<
     T extends string,
@@ -65,10 +63,10 @@ export class PacketCodecBuilder<
     this.packetFields.set(key as keyof P, fieldInfo);
     this.lastField = key as unknown as NK;
 
-    return this as unknown as PacketCodecBuilder<
-      P & Record<T, FT>,
-      T
-    >;
+    // Keeps track of the type that will be built on compilation.
+    // The second generic was the key added, for types on predicates
+    // that rely on the previous field.
+    return this as unknown as PacketCodecBuilder<P & Record<T, FT>, T>;
   }
 
   public validate(
@@ -87,14 +85,19 @@ export class PacketCodecBuilder<
     return this;
   }
 
+  // A public form to use the packet codec.
   public compile(hook?: PacketHook<P>) {
     const compiled = {
       decode: this.decode,
       encode: this.encode,
+
+      // If the packet were to be created for outbound,
+      // use this as starting point and modify the object.
       getScaffold: () => ({ id: this.id } as P),
     } as PacketCodec<P>;
 
     if (hook) {
+      // Packets with run hooks are outbound packets.
       this.direction = "O";
       compiled.runHook = hook;
     }
@@ -102,24 +105,23 @@ export class PacketCodecBuilder<
     return compiled;
   }
 
-  public async encode(data: P) {
-    const insert = collator();
+  // Generally, avoid using side effects like this
+  // however concatenation is an operation that should only happen at the end
+  // as it is a costly operation.
+  private async encode(insert: Collator, data: P) {
     for (const [key, fieldInfo] of this.packetFields.entries()) {
       const fieldVal = data[key];
       if (fieldInfo.skip?.(data, fieldVal) ?? false) continue;
-
       const bytes = await fieldInfo.codec.encode(insert);
       if (fieldInfo.validate) {
         this.validateField(data, fieldInfo.validate, key, fieldVal);
       }
 
-      insert(bytes);
+      insert(bytes, "append");
     }
-
-    return insert();
   }
 
-  public async decode(consumer: Consumer, headers: ProtocolHeaders) {
+  private async decode(consumer: Consumer, headers: ProtocolHeaders) {
     const data = headers as P;
     for (const [key, fieldInfo] of this.packetFields.entries()) {
       const fieldVal = await fieldInfo.codec.decode(
@@ -136,7 +138,6 @@ export class PacketCodecBuilder<
     return data;
   }
 
-  // TODO(z): Clean this mess up.
   private validateField<KOP extends keyof P>(
     data: P,
     validate: FieldPredicate<P, KOP>,
@@ -157,8 +158,8 @@ export class PacketCodecBuilder<
     field: "validate" | "skip",
     func: FieldPredicate<P, NK>,
   ) {
-    const fieldData = this.packetFields.get(this.lastField) as FieldInfo<P, NK>;
+    const fieldData = this.packetFields.get(this.lastField!) as FieldInfo<P, NK>;
     fieldData[field] = func;
-    this.packetFields.set(this.lastField, fieldData);
+    this.packetFields.set(this.lastField!, fieldData);
   }
 }
