@@ -19,7 +19,7 @@ type LevelNames = keyof typeof METHOD_COLOURS;
 type LoggerMethods = Record<LevelNames, typeof console.log>;
 
 export interface Logger extends LoggerMethods {
-  child(name: string): Logger;
+  child(...names: string[]): Logger;
 }
 
 let defaultName = "";
@@ -41,7 +41,7 @@ export function createLogger(name = defaultName, childNames?: string[]) {
     Object.entries(METHOD_COLOURS).map(([key, colouriser]) => [
       key,
       (...args: unknown[]) => {
-        let callableKey = key === "warn" ? "info" : key;
+        const callableKey = key === "warn" ? "info" : key;
         if (callableKey === "debug" && !debugEnabled) return;
         console[callableKey as "log"](
           formatLog(displayName, { method: key, colouriser }),
@@ -51,14 +51,14 @@ export function createLogger(name = defaultName, childNames?: string[]) {
     ]),
   ) as unknown) as Logger;
 
-  loggerObj.child = (childName: string) =>
-    createLogger(name, [childName, ...knownChildNames]);
+  loggerObj.child = (...childNames: string[]) =>
+    createLogger(name, [...childNames, ...knownChildNames]);
 
   return loggerObj;
 }
 
-export function createChild(childName: string) {
-  return createLogger(defaultName, [childName]);
+export function createChild(...childNames: string[]) {
+  return createLogger(defaultName, childNames);
 }
 
 function formatLog(

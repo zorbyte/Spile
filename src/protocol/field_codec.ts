@@ -62,9 +62,9 @@ export class FieldCodecBuilder<T extends unknown> {
         const passed = this.encoderValidator?.(value) ?? true;
         if (!passed) {
           throw new STypeError(
-            "FIELD_DATA_INVALID",
+            "INVALID_FIELD_DATA",
             this.fieldTypeName,
-            "decoding",
+            "encoding",
             value,
           );
         }
@@ -77,7 +77,7 @@ export class FieldCodecBuilder<T extends unknown> {
         const passed = this.decoderValidator?.(data) ?? true;
         if (!passed) {
           throw new STypeError(
-            "FIELD_DATA_INVALID",
+            "INVALID_FIELD_DATA",
             this.fieldTypeName,
             "decoding",
             data,

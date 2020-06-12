@@ -25,6 +25,9 @@ Ensure that you lint everything with prettier and then `deno fmt` prior to commi
 
 Do not use a `deps.ts` file. Instead use the import map, take a look at how previous imports are done and replicate the format.
 
+If you use the cSpell VSCode plugin, you can create a `custom_dictionary.json` file in the root directory to use custom words.
+To update it, make your changes to the `custom_dictionary.json` file and run `vr setup_dev` again.
+
 ## Credits
 
 This project would be impossible without these amazing people, resources, communities and projects:

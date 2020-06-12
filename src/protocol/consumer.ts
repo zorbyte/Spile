@@ -28,7 +28,7 @@ export class Consumer {
   }
 
   public changeOffset(amount: number) {
-    const newOffset = this.offset + amount;
+    const newOffset = this.#offset + amount;
     if (newOffset > this.maxOffset) {
       throw new Error("Can not read outside bounds of consumer!");
     }

@@ -1,5 +1,4 @@
 import { STypeError } from "@utils/errors/mod.ts";
-import { Predicate } from "@utils/type_utils.d.ts";
 
 import { Consumer } from "./consumer.ts";
 import { FieldCodec } from "./field_codec.ts";
@@ -8,14 +7,26 @@ import { FieldCodec } from "./field_codec.ts";
 type Direction = "I" | "O" | "B";
 type RestrictedKeys = keyof KnownPacketFields;
 type FieldCodecType<T> = T extends FieldCodec<infer FType> ? FType : never;
-type SkipPredicate<P, T> = (packet: P, data: T) => boolean;
+type FieldPredicate<
+  P extends KnownPacketFields,
+  F extends keyof P,
+  PT = Omit<PacketType<P>, F>,
+> = (data: P[F], packet: PT) => boolean;
 
-export type PacketType<P> = P extends PacketCodec<infer PType> ? PType : never;
+type RestrictedKeysCheck<K> = K & (K extends RestrictedKeys ? never : {});
 
-interface FieldInfo<P, T, F = FieldCodec<T>> {
-  fieldCodec: F;
-  validator?: Predicate<T>;
-  skipOn?: SkipPredicate<P, T>;
+export type PacketType<P extends KnownPacketFields> = P extends
+  PacketCodec<infer PType, any> ? PType
+  : never;
+
+interface FieldInfo<
+  P extends KnownPacketFields,
+  T extends keyof P,
+  F = FieldCodec<T>,
+> {
+  codec: F;
+  validate?: FieldPredicate<P, T>;
+  skip?: FieldPredicate<P, T>;
 }
 
 interface KnownPacketFields {
@@ -24,9 +35,13 @@ interface KnownPacketFields {
   readonly id: number;
 }
 
-class PacketCodec<P extends KnownPacketFields> {
+class PacketCodec<
+  P extends KnownPacketFields,
+  NK extends keyof P,
+> {
   public name: string;
 
+  private lastField!: NK;
   private packetFields = new Map<keyof P, FieldInfo<P, any>>();
 
   public constructor(
@@ -41,22 +56,27 @@ class PacketCodec<P extends KnownPacketFields> {
     T extends string,
     F extends FieldCodec<any>,
     FT extends FieldCodecType<F>,
-  >(key: T & (T extends RestrictedKeys ? never : {}), fieldCodec: F) {
-    const fieldInfo: FieldInfo<P, FT> = { fieldCodec };
+  >(key: RestrictedKeysCheck<T>, fieldCodec: F) {
+    const fieldInfo: FieldInfo<P, FT> = { codec: fieldCodec };
 
     this.packetFields.set(key as keyof P, fieldInfo);
+    this.lastField = key as unknown as NK;
 
-    return (this as unknown) as PacketCodec<P & Record<T, FT>>;
+    return this as unknown as PacketCodec<P & Record<T, FT>, T>;
   }
 
-  public skipOn<K extends keyof P>(
-    key: K & (K extends RestrictedKeys ? never : {}),
-    skipPredicate: SkipPredicate<P, P[K]>,
+  public validate(
+    isValid: FieldPredicate<P, NK>,
   ) {
-    const fieldData = this.packetFields.get(key);
-    if (!fieldData) throw new STypeError("INVALID_FIELD_KEY", key as string);
-    fieldData.skipOn = skipPredicate;
-    this.packetFields.set(key, fieldData);
+    this.addPredicate("validate", isValid);
+
+    return this;
+  }
+
+  public skip(
+    shouldSkip: FieldPredicate<P, NK>,
+  ) {
+    this.addPredicate("skip", shouldSkip);
 
     return this;
   }
@@ -64,20 +84,31 @@ class PacketCodec<P extends KnownPacketFields> {
   public async populate(consumer: Consumer, current: KnownPacketFields) {
     const fields = current as P;
     for (const [key, fieldInfo] of this.packetFields.entries()) {
-      const val = await fieldInfo.fieldCodec.decode(consumer);
-      if (fieldInfo.validator?.(val) ?? false) {
-        throw new STypeError("MALFORMED_PACKET", key as string, val);
+      const val = await fieldInfo.codec.decode(consumer);
+      if (fieldInfo.validate?.(val, fields) ?? false) {
+        throw new STypeError(
+          "PACKET_FIELD_VALIDATION_FAILURE",
+          this.name,
+          key as string,
+          val,
+        );
       }
 
+      if (fieldInfo.skip?.(val, fields) ?? false) continue;
+
       fields[key] = val;
-      fieldInfo.skipOn?.(fields, val);
     }
 
     return fields;
   }
 
-  public getScaffold() {
-    return { id: this.id } as P;
+  private addPredicate(
+    field: "validate" | "skip",
+    predicate: FieldPredicate<P, NK>,
+  ) {
+    const fieldData = this.packetFields.get(this.lastField) as FieldInfo<P, NK>;
+    fieldData[field] = predicate;
+    this.packetFields.set(this.lastField, fieldData);
   }
 }
 

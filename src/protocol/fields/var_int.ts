@@ -8,7 +8,7 @@ export const varInt = new FieldCodecBuilder<number>("varInt")
     const byteArr = [];
 
     while (true) {
-      let temp = value & 0x7f;
+      let temp = value & 0x7F;
       value >>>= 7;
 
       if (value !== 0) temp |= 0x80;
@@ -25,11 +25,11 @@ export const varInt = new FieldCodecBuilder<number>("varInt")
 
     while (true) {
       const [read] = await consumer.read(1);
-      result |= (read & 0x7f) << (7 * numRead);
+      result |= (read & 0x7F) << (7 * numRead);
 
       numRead++;
       if (numRead > 5) {
-        throw new STypeError("FIELD_DATA_INVALID", "varInt", "decoding", "N/A");
+        throw new STypeError("INVALID_FIELD_DATA", "varInt", "decoding", "N/A");
       }
 
       if ((read & 0x80) !== 0x80) break;

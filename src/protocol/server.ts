@@ -1,7 +1,7 @@
 import { createLogger } from "@utils/logger.ts";
 
 import { parseHeaders } from "./io_utils.ts";
-import { Context } from "./context.ts";
+import { Client } from "./client.ts";
 
 import Listener = Deno.Listener;
 import Conn = Deno.Conn;
@@ -23,11 +23,11 @@ async function acceptConnections() {
 }
 
 async function handleConnection(conn: Conn) {
-  const ctx = new Context(conn, log);
+  const client = new Client(conn, log);
 
-  while (open && !ctx.closed) {
+  while (open && !client.closed) {
     // TODO: Get legit data.
-    const headerData = await parseHeaders(ctx.consumer, {
+    const headerData = await parseHeaders(client.consumer, {
       encrypted: false,
       compressed: false,
       compressionThreshold: -1,
@@ -36,7 +36,7 @@ async function handleConnection(conn: Conn) {
     if (!headerData) continue;
 
     // TODO: Change to @ts-expect-error in future.
-    // @ts-ignore
+    // @ts-expect-error
     const { packetLength, dataLength, id } = headerData;
   }
 }

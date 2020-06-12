@@ -8,7 +8,7 @@ export const varLong: FieldCodec<bigint> = {
     const byteArr = [];
 
     while (value !== 0n) {
-      let temp = value & 0x7fn;
+      let temp = value & 0x7Fn;
 
       value >>= 7n;
       if (value !== 0n) temp |= 0x80n;
@@ -25,12 +25,12 @@ export const varLong: FieldCodec<bigint> = {
 
     while (true) {
       const [read] = await consumer.read(1);
-      result |= (BigInt(read) & 0x7fn) << (7n * numRead);
+      result |= (BigInt(read) & 0x7Fn) << (7n * numRead);
 
       numRead++;
       if (numRead > 10) {
         throw new STypeError(
-          "FIELD_DATA_INVALID",
+          "INVALID_FIELD_DATA",
           "varLong",
           "decoding",
           "N/A",

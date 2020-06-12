@@ -6,23 +6,19 @@ const {
   errors: { NotFound },
 } = Deno;
 
-const tsconfigProject = {
-  extends: "./etc/tsconfig.json",
-  include: ["./src/**/*", "./bin/setup_dev.ts", "./etc/package.ts"],
-};
-
-const vscodeSettings = {
-  "deno.enable": true,
-  "deno.unstable": true,
-  "deno.tsconfig": "./tsconfig.json",
-  "deno.importmap": "./import_map_dev.json",
-  "prettier.configPath": "./etc/.prettierrc",
-  "cSpell.words": ["prettierrc"],
-};
-
-const importMap = JSON.parse(await readTextFile("./etc/import_map.json")) as {
+interface ImportMap {
   imports: Record<string, string>;
-};
+}
+
+const importMap = await loadJson<ImportMap>("./etc/import_map.json");
+
+if (!importMap) {
+  console.error(
+    "Import map does not exist! Please create one at './etc/import_map.json'",
+  );
+
+  Deno.exit(1);
+}
 
 const importMapDev = {
   imports: Object.fromEntries(
@@ -36,11 +32,38 @@ const importMapDev = {
   ),
 };
 
+const customDictionary = await loadJson<string[]>(
+  "./custom_dictionary.json",
+);
+
+const vscodeSettings: Record<string, any> = {
+  "deno.enable": true,
+  "deno.unstable": true,
+  "deno.tsconfig": "./tsconfig.json",
+  "deno.importmap": "./import_map_dev.json",
+  "prettier.configPath": "./etc/.prettierrc",
+};
+
+if (customDictionary) vscodeSettings["cSpell.words"] = customDictionary;
+
+const tsconfigProject = {
+  extends: "./etc/tsconfig.json",
+  include: ["./src/**/*", "./bin/setup_dev.ts", "./etc/package.ts"],
+};
+
 await Promise.all([
   writeJson("./tsconfig.json", tsconfigProject),
   writeJson("./.vscode/settings.json", vscodeSettings),
   writeJson("./import_map_dev.json", importMapDev),
 ]);
+
+async function loadJson<T>(location: string) {
+  const exists = await locExists(location, false);
+  if (!exists) return;
+
+  const loadedText = await readTextFile(location);
+  return JSON.parse(loadedText) as T;
+}
 
 async function writeJson(location: string, data: Record<string, any>) {
   const dirs = location.split("/");
@@ -51,17 +74,17 @@ async function writeJson(location: string, data: Record<string, any>) {
   if (dirs.length > 2) {
     const [, dir] = dirs;
     const dirLoc = `./${dir}`;
-    const exists = await dirExists(dirLoc);
+    const exists = await locExists(dirLoc, true);
     if (!exists) await mkdir(dirLoc);
   }
 
   await writeTextFile(location, JSON.stringify(data));
 }
 
-async function dirExists(path: string) {
+async function locExists(path: string, isDirectory: boolean) {
   try {
     const stats = await stat(path);
-    return stats.isDirectory;
+    return isDirectory ? stats.isDirectory : stats.isFile;
   } catch (err) {
     if (err instanceof NotFound) return false;
     throw err;

@@ -64,7 +64,7 @@ export function collator(): Collator {
   return insert;
 }
 
-export interface ProtoHeaders {
+export interface ProtocolHeaders {
   packetLength: number;
   dataLength: number;
   id: number;
@@ -76,13 +76,25 @@ export interface HeaderParserOpts {
   encrypted: boolean;
 }
 
-export async function parseHeaders(cons: Consumer, _opts: HeaderParserOpts) {
-  const headers: Partial<ProtoHeaders> = {
-    packetLength: await varInt.decode(cons),
-    dataLength: await varInt.decode(cons),
+export async function parseHeaders(cons: Consumer, opts: HeaderParserOpts) {
+  const packetLength = await varInt.decode(cons);
+  const dataLengthOrId = await varInt.decode(cons);
+  let dataLegnth: number;
+  let id: number;
+
+  if (!opts.compressed) {
+    id = dataLengthOrId;
+  } else {
+    dataLegnth = await varInt.decode(cons);
+  }
+
+  const headers: ProtocolHeaders = {
+    packetLength,
+    dataLength: dataLegnth!,
+    id: id!,
   };
 
-  headers.id = 0;
-
-  return headers as ProtoHeaders;
+  return headers;
+}
+export function createArrayReader() {
 }

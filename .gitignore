@@ -10,3 +10,4 @@ isolate-*.log
 __pycache__/
 /tsconfig.json
 /import_map_dev.json
+/custom_dictionary.json
