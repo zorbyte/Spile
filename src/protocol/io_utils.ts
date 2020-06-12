@@ -78,7 +78,7 @@ export interface HeaderParserOpts {
 }
 
 export async function parseHeaders(cons: Consumer, opts: HeaderParserOpts) {
-  if (opts.compressed) throw new SError("NOT_IMPLEMENTED");
+  if (opts.compressed || opts.encrypted) throw new SError("NOT_IMPLEMENTED");
 
   const packetLength = await varInt.decode(cons);
   const dataLengthOrId = await varInt.decode(cons);
