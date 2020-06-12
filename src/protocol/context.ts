@@ -1,10 +1,11 @@
 import { BaseContextHolder } from "./base_context_holder.ts";
+import { ProtocolHeaders } from "./io_utils.ts";
 import { Client } from "./client.ts";
 
-export class Context extends BaseContextHolder {
+export class Context<P extends ProtocolHeaders> extends BaseContextHolder {
   public ended = false;
 
-  public constructor(private client: Client) {
+  public constructor(private client: Client, public packet: P) {
     super("context", client.log);
   }
 

@@ -1,26 +1,35 @@
 import { STypeError } from "@utils/errors/mod.ts";
+import { Asyncable } from "@utils/type_utils.d.ts";
 
 import { Consumer } from "./consumer.ts";
 import { FieldCodec } from "./field_codec.ts";
+import { Context } from "./context.ts";
+import { ProtocolHeaders, collator } from "./io_utils.ts";
 
-// Inbound, Outbound, Bidirectional.
-type Direction = "I" | "O" | "B";
-type RestrictedKeys = keyof KnownPacketFields;
+type RestrictedKeys = keyof ProtocolHeaders;
+type RestrictedKeysCheck<K> = K & (K extends RestrictedKeys ? never : {});
 type FieldCodecType<T> = T extends FieldCodec<infer FType> ? FType : never;
 type FieldPredicate<
-  P extends KnownPacketFields,
+  P extends ProtocolHeaders,
   F extends keyof P,
-  PT = Omit<PacketType<P>, F>,
-> = (data: P[F], packet: PT) => boolean;
+  PAtTime = Omit<P, F>,
+> = (data: P[F], packet: PAtTime) => boolean;
 
-type RestrictedKeysCheck<K> = K & (K extends RestrictedKeys ? never : {});
+// Inbound and Outbound.
+type PacketDirection = "I" | "O";
+type PacketHook<P extends ProtocolHeaders> = (
+  ctx: Context<P>,
+) => Asyncable<void>;
 
-export type PacketType<P extends KnownPacketFields> = P extends
-  PacketCodec<infer PType, any> ? PType
-  : never;
+export interface PacketCodec<P extends ProtocolHeaders> {
+  decode(ctx: Consumer, headers: ProtocolHeaders): Promise<P>;
+  encode(data: P): Promise<Uint8Array>;
+  getScaffold(): P;
+  runHook?: PacketHook<P>;
+}
 
 interface FieldInfo<
-  P extends KnownPacketFields,
+  P extends ProtocolHeaders,
   T extends keyof P,
   F = FieldCodec<T>,
 > {
@@ -29,17 +38,12 @@ interface FieldInfo<
   skip?: FieldPredicate<P, T>;
 }
 
-interface KnownPacketFields {
-  readonly packetLength: number;
-  readonly dataLength: number;
-  readonly id: number;
-}
-
-class PacketCodec<
-  P extends KnownPacketFields,
+export class PacketCodecBuilder<
+  P extends ProtocolHeaders,
   NK extends keyof P,
 > {
   public name: string;
+  public direction: PacketDirection = "I";
 
   private lastField!: NK;
   private packetFields = new Map<keyof P, FieldInfo<P, any>>();
@@ -47,7 +51,6 @@ class PacketCodec<
   public constructor(
     public id: number,
     name: string,
-    public direction: Direction,
   ) {
     this.name = name.toLowerCase();
   }
@@ -62,7 +65,10 @@ class PacketCodec<
     this.packetFields.set(key as keyof P, fieldInfo);
     this.lastField = key as unknown as NK;
 
-    return this as unknown as PacketCodec<P & Record<T, FT>, T>;
+    return this as unknown as PacketCodecBuilder<
+      P & Record<T, FT>,
+      T
+    >;
   }
 
   public validate(
@@ -81,35 +87,78 @@ class PacketCodec<
     return this;
   }
 
-  public async populate(consumer: Consumer, current: KnownPacketFields) {
-    const fields = current as P;
-    for (const [key, fieldInfo] of this.packetFields.entries()) {
-      const val = await fieldInfo.codec.decode(consumer);
-      if (fieldInfo.validate?.(val, fields) ?? false) {
-        throw new STypeError(
-          "PACKET_FIELD_VALIDATION_FAILURE",
-          this.name,
-          key as string,
-          val,
-        );
-      }
+  public compile(hook?: PacketHook<P>) {
+    const compiled = {
+      decode: this.decode,
+      encode: this.encode,
+      getScaffold: () => ({ id: this.id } as P),
+    } as PacketCodec<P>;
 
-      if (fieldInfo.skip?.(val, fields) ?? false) continue;
-
-      fields[key] = val;
+    if (hook) {
+      this.direction = "O";
+      compiled.runHook = hook;
     }
 
-    return fields;
+    return compiled;
+  }
+
+  public async encode(data: P) {
+    const insert = collator();
+    for (const [key, fieldInfo] of this.packetFields.entries()) {
+      const fieldVal = data[key];
+      if (fieldInfo.skip?.(data, fieldVal) ?? false) continue;
+
+      const bytes = await fieldInfo.codec.encode(insert);
+      if (fieldInfo.validate) {
+        this.validateField(data, fieldInfo.validate, key, fieldVal);
+      }
+
+      insert(bytes);
+    }
+
+    return insert();
+  }
+
+  public async decode(consumer: Consumer, headers: ProtocolHeaders) {
+    const data = headers as P;
+    for (const [key, fieldInfo] of this.packetFields.entries()) {
+      const fieldVal = await fieldInfo.codec.decode(
+        consumer,
+      ) as (typeof data)[keyof typeof data];
+
+      if (fieldInfo.validate) {
+        this.validateField(data, fieldInfo.validate, key, fieldVal);
+      }
+
+      data[key] = fieldVal;
+    }
+
+    return data;
+  }
+
+  // TODO(z): Clean this mess up.
+  private validateField<KOP extends keyof P>(
+    data: P,
+    validate: FieldPredicate<P, KOP>,
+    key: KOP,
+    fieldVal: P[KOP],
+  ) {
+    if (!validate(fieldVal, data)) {
+      throw new STypeError(
+        "PACKET_FIELD_VALIDATION_FAILURE",
+        this.name,
+        key as string,
+        fieldVal as unknown as string,
+      );
+    }
   }
 
   private addPredicate(
     field: "validate" | "skip",
-    predicate: FieldPredicate<P, NK>,
+    func: FieldPredicate<P, NK>,
   ) {
     const fieldData = this.packetFields.get(this.lastField) as FieldInfo<P, NK>;
-    fieldData[field] = predicate;
+    fieldData[field] = func;
     this.packetFields.set(this.lastField, fieldData);
   }
 }
-
-export default PacketCodec;

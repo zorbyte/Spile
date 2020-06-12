@@ -5,6 +5,7 @@ import { Client } from "./client.ts";
 
 import Listener = Deno.Listener;
 import Conn = Deno.Conn;
+import { Context } from "./context.ts";
 
 const { listen: listenTcp } = Deno;
 
@@ -35,9 +36,13 @@ async function handleConnection(conn: Conn) {
 
     if (!headerData) continue;
 
-    // TODO: Change to @ts-expect-error in future.
+    // TODO: Check data lengths and Ids.
     // @ts-expect-error
     const { packetLength, dataLength, id } = headerData;
+
+    // TODO: Use the context, get the packet, send it to its hook.
+    // @ts-expect-error
+    const ctx = new Context(client, headerData);
   }
 }
 

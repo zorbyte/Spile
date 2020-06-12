@@ -65,9 +65,9 @@ export function collator(): Collator {
 }
 
 export interface ProtocolHeaders {
-  packetLength: number;
-  dataLength: number;
-  id: number;
+  readonly packetLength: number;
+  readonly dataLength: number;
+  readonly id: number;
 }
 
 export interface HeaderParserOpts {
