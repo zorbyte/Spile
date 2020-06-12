@@ -20,7 +20,7 @@ export class Client extends BaseContextHolder {
   #closed = false;
 
   public constructor(private conn: Conn, log: Logger) {
-    super("client", log)
+    super("client", log);
     this.#consumer = new Consumer(conn);
   }
 

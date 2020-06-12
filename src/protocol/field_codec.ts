@@ -77,11 +77,9 @@ export class FieldCodecBuilder<T extends unknown> {
   }
 
   private isValid(data: T, process: ProcessVerb) {
-    const passed =
-      this?.[
-        process === "encoding"
-          ? "encoderValidator"
-          : "decoderValidator"
+    const passed = this
+      ?.[
+        process === "encoding" ? "encoderValidator" : "decoderValidator"
       ]?.(data) ?? true;
 
     if (!passed) {

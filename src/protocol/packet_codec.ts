@@ -158,7 +158,10 @@ export class PacketCodecBuilder<
     field: "validate" | "skip",
     func: FieldPredicate<P, NK>,
   ) {
-    const fieldData = this.packetFields.get(this.lastField!) as FieldInfo<P, NK>;
+    const fieldData = this.packetFields.get(this.lastField!) as FieldInfo<
+      P,
+      NK
+    >;
     fieldData[field] = func;
     this.packetFields.set(this.lastField!, fieldData);
   }
