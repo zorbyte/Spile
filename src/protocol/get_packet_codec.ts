@@ -1,4 +1,4 @@
-import { State } from "./client.ts";
+import { State } from "./context.ts";
 import { PacketCodec } from "./packet_codec.ts";
 import { ProtocolHeaders } from "./io_utils.ts";
 

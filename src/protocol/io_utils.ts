@@ -1,8 +1,8 @@
+import { SError } from "@utils/errors/mod.ts";
 import { PickByValue } from "@utils/type_utils.d.ts";
 
 import { varInt } from "./fields/var_int.ts";
 import { Consumer } from "./consumer.ts";
-import { SError } from "../utils/errors/mod.ts";
 import { Collator } from "./collator.ts";
 
 export const MAX_PACKET_SIZE = 1_000_000;
@@ -50,9 +50,12 @@ export interface ProtocolHeadersOpts {
 /** Encodes the headers for an outbound packet. */
 export async function encodeHeaders(
   col: Collator,
+  id: number,
   opts: ProtocolHeadersOpts,
 ) {
   checkHeaderOptions(opts);
+
+  col.prepend(await varInt.encode(id));
   const packetLength = col.length;
   col.prepend(await varInt.encode(packetLength));
 }

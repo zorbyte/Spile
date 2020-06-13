@@ -116,13 +116,18 @@ export class Consumer {
   private async readIntoArray(
     amount: number,
   ) {
-    const data = new Uint8Array(amount);
-    const amountRead = await this.reader.read(data);
-    if (amountRead !== null && amountRead > 0) {
-      this.changeOffset(amount);
-      return data;
-    }
+    try {
+      const data = new Uint8Array(amount);
+      const amountRead = await this.reader.read(data);
+      if (amountRead !== null && amountRead > 0) {
+        this.changeOffset(amount);
+        return data;
+      }
 
-    throw new SError("CONNECTION_CLOSED");
+      throw new Deno.errors.BadResource("Bad resource ID");
+    } catch (err) {
+      if (!(err instanceof Deno.errors.BadResource)) throw err;
+      throw new SError("CONNECTION_CLOSED");
+    }
   }
 }

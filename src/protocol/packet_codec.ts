@@ -3,10 +3,9 @@ import { Asyncable } from "@utils/type_utils.d.ts";
 
 import { Consumer } from "./consumer.ts";
 import { Collator } from "./collator.ts";
-import { FieldCodec } from "./field_codec.ts";
 import { Context } from "./context.ts";
+import { FieldCodec } from "./field_codec.ts";
 import { ProtocolHeaders } from "./io_utils.ts";
-import { varInt } from "./fields/var_int.ts";
 
 type RestrictedKeys = keyof ProtocolHeaders;
 type RestrictedKeysCheck<K> = K & (K extends RestrictedKeys ? never : {});
@@ -49,9 +48,7 @@ export class PacketCodecBuilder<
   public constructor(
     public id: number,
     public name: string,
-  ) {
-    this.addField("id" as string, varInt);
-  }
+  ) {}
 
   public addField<
     T extends string,
@@ -120,7 +117,6 @@ export class PacketCodecBuilder<
   private async decode(consumer: Consumer, headers: ProtocolHeaders) {
     const data = { ...headers } as P;
     for (const [key, fieldInfo] of this.packetFields.entries()) {
-      if (key === "id") continue;
       const fieldVal = await fieldInfo.codec.decode(
         consumer,
       ) as (typeof data)[keyof typeof data];
