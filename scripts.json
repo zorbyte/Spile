@@ -12,7 +12,7 @@
         "DEBUG_LOG": "true"
       }
     },
-    "run": {
+    "start": {
       "desc": "Runs Spile",
       "cmd": "deno run --unstable ./src/main.ts",
       "tsconfig": "./etc/tsconfig.json",

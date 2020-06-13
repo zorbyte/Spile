@@ -1,27 +1,24 @@
-import { BaseContextHolder } from "./base_context_holder.ts";
 import { ProtocolHeaders } from "./io_utils.ts";
-import { Client } from "./client.ts";
+import { Client, State } from "./client.ts";
+import { createLogger } from "../utils/logger.ts";
 
-export class Context<P extends ProtocolHeaders> extends BaseContextHolder {
+const ctxLog = createLogger("protocol", ["req"]);
+
+export class Context<P extends ProtocolHeaders> {
   public ended = false;
+  public log = ctxLog;
 
-  public constructor(private client: Client, public packet: P) {
-    super("ctx", client.log);
-  }
+  public constructor(private client: Client, public packet: P) {}
 
   public get state() {
     return this.client.state;
   }
 
+  public set state(newState: State) {
+    this.client.state = newState;
+  }
+
   public close() {
     this.client.close();
-  }
-
-  public get closed() {
-    return this.client.closed;
-  }
-
-  public get closing() {
-    return this.client.shouldClose;
   }
 }

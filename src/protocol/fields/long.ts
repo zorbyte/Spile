@@ -8,7 +8,7 @@ export const long = new FieldCodecBuilder<bigint>("long")
   .validate((value) => value >= MIN_LONG && value <= MAX_LONG)
   .encode((value) => {
     const bytes = new Uint8Array(8);
-    const view = new DataView(bytes);
+    const view = new DataView(bytes.buffer);
     view.setBigInt64(0, value);
 
     return bytes;

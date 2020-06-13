@@ -1,3 +1,5 @@
+<!-- TODO: Use Aliases for the URLs. -->
+
 # Spile Server
 
 ![Discord Shield](https://discordapp.com/api/guilds/702504330456072303/widget.png?style=shield)
@@ -15,7 +17,7 @@ latency benefits and to participate in a better ecosystem.
 
 There are two ways of running Spile, the first is by installing the
 [Velociraptor](https://github.com/umbopepato/velociraptor) CLI and then running
-`vr run`.
+`vr start`.
 
 The other is to use the following command through the Deno CLI:
 
@@ -23,10 +25,12 @@ The other is to use the following command through the Deno CLI:
 deno run --allow-net --allow-read --allow-write allow-env --config ./etc/tsconfig.json --importmap ./etc/import_map.json --lock ./etc/lock.json --unstable ./src/main.ts
 ```
 
-It is recommended to use the Velociraptor CLI to avoid typing this long command
-or creating your own shell script. If you are contributing to Spile, do not
-commit any files of this nature. Please see the [Contributing](#contributing)
-section below in the latter case.
+It is recommended to use the
+[Velociraptor](https://github.com/umbopepato/velociraptor)CLI to avoid typing
+this long command or creating your own shell script. If you are contributing to
+Spile, do not commit any files for starting the server, you should instead be
+using the [Velociraptor](https://github.com/umbopepato/velociraptor) CLI. Please
+see the [Contributing](#contributing) section below in the latter case.
 
 ## Contributing
 
@@ -49,9 +53,11 @@ easiest way to achieve this) and then `vr lint` prior to committing.
 Do not use a `deps.ts` file. Instead use the import map, take a look at how
 previous imports are done and replicate the format.
 
-If you use the cSpell VSCode plugin, you can create a `custom_dictionary.json`
-file in the root directory to use custom words. To update it, make your changes
-to the `custom_dictionary.json` file and run `vr setup_dev` again.
+If you use the
+[Code Spell Checker VSCode plugin](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker),
+you can create a `custom_dictionary.json` file in the root directory to use
+custom words. To update it, make your changes to the `custom_dictionary.json`
+file and run `vr setup_dev` again.
 
 ## Credits
 

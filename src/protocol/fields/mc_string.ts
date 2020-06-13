@@ -1,5 +1,3 @@
-import { flatStr } from "@utils/common.ts";
-
 import { concatArrays } from "../io_utils.ts";
 import { FieldCodec } from "../field_codec.ts";
 
@@ -10,7 +8,6 @@ const decoder = new TextDecoder();
 
 export const buildMCString = (n = 32767): FieldCodec<string> => ({
   async encode(str) {
-    str = flatStr(str);
     if (str.length > n) {
       throw new TypeError(`This MCString can have up tp ${n} characters`);
     }
@@ -39,6 +36,6 @@ export const buildMCString = (n = 32767): FieldCodec<string> => ({
     const data = await consumer.read(len);
     const str = decoder.decode(data);
 
-    return flatStr(str);
+    return str;
   },
 });

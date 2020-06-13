@@ -1,10 +1,13 @@
 import { STypeError } from "@utils/errors/mod.ts";
 
-import { FieldCodec } from "../field_codec.ts";
+import { FieldCodecBuilder } from "../field_codec.ts";
 
-// TODO: Use the builder.
-export const varLong: FieldCodec<bigint> = {
-  encode(value) {
+const MAX = 9223372036854775807n;
+const MIN = -9223372036854775808n;
+
+export const varLong = new FieldCodecBuilder<bigint>("varLong")
+  .validate((value) => value < MAX && value > MIN)
+  .encode((value) => {
     const byteArr = [];
 
     while (value !== 0n) {
@@ -17,9 +20,8 @@ export const varLong: FieldCodec<bigint> = {
     }
 
     return Uint8Array.from(byteArr);
-  },
-
-  async decode(consumer) {
+  })
+  .decode(async (consumer) => {
     let numRead = 0n;
     let result = 0n;
 
@@ -41,5 +43,5 @@ export const varLong: FieldCodec<bigint> = {
     }
 
     return result;
-  },
-};
+  })
+  .compile();

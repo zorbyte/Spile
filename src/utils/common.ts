@@ -15,10 +15,3 @@ export function Enumerable(value: boolean) {
     });
   };
 }
-
-// Improves speed when working with heavily concatenated strings.
-// It works by flattening the underlying C structures of a string.
-export function flatStr(str: string): string {
-  // @ts-ignore
-  return str | 0;
-}

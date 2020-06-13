@@ -2,8 +2,11 @@ import { STypeError } from "@utils/errors/mod.ts";
 
 import { FieldCodecBuilder } from "../field_codec.ts";
 
+const MAX = 2147483647;
+const MIN = -2147483648;
+
 export const varInt = new FieldCodecBuilder<number>("varInt")
-  .validate((value) => value < 2147483647 && value > -2147483648)
+  .validate((value) => value < MAX && value > MIN)
   .encode((value) => {
     const byteArr = [];
 

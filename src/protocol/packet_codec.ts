@@ -2,9 +2,11 @@ import { STypeError } from "@utils/errors/mod.ts";
 import { Asyncable } from "@utils/type_utils.d.ts";
 
 import { Consumer } from "./consumer.ts";
+import { Collator } from "./collator.ts";
 import { FieldCodec } from "./field_codec.ts";
 import { Context } from "./context.ts";
-import { ProtocolHeaders, Collator } from "./io_utils.ts";
+import { ProtocolHeaders } from "./io_utils.ts";
+import { varInt } from "./fields/var_int.ts";
 
 type RestrictedKeys = keyof ProtocolHeaders;
 type RestrictedKeysCheck<K> = K & (K extends RestrictedKeys ? never : {});
@@ -15,8 +17,6 @@ type FieldPredicate<
   PAtTime = Omit<P, F>,
 > = (data: P[F], packet: PAtTime) => boolean;
 
-// Inbound and Outbound.
-type PacketDirection = "I" | "O";
 type PacketHook<P extends ProtocolHeaders> = (
   ctx: Context<P>,
 ) => Asyncable<ProtocolHeaders & unknown | void>;
@@ -42,8 +42,6 @@ export class PacketCodecBuilder<
   P extends ProtocolHeaders,
   NK extends keyof P,
 > {
-  public direction = "I" as PacketDirection;
-
   // Used to add validators to.
   private lastField?: NK;
   private packetFields = new Map<keyof P, FieldInfo<P, any>>();
@@ -51,7 +49,9 @@ export class PacketCodecBuilder<
   public constructor(
     public id: number,
     public name: string,
-  ) {}
+  ) {
+    this.addField("id" as string, varInt);
+  }
 
   public addField<
     T extends string,
@@ -96,11 +96,7 @@ export class PacketCodecBuilder<
       getScaffold: () => ({ id: this.id } as P),
     } as PacketCodec<P>;
 
-    if (hook) {
-      // Packets with run hooks are outbound packets.
-      this.direction = "O";
-      compiled.runHook = hook;
-    }
+    if (hook) compiled.runHook = hook;
 
     return compiled;
   }
@@ -108,22 +104,23 @@ export class PacketCodecBuilder<
   // Generally, avoid using side effects like this
   // however concatenation is an operation that should only happen at the end
   // as it is a costly operation.
-  private async encode(insert: Collator, data: P) {
+  private async encode(col: Collator, data: P) {
     for (const [key, fieldInfo] of this.packetFields.entries()) {
       const fieldVal = data[key];
       if (fieldInfo.skip?.(data, fieldVal) ?? false) continue;
-      const bytes = await fieldInfo.codec.encode(insert);
+      const bytes = await fieldInfo.codec.encode(fieldVal);
       if (fieldInfo.validate) {
         this.validateField(data, fieldInfo.validate, key, fieldVal);
       }
 
-      insert(bytes, "append");
+      col.append(bytes);
     }
   }
 
   private async decode(consumer: Consumer, headers: ProtocolHeaders) {
     const data = { ...headers } as P;
     for (const [key, fieldInfo] of this.packetFields.entries()) {
+      if (key === "id") continue;
       const fieldVal = await fieldInfo.codec.decode(
         consumer,
       ) as (typeof data)[keyof typeof data];

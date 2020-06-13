@@ -34,33 +34,42 @@ export function createLogger(name: string, childNames: string[]): Logger;
 export function createLogger(name = defaultName, childNames?: string[]) {
   const knownChildNames = childNames ?? [];
 
-  // Discard children with the name "".
+  // If a logger has a blank name and has children,
+  // take the first child name as the main name.
   if (name === "" && knownChildNames.length) name = knownChildNames.pop() ?? "";
   const debugEnabled = Deno.env.get("DEBUG_LOG") === "true";
-  const displayName = [name, ...knownChildNames].map(green).join(gray(" > "));
+  const displayName = [name, ...knownChildNames]
+    .filter((name) => name !== "")
+    .map(green).join(gray(" > "));
 
-  const loggerObj = (Object.fromEntries(
-    Object.entries(METHOD_COLOURS).map(([key, colouriser]) => [
-      key,
-      (...args: unknown[]) => {
-        const callableKey = key === "warn" ? "info" : key;
-        if (callableKey === "debug" && !debugEnabled) return;
-        console[callableKey as "log"](
-          formatLog(displayName, { method: key, colouriser }),
-          ...args,
-        );
-      },
-    ]),
-  ) as unknown) as Logger;
-
-  loggerObj.child = (...childNames: string[]) =>
-    createLogger(name, [...knownChildNames, ...childNames]);
+  const loggerObj: Logger = {
+    debug(...args: unknown[]) {
+      if (!debugEnabled) return;
+      writeLog(displayName, "debug", ...args);
+    },
+    info: writeLog.bind(null, displayName, "info"),
+    warn: writeLog.bind(null, displayName, "warn"),
+    error: writeLog.bind(null, displayName, "error"),
+    child(...childNames: string[]) {
+      return createLogger(name, [...knownChildNames, ...childNames]);
+    },
+  };
 
   return loggerObj;
 }
 
-export function createChild(...childNames: string[]) {
-  return createLogger(defaultName, childNames);
+function writeLog(
+  displayName: string,
+  key: LevelNames,
+  ...args: unknown[]
+) {
+  const callableKey = key === "warn" ? "info" : key;
+  const colouriser = METHOD_COLOURS[key];
+
+  console[callableKey as "log"](
+    formatLog(displayName, { method: key, colouriser }),
+    ...args,
+  );
 }
 
 function formatLog(

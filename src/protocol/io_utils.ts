@@ -3,6 +3,7 @@ import { PickByValue } from "@utils/type_utils.d.ts";
 import { varInt } from "./fields/var_int.ts";
 import { Consumer } from "./consumer.ts";
 import { SError } from "../utils/errors/mod.ts";
+import { Collator } from "./collator.ts";
 
 export const MAX_PACKET_SIZE = 1_000_000;
 
@@ -12,7 +13,7 @@ export function concatArrays(arrays: Uint8Array[], length: number) {
   let prevPos = 0;
   for (const array of arrays) {
     output.set(array, prevPos);
-    prevPos = array.length;
+    prevPos += array.length;
   }
 
   return output;
@@ -34,61 +35,31 @@ export function getBytesOfNumber(
   return bytes;
 }
 
-type CollatorAction = "prepend" | "append" | "replace";
-
-export interface Collator {
-  (): Uint8Array;
-  (data: Uint8Array, action: CollatorAction): void;
-  (
-    data: Uint8Array,
-    action: "prepend" | "append" | "replace",
-  ): Uint8Array | void;
-}
-
-/**
- * Functional interface to manipulate an array of
- * Uint8Arrays and concatenate them if need be
- */
-export function collator() {
-  let length = 0;
-  let buffered: Uint8Array[] = [];
-
-  function insert(): Uint8Array;
-  function insert(
-    data: Uint8Array,
-    action: "prepend" | "append" | "replace",
-  ): void;
-  function insert(
-    data?: Uint8Array,
-    action?: "prepend" | "append" | "replace",
-  ): Uint8Array | void {
-    if (!data) return concatArrays(buffered, length);
-    if (action && action === "replace") {
-      length = data.length;
-      buffered = [data];
-    }
-    length += data.length;
-    buffered[action === "prepend" ? "unshift" : "push"](data);
-  }
-
-  return insert as Collator;
-}
-
 export interface ProtocolHeaders {
   readonly packetLength: number;
   readonly dataLength: number;
   readonly id: number;
 }
 
-export interface HeaderParserOpts {
+export interface ProtocolHeadersOpts {
   compressed: boolean;
   compressionThreshold: number;
   encrypted: boolean;
 }
 
-/* Parses the headers of a request */
-export async function parseHeaders(cons: Consumer, opts: HeaderParserOpts) {
-  if (opts.compressed || opts.encrypted) throw new SError("NOT_IMPLEMENTED");
+/** Encodes the headers for an outbound packet. */
+export async function encodeHeaders(
+  col: Collator,
+  opts: ProtocolHeadersOpts,
+) {
+  checkHeaderOptions(opts);
+  const packetLength = col.length;
+  col.prepend(await varInt.encode(packetLength));
+}
+
+/** Decodes the headers of a request */
+export async function decodeHeaders(cons: Consumer, opts: ProtocolHeadersOpts) {
+  checkHeaderOptions(opts);
 
   const packetLength = await varInt.decode(cons);
   const dataLengthOrId = await varInt.decode(cons);
@@ -109,4 +80,9 @@ export async function parseHeaders(cons: Consumer, opts: HeaderParserOpts) {
   };
 
   return headers;
+}
+
+/** Checks if the header options violate a set of requirements. */
+function checkHeaderOptions(opts: ProtocolHeadersOpts) {
+  if (opts.compressed || opts.encrypted) throw new SError("NOT_IMPLEMENTED");
 }

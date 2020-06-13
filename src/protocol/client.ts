@@ -1,6 +1,5 @@
 import { Logger } from "@utils/logger.ts";
 
-import { BaseContextHolder } from "./base_context_holder.ts";
 import { Consumer } from "./consumer.ts";
 
 import Conn = Deno.Conn;
@@ -12,15 +11,14 @@ export const enum State {
   PLAY,
 }
 
-export class Client extends BaseContextHolder {
+export class Client {
   public state = State.HANDSHAKE;
 
   readonly #consumer: Consumer;
   #shouldClose = false;
   #closed = false;
 
-  public constructor(private conn: Conn, log: Logger) {
-    super("client", log);
+  public constructor(private conn: Conn, public log: Logger) {
     this.#consumer = new Consumer(conn);
   }
 
@@ -39,6 +37,8 @@ export class Client extends BaseContextHolder {
 
   public close(immediate = false) {
     if (immediate) {
+      this.#shouldClose = false;
+      this.#consumer.empty();
       this.conn.close();
       this.#closed = true;
     } else {
