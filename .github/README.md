@@ -1,6 +1,6 @@
 <!-- TODO: Use Aliases for the URLs. -->
 
-# Spile Server
+# Spile
 
 ![Discord Shield](https://discordapp.com/api/guilds/702504330456072303/widget.png?style=shield)
 
