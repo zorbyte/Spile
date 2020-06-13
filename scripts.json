@@ -1,0 +1,45 @@
+{
+  "scripts": {
+    "lint": "deno fmt ./src ./bin",
+    "dev": {
+      "desc": "Runs Spile in development mode",
+      "cmd": "deno run --unstable --lock-write ./src/main.ts",
+      "tsconfig": "./etc/tsconfig.json",
+      "imap": "./etc/import_map.json",
+      "lock": "./etc/lock.json",
+      "allow": ["net", "read", "write", "env"],
+      "env": {
+        "DEBUG_LOG": "true"
+      }
+    },
+    "start": {
+      "desc": "Runs Spile",
+      "cmd": "deno run --unstable ./src/main.ts",
+      "tsconfig": "./etc/tsconfig.json",
+      "imap": "./etc/import_map.json",
+      "lock": "./etc/lock.json",
+      "allow": ["net", "read", "write", "env"]
+    },
+    "cache": {
+      "desc": "Cache the modules and write the lock",
+      "cmd": "deno cache --unstable --lock-write ./src/main.ts",
+      "imap": "./etc/import_map.json",
+      "lock": "./etc/lock.json"
+    },
+    "setup_dev": {
+      "desc": "Sets up the development environment",
+      "pll": [
+        {
+          "cmd": "./bin/setup_dev.ts",
+          "tsconfig": "./etc/tsconfig.json",
+          "allow": ["write", "read"]
+        },
+        {
+          "cmd": "deno cache --unstable --lock-write ./src/main.ts",
+          "imap": "./etc/import_map.json",
+          "lock": "./etc/lock.json"
+        }
+      ]
+    }
+  }
+}

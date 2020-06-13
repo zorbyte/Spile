@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "std/": "https://deno.land/std@0.56.0/",
+    "secure-json-parse-deno/": "https://raw.githubusercontent.com/zorbyte/secure-json-parse-deno/359195fac8074ee022c46a1ed1561621b2c4cc47/",
+
+    "@etc/": "../etc/",
+    "@utils/": "../src/utils/"
+  }
+}
