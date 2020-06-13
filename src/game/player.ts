@@ -1,2 +1,2 @@
-// Stub.
+// Stub
 export class Player {}
