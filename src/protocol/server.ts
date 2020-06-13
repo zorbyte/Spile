@@ -3,7 +3,7 @@ import { SError } from "@utils/errors/mod.ts";
 
 import { Collator } from "./collator.ts";
 import { Consumer } from "./consumer.ts";
-import { Context, State } from "./context.ts";
+import { createContext, State } from "./context.ts";
 import { getPacketCodec } from "./get_packet_codec.ts";
 import {
   decodeHeaders,
@@ -121,7 +121,7 @@ async function handleConnection(conn: Conn) {
       if (!packetCodec) break;
 
       const packet = await packetCodec.decode(cons, headerData);
-      const ctx = new Context(packet, client.state);
+      const ctx = createContext(packet, client.state);
 
       ctx.log.debug("Incoming packet with headers:", headerData);
 

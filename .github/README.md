@@ -18,7 +18,7 @@ Spile will also be able to be used as a library to make minecraft bots in Deno.
 The server component is a long term project, and the Spile as library features
 will be developed in a "second-class" manner until the server is finished.
 
-Check out issue [#1](../../issues/1) (WARNING, this issue is outdated) for more info.
+Check out issue [#1](../../../issues/1) for a checklist of ideas planned for Spile.
 
 ## Running Spile
 

@@ -1,4 +1,4 @@
-import { createLogger } from "@utils/logger.ts";
+import { createLogger, Logger } from "@utils/logger.ts";
 import { ProtocolHeaders } from "./io_utils.ts";
 
 const ctxLog = createLogger("protocol", ["req"]);
@@ -10,18 +10,32 @@ export const enum State {
   PLAY,
 }
 
-export class Context<P extends ProtocolHeaders> {
-  public log = ctxLog;
+export interface Context<P extends ProtocolHeaders> {
+  readonly closeOnEnd: boolean;
+  packet: P;
+  state: State;
+  log: Logger;
+  close(): void;
+}
 
-  #closeOnEnd = false;
+export function createContext<P extends ProtocolHeaders>(
+  packet: P,
+  state: State,
+) {
+  let closeOnEnd = false;
 
-  public constructor(public packet: P, public state: State) {}
+  return {
+    packet,
+    state,
 
-  public get closeOnEnd() {
-    return this.#closeOnEnd;
-  }
+    log: ctxLog,
 
-  public close() {
-    this.#closeOnEnd = true;
-  }
+    get closeOnEnd() {
+      return closeOnEnd;
+    },
+
+    close() {
+      closeOnEnd = true;
+    },
+  };
 }
