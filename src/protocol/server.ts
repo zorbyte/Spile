@@ -36,6 +36,26 @@ interface ServeOptions {
   port: number;
 }
 
+export function listen(opts: ServeOptions) {
+  listener = Deno.listen(opts);
+  serverOpen = true;
+
+  acceptConnections();
+  log.info(`Started listening on ${opts.hostname}:${opts.port}`);
+}
+
+export function close() {
+  serverOpen = false;
+  listener?.close();
+  for (const client of clients) {
+    try {
+      client.close();
+    } catch (err) {
+      if (!isConnClosedErr(err)) throw err;
+    }
+  }
+}
+
 async function acceptConnections() {
   // Do not await handleConnection, otherwise each connection would block the entire program.
   for await (const conn of listener) handleConnection(conn);
@@ -156,26 +176,6 @@ async function handleConnection(conn: Conn) {
   // This is just a precaution, connections should not be left idling in the background.
   client.close(false);
   log.debug("Closed connection");
-}
-
-export function listen(opts: ServeOptions) {
-  listener = Deno.listen(opts);
-  serverOpen = true;
-
-  acceptConnections();
-  log.info(`Started listening on ${opts.hostname}:${opts.port}`);
-}
-
-export function close() {
-  serverOpen = false;
-  listener?.close();
-  for (const client of clients) {
-    try {
-      client.close();
-    } catch (err) {
-      if (!isConnClosedErr(err)) throw err;
-    }
-  }
 }
 
 function isConnClosedErr(err: any) {
