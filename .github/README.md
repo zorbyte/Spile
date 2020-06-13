@@ -4,14 +4,21 @@
 
 ![Discord Shield](https://discordapp.com/api/guilds/702504330456072303/widget.png?style=shield)
 
-Spile is a Minecraft Java edition game server written in Typescript using Deno.
+Spile is a Minecraft Java edition game server and library written in Typescript
+and (soon) Rust using Deno.
 
 Check out issue [#1](../../issues/1) for more info.
 
 ## About
 
-Spile was originally written in Node.js, however it is being ported to Deno for
-latency benefits and to participate in a better ecosystem.
+Spile is a Minecraft Java Edition server that will in future sport all the
+features of other Minecraft servers such as Spigot. To make this possible in
+Deno, rust plugins will be used for resource heavy operations and TypeScript
+will be used for game logic.
+
+Spile will also be able to be used as a library to make minecraft bots in Deno.
+The server component is a long term project, and the Spile as library features
+will be developed in a "second-class" manner until the server is finished.
 
 ## Running Spile
 
@@ -58,6 +65,10 @@ If you use the
 you can create a `custom_dictionary.json` file in the root directory to use
 custom words. To update it, make your changes to the `custom_dictionary.json`
 file and run `vr setup_dev` again.
+
+A note about the current state of the packet parser: The parser is currently
+written in TypeScript, this will change. The parser will be written in rust to
+take advantage of features such as macros and Rust's performance
 
 ## Credits
 
