@@ -1,3 +1,7 @@
+/**
+ * BitField allows an Enum to be provided as a constructor argument
+ * and then used as a way to set toggle binary values using the enum keys.
+ */
 export class BitField<
   T extends (string | number),
   TEnumValue extends number,

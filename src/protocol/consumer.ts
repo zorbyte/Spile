@@ -36,6 +36,7 @@ export class Consumer {
     let priorPortion: Uint8Array | undefined = void 0;
     let readMore = false;
 
+    // TODO: Clean this up, there is probably a cleaner way to do this.
     if (this.#peaked && this.#peakedOffset > 0) {
       let empty = false;
       let allowedReadAmount = this.#peakedOffset - amount;

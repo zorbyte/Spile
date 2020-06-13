@@ -15,6 +15,8 @@ export function buildMCJson<T>(): FieldCodec<T> {
 
     async decode(consumer): Promise<T> {
       const rawJson = await strCodec.decode(consumer);
+
+      // This parser protects against prototype pollution attacks.
       return parse(rawJson);
     },
   };

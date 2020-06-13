@@ -6,6 +6,7 @@ import { SError } from "../utils/errors/mod.ts";
 
 export const MAX_PACKET_SIZE = 1_000_000;
 
+/** Concatenates Uint8Arrays into a single one. */
 export function concatArrays(arrays: Uint8Array[], length: number) {
   const output = new Uint8Array(length);
   let prevPos = 0;
@@ -17,13 +18,17 @@ export function concatArrays(arrays: Uint8Array[], length: number) {
   return output;
 }
 
+/**
+ * Gets the Uint8Array using the name of the
+ * DataView method applied to the data
+ */
 export function getBytesOfNumber(
   length: number,
   value: number,
   method: keyof PickByValue<DataView, Function>,
 ) {
   const bytes = new Uint8Array(length);
-  const view = new DataView(bytes);
+  const view = new DataView(bytes.buffer);
   (view[method] as (offset: number, value: number) => number)(0, value);
 
   return bytes;
@@ -40,6 +45,10 @@ export interface Collator {
   ): Uint8Array | void;
 }
 
+/**
+ * Functional interface to manipulate an array of
+ * Uint8Arrays and concatenate them if need be
+ */
 export function collator() {
   let length = 0;
   let buffered: Uint8Array[] = [];
@@ -77,6 +86,7 @@ export interface HeaderParserOpts {
   encrypted: boolean;
 }
 
+/* Parses the headers of a request */
 export async function parseHeaders(cons: Consumer, opts: HeaderParserOpts) {
   if (opts.compressed || opts.encrypted) throw new SError("NOT_IMPLEMENTED");
 

@@ -13,6 +13,6 @@ export const MCBool: FieldCodec<boolean> = {
     if (byte === 0x01) return true;
     if (byte === 0x00) return false;
 
-    throw new STypeError("FIELD_DATA_INVALID", "MCBool", "decoding", byte);
+    throw new STypeError("INVALID_FIELD_DATA", "MCBool", "decoding", byte);
   },
 };

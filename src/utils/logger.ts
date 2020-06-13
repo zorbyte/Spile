@@ -33,6 +33,8 @@ export function createLogger(name?: string): Logger;
 export function createLogger(name: string, childNames: string[]): Logger;
 export function createLogger(name = defaultName, childNames?: string[]) {
   const knownChildNames = childNames ?? [];
+
+  // Discard children with the name "".
   if (name === "" && knownChildNames.length) name = knownChildNames.pop() ?? "";
   const debugEnabled = Deno.env.get("DEBUG_LOG") === "true";
   const displayName = [name, ...knownChildNames].map(green).join(gray(" > "));
@@ -65,11 +67,13 @@ function formatLog(
   displayName: string,
   opts: { method: string; colouriser: typeof gray },
 ) {
+  // 11 is the length of the ANSI escape codes.
   if (displayName.length > 11) displayName += " ";
   const currentTime = new Date();
   const timeStr = currentTime.toLocaleTimeString();
   return `${
     bold(
+      // Sliced so that we only get the time without the date.
       magenta(timeStr.slice(0, timeStr.indexOf(" "))),
     )
   } ${displayName}${opts.colouriser(opts.method)}`;

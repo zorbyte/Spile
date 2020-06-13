@@ -45,8 +45,7 @@ function createCustomError<E extends SpileErrorCtor>(DummyBaseCtor: E) {
         configurable: false,
       });
 
-      // TODO: Find out if this is required.
-      // if (Error.captureStackTrace) Error.captureStackTrace(this, SpileError);
+      if (Error.captureStackTrace) Error.captureStackTrace(this, SpileError);
     }
 
     public get name() {

@@ -1,5 +1,6 @@
-// All credit to the Author of this article: https://golb.hplar.ch/2018/09/javascript-bigint.html
-// Minimal modifications have been made.
+// Credit to the Author of this article: https://golb.hplar.ch/2018/09/javascript-bigint.html
+// For a lot of methods have been sourced from it.
+// Minimal modifications have been made to the methods from the aforementioned article.
 
 export class BigIntMath {
   public static max(...values: bigint[]) {

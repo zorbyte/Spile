@@ -26,8 +26,8 @@ export const varInt = new FieldCodecBuilder<number>("varInt")
     while (true) {
       const [read] = await consumer.read(1);
       result |= (read & 0x7F) << (7 * numRead);
-
       numRead++;
+
       if (numRead > 5) {
         throw new STypeError("INVALID_FIELD_DATA", "varInt", "decoding", "N/A");
       }

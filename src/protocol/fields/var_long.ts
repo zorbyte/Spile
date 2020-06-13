@@ -26,8 +26,8 @@ export const varLong: FieldCodec<bigint> = {
     while (true) {
       const [read] = await consumer.read(1);
       result |= (BigInt(read) & 0x7Fn) << (7n * numRead);
-
       numRead++;
+
       if (numRead > 10) {
         throw new STypeError(
           "INVALID_FIELD_DATA",

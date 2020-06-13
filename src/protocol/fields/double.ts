@@ -8,7 +8,7 @@ export const double = new FieldCodecBuilder<number>("double")
   )
   .encode((value) => getBytesOfNumber(8, value, "setFloat64"))
   .decode(async (consumer) => {
-    const [offset, view] = await consumer.readWithView(8);
-    return view.getFloat64(offset);
+    const view = await consumer.readWithView(8);
+    return view.getFloat64(0);
   })
   .compile();
