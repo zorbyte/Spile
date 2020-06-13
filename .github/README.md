@@ -7,8 +7,6 @@
 Spile is a Minecraft Java edition game server and library written in Typescript
 and (soon) Rust using Deno.
 
-Check out issue [#1](../../issues/1) for more info.
-
 ## About
 
 Spile is a Minecraft Java Edition server that will in future sport all the
@@ -19,6 +17,8 @@ will be used for game logic.
 Spile will also be able to be used as a library to make minecraft bots in Deno.
 The server component is a long term project, and the Spile as library features
 will be developed in a "second-class" manner until the server is finished.
+
+Check out issue [#1](../../issues/1) (WARNING, this issue is outdated) for more info.
 
 ## Running Spile
 
