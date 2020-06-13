@@ -13,8 +13,8 @@ Check out issue [#1](../../issues/1) for more info.
 
 Spile is a Minecraft Java Edition server that will in future sport all the
 features of other Minecraft servers such as Spigot. To make this possible in
-Deno, rust plugins will be used for resource heavy operations and TypeScript
-will be used for game logic.
+Deno, Rust plugins and Workers will be used for resource heavy operations and TypeScript
+will be used for game logic. 
 
 Spile will also be able to be used as a library to make minecraft bots in Deno.
 The server component is a long term project, and the Spile as library features
@@ -82,6 +82,7 @@ communities and projects:
 - [GlowstoneMC](https://github.com/GlowstoneMC/Glowstone) - For countless
   inspirations on how I should go about creating certain aspects on this
   project.
+- [Feather](https://github.com/feather-rs/feather) - For ideas for the rust side of Spile.
 - [PrismarineJS](https://github.com/PrismarineJS) - Existing JS code to help me
   gain insight on how things are done through JS in the MC protocol.
 
