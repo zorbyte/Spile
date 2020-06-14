@@ -12,10 +12,18 @@ import { request } from "./packets/status/request.ts";
 import { pingPong } from "./packets/status/ping_pong.ts";
 import { response } from "./packets/status/response.ts";
 
+type UnknownCodec = PacketCodec<ProtocolHeaders>;
+
+type PacketDirection = "I" | "O";
 type PacketHolder = Record<
   State,
-  Record<number, PacketCodec<ProtocolHeaders & unknown>>
+  Record<number, UnknownCodec>
 >;
+
+interface GetCodecOpts {
+  state: State;
+  direction: PacketDirection;
+}
 
 interface PacketCodecs {
   I: PacketHolder;
@@ -40,6 +48,6 @@ const packetCodecs = {
   },
 } as unknown as PacketCodecs;
 
-export function getPacketCodec(id: number, direction: "I" | "O", state: State) {
-  return packetCodecs[direction]?.[state]?.[id];
+export function getPacketCodec(id: number, opts: GetCodecOpts) {
+  return packetCodecs[opts.direction]?.[opts.state]?.[id];
 }

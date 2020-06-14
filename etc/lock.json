@@ -1,4 +1,4 @@
 {
-  "https://raw.githubusercontent.com/zorbyte/secure-json-parse-deno/359195fac8074ee022c46a1ed1561621b2c4cc47/mod.js": "bd720db47ac6658e1a4f8286c577e7d38a6c15c661988b3d51e96a306cacb7c8",
-  "https://deno.land/std@0.56.0/fmt/colors.ts": "06444b6ebc3842a4b2340d804bfa81fc5452a03513cbb81bd7f6bf8f4b8f3ac4"
+  "https://deno.land/std@0.56.0/fmt/colors.ts": "06444b6ebc3842a4b2340d804bfa81fc5452a03513cbb81bd7f6bf8f4b8f3ac4",
+  "https://raw.githubusercontent.com/zorbyte/secure-json-parse-deno/359195fac8074ee022c46a1ed1561621b2c4cc47/mod.js": "bd720db47ac6658e1a4f8286c577e7d38a6c15c661988b3d51e96a306cacb7c8"
 }

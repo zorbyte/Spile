@@ -21,6 +21,7 @@ type PacketHook<P extends ProtocolHeaders> = (
 ) => Asyncable<ProtocolHeaders & unknown | void>;
 
 export interface PacketCodec<P extends ProtocolHeaders> {
+  id: number;
   decode(consumer: Consumer, headers: ProtocolHeaders): Promise<P>;
   encode(insert: Collator, data: P): Promise<void>;
   getScaffold(): P;
@@ -84,14 +85,15 @@ export class PacketCodecBuilder<
 
   // A public form to use the packet codec.
   public compile(hook?: PacketHook<P>) {
-    const compiled = {
+    const compiled: PacketCodec<P> = {
+      id: this.id,
       decode: this.decode.bind(this),
       encode: this.encode.bind(this),
 
       // If the packet were to be created for outbound,
       // use this as starting point and modify the object.
       getScaffold: () => ({ id: this.id } as P),
-    } as PacketCodec<P>;
+    };
 
     if (hook) compiled.runHook = hook;
 

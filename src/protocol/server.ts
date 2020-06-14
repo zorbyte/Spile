@@ -114,11 +114,19 @@ async function handleConnection(conn: Conn) {
         );
 
         await conn.write(res);
+        client.close();
         break;
       }
 
-      const packetCodec = getPacketCodec(headerData.id, "I", client.state);
-      if (!packetCodec) break;
+      const packetCodec = getPacketCodec(
+        headerData.id,
+        { state: client.state, direction: "I" },
+      );
+
+      if (!packetCodec) {
+        client.close();
+        break;
+      }
 
       const packet = await packetCodec.decode(cons, headerData);
       const ctx = createContext(packet, client.state);
@@ -136,7 +144,11 @@ async function handleConnection(conn: Conn) {
 
       if (!resPacket) continue;
 
-      const resPacketCodec = getPacketCodec(resPacket.id, "O", client.state);
+      const resPacketCodec = getPacketCodec(
+        resPacket.id,
+        { state: client.state, direction: "O" },
+      );
+
       if (!resPacketCodec) {
         throw new Error(
           "Tried to send back a packet that doesn't have a codec",
